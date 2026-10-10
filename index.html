@@ -205,7 +205,7 @@
       </div>
 
       <div class="mt-4"><h3 class="font-semibold">Journal (diagnostic)</h3><pre id="log" class="mt-2 bg-slate-900 text-slate-50 rounded-2xl p-3 text-xs overflow-auto max-h-[360px]"></pre></div>
-      <div id="directivesSummary" class="mt-4 rounded-2xl border bg-slate-50 p-4 text-sm">
+      <div id="directivesSummary" class="hidden mt-4 rounded-2xl border bg-slate-50 p-4 text-sm">
         <h3 class="font-semibold">Résumé des directives appliquées</h3>
         <ul class="mt-2 list-disc pl-5 space-y-1 text-slate-700">
           <li>Courants OHPS échantillonnés sur la route et interpolés dans le temps; courant du sous-segment = moyenne P–Q, sans projection sur le cap.</li>
@@ -1645,6 +1645,7 @@ function failureExplanation(res){
 }
 
 function renderInitialResult(res){
+  el('directivesSummary').classList.remove('hidden');
   renderRowsInto('tbody',res);
   el('log').textContent=res.logs||'';
   lastText=res.logs||'';
