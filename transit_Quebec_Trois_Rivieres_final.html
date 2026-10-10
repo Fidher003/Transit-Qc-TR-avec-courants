@@ -1,0 +1,1767 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Transit Québec Trois-Rivières</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(255,255,255,.72), transparent 34%),
+        linear-gradient(145deg, #dbeafe 0%, #e8f1f8 45%, #cbddeb 100%);
+      color: #0f172a;
+      transition: background .25s ease, color .25s ease;
+    }
+    body.app-night {
+      color-scheme: dark;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(45,78,112,.36), transparent 34%),
+        linear-gradient(145deg, #071523 0%, #0b1d30 48%, #102b46 100%);
+      color: #e6eef8;
+    }
+    body.app-night .bg-white { background-color: #10243a !important; }
+    body.app-night .bg-slate-50 { background-color: #142a43 !important; }
+    body.app-night .bg-slate-100 { background-color: #1b3552 !important; }
+    body.app-night .bg-slate-900 { background-color: #06111f !important; }
+    body.app-night .bg-blue-50 { background-color: #102f4e !important; }
+    body.app-night .bg-emerald-50 { background-color: #103a35 !important; }
+    body.app-night .bg-amber-50 { background-color: #403316 !important; }
+    body.app-night .bg-red-50 { background-color: #402129 !important; }
+    body.app-night .text-slate-900,
+    body.app-night .text-slate-800 { color: #eef6ff !important; }
+    body.app-night .text-slate-700,
+    body.app-night .text-slate-600,
+    body.app-night .text-slate-500 { color: #b9cadc !important; }
+    body.app-night .text-emerald-700 { color: #86efc4 !important; }
+    body.app-night .text-red-700 { color: #fca5a5 !important; }
+    body.app-night .border,
+    body.app-night .border-slate-200,
+    body.app-night .border-blue-200,
+    body.app-night .border-emerald-200,
+    body.app-night .border-amber-200,
+    body.app-night .border-red-200 { border-color: #355473 !important; }
+    body.app-night input,
+    body.app-night select {
+      background-color: #0b1a2b !important;
+      color: #eef6ff !important;
+      border-color: #456482 !important;
+    }
+    body.app-night button.border { background-color: #132a43; color: #e7f1fb; }
+    body.app-night button.border:hover { background-color: #1c3a5a; }
+    body.app-night #runBtn { background-color: #1c4d73 !important; }
+    body.app-night #progressBar { background-color: #70a8d1 !important; }
+
+
+    /* Affichage mobile : les lignes du tableau deviennent des cartes lisibles sans défilement horizontal. */
+    @media (max-width: 767px) {
+      .max-w-7xl { padding-left: .75rem !important; padding-right: .75rem !important; }
+      header h1 { font-size: 1.35rem !important; line-height: 1.75rem !important; }
+      header p { line-height: 1.35rem; }
+      section { padding: .8rem !important; }
+      input, select, button { min-height: 44px; font-size: 16px !important; }
+      #copyBtn, #downloadBtn { flex: 1 1 9rem; }
+      .results-table, .results-table tbody { display: block; width: 100%; }
+      .results-table thead { display: none; }
+      .results-table .result-row {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+        gap: 0 .75rem;
+        padding: .55rem .65rem .35rem;
+        border-top: 1px solid #355473;
+      }
+      .results-table .result-row:first-child { border-top: 0; }
+      .results-table .result-row td {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        padding: .32rem .1rem !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere;
+      }
+      .results-table .result-row td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: .1rem;
+        font-size: .66rem;
+        line-height: .85rem;
+        font-weight: 700;
+        letter-spacing: .035em;
+        text-transform: uppercase;
+        color: #8eabc5;
+      }
+      .results-table .result-row td:first-child {
+        grid-column: 1 / -1;
+        font-size: 1rem;
+        padding-top: .15rem !important;
+      }
+      .results-table .result-detail {
+        display: block;
+        padding: 0 .65rem .7rem;
+        border-bottom: 1px solid #355473;
+      }
+      .results-table .result-detail td {
+        display: block;
+        width: 100%;
+        padding: .1rem .1rem .45rem !important;
+        line-height: 1.15rem;
+        white-space: normal;
+      }
+      #log { max-height: 260px !important; font-size: .7rem !important; white-space: pre-wrap; overflow-wrap: anywhere; }
+      #directivesSummary { font-size: .82rem !important; }
+    }
+  </style>
+</head>
+<body class="app-night bg-slate-50 text-slate-900">
+<div class="max-w-7xl mx-auto p-4 md:p-6">
+  <header class="mb-4">
+    <h1 class="text-2xl md:text-3xl font-semibold">Transit Québec Trois-Rivières</h1>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <section class="bg-white rounded-2xl shadow-sm border p-4">
+      <h2 class="text-lg font-semibold mb-3">Paramètres</h2>
+      <div class="grid grid-cols-1 gap-3">
+        <label class="text-sm">
+          <span class="block text-slate-700 mb-1">Direction</span>
+          <select id="direction" class="w-full border rounded-xl px-3 py-2">
+            <option value="QPOR">Station Québec → Station Pointe-des-Ormes</option>
+            <option value="PORQ">Station Pointe-des-Ormes → Station Québec</option>
+          </select>
+        </label>
+        <label class="text-sm">
+          <span class="block text-slate-700 mb-1">Type de navire</span>
+          <select id="vesselType" class="w-full border rounded-xl px-3 py-2"><option>Conteneur</option><option>Autre</option></select>
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <label class="text-sm"><span class="block text-slate-700 mb-1">Tirant (m)</span><input id="draftM" type="number" step="0.01" value="9.70" class="w-full border rounded-xl px-3 py-2" /></label>
+          <label class="text-sm"><span class="block text-slate-700 mb-1">Largeur (m)</span><input id="beamM" type="number" step="0.1" value="33" class="w-full border rounded-xl px-3 py-2" /></label>
+        </div>
+        <label class="text-sm">
+          <span class="block text-slate-700 mb-1">Vitesse sur l'eau maximum (kn)</span>
+          <input id="maxSowKn" type="number" min="7" max="20" step="0.1" value="15.0" class="w-full border rounded-xl px-3 py-2" />
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <label class="text-sm"><span class="block text-slate-700 mb-1">Date départ (local)</span><input id="depDate" type="date" class="w-full border rounded-xl px-3 py-2" /></label>
+          <label class="text-sm"><span class="block text-slate-700 mb-1">Heure départ</span><input id="depTime" type="time" step="60" class="w-full border rounded-xl px-3 py-2" /></label>
+        </div>
+        <button id="runBtn" class="w-full bg-slate-900 text-white rounded-2xl py-3 font-semibold hover:bg-slate-800">Calculer</button>
+        <div id="status" class="text-sm text-slate-700"></div>
+        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div id="progressBar" class="bg-slate-700 h-2" style="width:0%"></div></div>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-2xl shadow-sm border p-4 lg:col-span-2">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 class="text-lg font-semibold">Plan initial — ETA par waypoint</h2>
+        <div class="flex flex-wrap gap-2"><button id="copyBtn" class="border rounded-xl px-3 py-2 text-sm hover:bg-slate-50">Copier journal</button><button id="downloadBtn" class="border rounded-xl px-3 py-2 text-sm hover:bg-slate-50">Télécharger .txt</button></div>
+      </div>
+      <div id="summary" class="mt-3 text-sm"></div>
+      <div class="mt-4 overflow-auto border rounded-2xl">
+        <table class="results-table min-w-full text-sm">
+          <thead class="bg-slate-100 text-slate-700"><tr>
+            <th class="text-left p-2">Waypoint</th>
+            <th class="text-left p-2">ETA (local)</th>
+            <th class="text-left p-2">Niveau (m)</th>
+            <th class="text-left p-2">DSQ min (m)</th>
+            <th class="text-left p-2">Courant moy. (kn)</th>
+            <th class="text-left p-2">SOW permise min. (kn)</th>
+            <th class="text-left p-2">SOW utilisée moy. (kn)</th>
+            <th class="text-left p-2 leading-tight">SOG<br><span class="font-normal">(Kts)</span></th>
+            <th class="text-left p-2">Statut</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="recalcPrompt" class="hidden mt-4 rounded-2xl border bg-amber-50 border-amber-200 p-4 text-sm">
+        <div class="font-semibold">Le plan initial ne permet pas un transit continu</div>
+        <div id="recalcReason" class="mt-1"></div>
+        <button id="recalcBtn" class="mt-3 rounded-xl border px-4 py-2 font-semibold">Recalculer le prochain passage</button>
+      </div>
+
+      <div id="recalcSection" class="hidden mt-6">
+        <h3 class="text-lg font-semibold">Nouveau plan de passage</h3>
+        <div id="recalcSummary" class="mt-3 text-sm"></div>
+        <div class="mt-4 overflow-auto border rounded-2xl">
+          <table class="results-table min-w-full text-sm">
+            <thead class="bg-slate-100 text-slate-700"><tr>
+              <th class="text-left p-2">Waypoint</th>
+              <th class="text-left p-2">ETA (local)</th>
+              <th class="text-left p-2">Niveau (m)</th>
+              <th class="text-left p-2">DSQ min (m)</th>
+              <th class="text-left p-2">Courant moy. (kn)</th>
+              <th class="text-left p-2">SOW permise min. (kn)</th>
+              <th class="text-left p-2">SOW utilisée moy. (kn)</th>
+              <th class="text-left p-2 leading-tight">SOG<br><span class="font-normal">(Kts)</span></th>
+              <th class="text-left p-2">Statut</th>
+            </tr></thead>
+            <tbody id="recalcTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-4"><h3 class="font-semibold">Journal (diagnostic)</h3><pre id="log" class="mt-2 bg-slate-900 text-slate-50 rounded-2xl p-3 text-xs overflow-auto max-h-[360px]"></pre></div>
+      <div id="directivesSummary" class="mt-4 rounded-2xl border bg-slate-50 p-4 text-sm">
+        <h3 class="font-semibold">Résumé des directives appliquées</h3>
+        <ul class="mt-2 list-disc pl-5 space-y-1 text-slate-700">
+          <li>Courants OHPS échantillonnés sur la route et interpolés dans le temps; courant du sous-segment = moyenne P–Q, sans projection sur le cap.</li>
+          <li>Québec → Pointe-des-Ormes : MONTANT ajouté, DESCENDANT soustrait. Pointe-des-Ormes → Québec : DESCENDANT ajouté, MONTANT soustrait. Le courant est appliqué directement à la SOW pour calculer la SOG; SLACK &lt; 0,10 kn = 0.</li>
+          <li>Majoration du courant DESCENDANT OHPS : +14 % par défaut; +20 % de Pont de Québec à CIP St-Nicolas; +30 % de Phare Richelieu à Barre Boulard. Exception : au point Q73 en direction Québec → Trois-Rivières, le courant est remplacé par la règle Portneuf − Deschaillons ci-dessous.</li>
+          <li>Courant spécial Q73, Québec → Trois-Rivières : Δ niveau = Portneuf − Deschaillons à l'heure réelle de passage. Table Δ→courant baissant : +1,50→1 kn; +1,25→2; +1,00→3; +0,75→4; +0,50→5; +0,25→6; 0,00→7; −0,25→8; −0,50→9. Interpolation linéaire entre les valeurs. Hors de la plage −0,50 à +1,50 m, la valeur limite la plus proche du tableau est utilisée : 9 kn sous −0,50 m et 1 kn au-dessus de +1,50 m.</li>
+          <li>À Q73 en direction Québec → Trois-Rivières, critère de passage basé sur la SOG avec ce courant spécial : largeur réelle &lt; 24 m → SOG minimale 2,5 kn; largeur réelle ≥ 24 m → SOG minimale 3,0 kn.</li>
+          <li>Heures : toutes les heures sont affichées en heure locale du Saint-Laurent (America/Montreal); aucun choix de fuseau n'est demandé.</li>
+          <li>DSQ : aucune marge additionnelle n'est ajoutée au calcul. Le dégagement disponible est calculé à partir du niveau, de la profondeur de référence et du tirant d'eau saisi.</li>
+          <li>Profondeur de référence spéciale : 10,8 m de Pointe Deschambeault jusqu'au point intermédiaire non nommé (11,5 NM), puis 10,7 m de ce point jusqu'à Bouée Q19, dans les deux directions.</li>
+          <li>Plancher SOW général : 7,0 kn partout. À Q73 en direction Québec → Trois-Rivières, le critère additionnel est une SOG minimale, et non un plancher SOW spécial.</li>
+          <li>Limites locales de SOW : 11,0 kn sur les 2,0 premiers NM depuis Québec; 12,0 kn ensuite jusqu'au Pont de Québec; 11,0 kn entre Wayagamak et Station Pointe-des-Ormes.</li>
+          <li>Navires de largeur réelle &lt; 30 m : la vitesse maximale saisie peut aller jusqu’à 20,0 kn. Jusqu’à 15,0 kn inclusivement, la table SQ initiale demeure inchangée. Au-dessus de 15,0 kn, le dégagement requis est égal à la valeur requise à 15,0 kn + 0,60 m par nœud supplémentaire; interpolation linéaire entre les dixièmes de nœud.</li>
+          <li>Navires de largeur réelle ≥ 30 m, dans les deux directions : maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes. Toute limite locale plus basse demeure prioritaire.</li>
+          <li>Table SQ porte-conteneurs complète utilisée de 7 à 15 kn pour toutes les largeurs 24 à 44 m; au-dessus de 15 kn, l'exigence augmente de 0,60 m par nœud supplémentaire, avec interpolation.</li>
+          <li>La SOW utilisée reste la plus élevée permise par le DSQ, la vitesse maximale saisie et les limites locales applicables; le plancher de 7 kn n'est pas un plafond.</li>
+          <li>Affichage par secteur : « SOW permise min. » = plus faible SOW permise rencontrée dans le secteur; « SOW utilisée moy. » = moyenne pondérée par la distance des SOW réellement utilisées. Il est donc possible que la moyenne utilisée soit supérieure au minimum permis sans qu'aucun sous-segment ne dépasse sa propre limite.</li>
+          <li>Le bouton Calculer affiche toujours d'abord le plan initial demandé. Si le transit est interrompu, le tableau initial demeure visible avec la raison du bris.</li>
+          <li>Le bouton « Recalculer le prochain passage » essaie d'abord de conserver exactement l'heure de départ demandée. Pour un bris lié à Q73 en direction Québec → Pointe-des-Ormes, il réduit au besoin la SOW avant Q73 seulement, en recherchant le plafond pré-Q73 le plus élevé qui permet le passage.</li>
+          <li>Dès Q73, le ralentissement de synchronisation cesse : la SOW revient à la vitesse maximale permise par le DSQ, la vitesse maximale saisie et les restrictions locales. Si aucun profil ne fonctionne à l'heure demandée, le logiciel cherche ensuite le prochain départ possible sur 30 h, par pas de 5 min puis avec raffinement à 1 min, en appliquant la même stratégie.</li>
+          <li>Le plancher de 7 kn demeure uniquement le minimum absolu; il n'est jamais utilisé comme plafond général de planification.</li>
+          <li>Si les données nécessaires sont indisponibles, le calcul s'arrête avec une erreur visible.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+'use strict';
+const LOCAL_TZ='America/Montreal';
+const TABLE_SQUAT_CONTENEUR = {24:{7:0.79,8:0.88,9:0.96,10:1.04,11:1.22,12:1.41,13:1.63,14:1.88,15:2.17},26:{7:0.83,8:0.90,9:0.98,10:1.07,11:1.25,12:1.45,13:1.68,14:1.93,15:2.23},28:{7:0.84,8:0.91,9:1.00,10:1.09,11:1.28,12:1.48,13:1.72,14:1.98,15:2.29},30:{7:0.86,8:0.93,9:1.01,10:1.11,11:1.31,12:1.52,13:1.76,14:2.03,15:2.34},32:{7:0.87,8:0.94,9:1.03,10:1.14,11:1.34,12:1.55,13:1.80,14:2.08,15:2.40},34:{7:0.88,8:0.96,9:1.05,10:1.16,11:1.36,12:1.58,13:1.84,14:2.12,15:2.45},36:{7:0.89,8:0.97,9:1.07,10:1.18,11:1.39,12:1.62,13:1.88,14:2.16,15:2.50},38:{7:0.90,8:0.98,9:1.08,10:1.20,11:1.42,12:1.65,13:1.92,14:2.20,15:2.55},40:{7:0.91,8:1.00,9:1.10,10:1.22,11:1.44,12:1.68,13:1.96,14:2.24,15:2.60},42:{7:0.92,8:1.01,9:1.12,10:1.24,11:1.47,12:1.71,13:1.99,14:2.29,15:2.65},44:{7:0.93,8:1.02,9:1.13,10:1.26,11:1.49,12:1.74,13:2.03,14:2.33,15:2.70}};
+const TABLE_SQUAT_AUTRE = {24:{7:0.80,8:0.90,9:0.97,10:1.06,11:1.24,12:1.44,13:1.66,14:1.92,15:2.21},26:{7:0.85,8:0.92,9:1.00,10:1.09,11:1.29,12:1.49,13:1.73,14:1.99,15:2.29},28:{7:0.86,8:0.94,9:1.03,10:1.13,11:1.33,12:1.54,13:1.79,14:2.06,15:2.37},30:{7:0.88,8:0.96,9:1.05,10:1.16,11:1.37,12:1.59,13:1.85,14:2.13,15:2.46},32:{7:0.89,8:0.98,9:1.08,10:1.19,11:1.41,12:1.64,13:1.91,14:2.19,15:2.53},34:{7:0.91,8:1.00,9:1.10,10:1.23,11:1.45,12:1.69,13:1.97,14:2.26,15:2.61},36:{7:0.93,8:1.02,9:1.13,10:1.26,11:1.49,12:1.74,13:2.02,14:2.32,15:2.69},38:{7:0.94,8:1.04,9:1.16,10:1.29,11:1.53,12:1.78,13:2.08,14:2.39,15:2.77},40:{7:0.96,8:1.06,9:1.18,10:1.32,11:1.57,12:1.83,13:2.13,14:2.44,15:2.84},42:{7:0.97,8:1.08,9:1.21,10:1.36,11:1.61,12:1.88,13:2.18,14:2.51,15:2.91},44:{7:0.99,8:1.10,9:1.23,10:1.39,11:1.65,12:1.93,13:2.24,14:2.57,15:2.98}};
+const STATIONS = {"Trois-Rivières":["5cebf1df3d0f4a073c4bbbac","Trois-Rivières"],"Bécancour":["5cebf1e03d0f4a073c4bbda9","Bécancour"],"Batiscan":["5cebf1df3d0f4a073c4bbb91","Batiscan"],"Deschaillons":["5cebf1df3d0f4a073c4bbb76","Deschaillons"],"Portneuf":["5cebf1df3d0f4a073c4bbb56","Portneuf"],"Neuville":["5cebf1df3d0f4a073c4bbb38","Neuville"]};
+const OHPS_ROUTE_POINTS = [
+  {
+    "index": 0,
+    "name": "",
+    "latitude": 46.82292283,
+    "longitude": -71.193222,
+    "distanceNm": 1.5,
+    "distanceFromStartNm": 0.0,
+    "courseDeg": 198.0
+  },
+  {
+    "index": 1,
+    "name": "",
+    "latitude": 46.799456,
+    "longitude": -71.2043225,
+    "distanceNm": 2.0,
+    "distanceFromStartNm": 1.5,
+    "courseDeg": 218.0
+  },
+  {
+    "index": 2,
+    "name": "",
+    "latitude": 46.77323533,
+    "longitude": -71.23419033,
+    "distanceNm": 1.7,
+    "distanceFromStartNm": 3.5,
+    "courseDeg": 228.0
+  },
+  {
+    "index": 3,
+    "name": "",
+    "latitude": 46.75385417,
+    "longitude": -71.26548817,
+    "distanceNm": 0.9,
+    "distanceFromStartNm": 5.2,
+    "courseDeg": 241.5
+  },
+  {
+    "index": 4,
+    "name": "",
+    "latitude": 46.74633867,
+    "longitude": -71.2855845,
+    "distanceNm": 0.1,
+    "distanceFromStartNm": 6.2,
+    "courseDeg": 252.3
+  },
+  {
+    "index": 5,
+    "name": "Pont de Québec",
+    "latitude": 46.74580667,
+    "longitude": -71.28800667,
+    "distanceNm": 0.3,
+    "distanceFromStartNm": 6.3,
+    "courseDeg": 253.6
+  },
+  {
+    "index": 6,
+    "name": "",
+    "latitude": 46.74448583,
+    "longitude": -71.29454833,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 6.5,
+    "courseDeg": 252.9
+  },
+  {
+    "index": 7,
+    "name": "Pointe Pigeonnière",
+    "latitude": 46.74153033,
+    "longitude": -71.30852833,
+    "distanceNm": 1.0,
+    "distanceFromStartNm": 7.1,
+    "courseDeg": 252.9
+  },
+  {
+    "index": 8,
+    "name": "",
+    "latitude": 46.73658983,
+    "longitude": -71.33182917,
+    "distanceNm": 1.7,
+    "distanceFromStartNm": 8.1,
+    "courseDeg": 243.8
+  },
+  {
+    "index": 9,
+    "name": "Pointe Deschambeault",
+    "latitude": 46.72396567,
+    "longitude": -71.36919133,
+    "distanceNm": 1.6,
+    "distanceFromStartNm": 9.9,
+    "courseDeg": 257.6
+  },
+  {
+    "index": 10,
+    "name": "",
+    "latitude": 46.71806217,
+    "longitude": -71.40833083,
+    "distanceNm": 1.6,
+    "distanceFromStartNm": 11.5,
+    "courseDeg": 257.8
+  },
+  {
+    "index": 11,
+    "name": "Bouée Q19",
+    "latitude": 46.71255383,
+    "longitude": -71.44525483,
+    "distanceNm": 0.3,
+    "distanceFromStartNm": 13.1,
+    "courseDeg": 257.1
+  },
+  {
+    "index": 12,
+    "name": "CIP St-Nicolas",
+    "latitude": 46.7115885,
+    "longitude": -71.45136,
+    "distanceNm": 1.2,
+    "distanceFromStartNm": 13.3,
+    "courseDeg": 257.6
+  },
+  {
+    "index": 13,
+    "name": "",
+    "latitude": 46.70727067,
+    "longitude": -71.47979433,
+    "distanceNm": 1.1,
+    "distanceFromStartNm": 14.5,
+    "courseDeg": 257.5
+  },
+  {
+    "index": 14,
+    "name": "Bouée Q27",
+    "latitude": 46.70323267,
+    "longitude": -71.506354,
+    "distanceNm": 1.0,
+    "distanceFromStartNm": 15.6,
+    "courseDeg": 247.1
+  },
+  {
+    "index": 15,
+    "name": "",
+    "latitude": 46.69685933,
+    "longitude": -71.52823567,
+    "distanceNm": 1.1,
+    "distanceFromStartNm": 16.6,
+    "courseDeg": 235.2
+  },
+  {
+    "index": 16,
+    "name": "Bouée Q31",
+    "latitude": 46.6868685,
+    "longitude": -71.54916433,
+    "distanceNm": 0.2,
+    "distanceFromStartNm": 17.7,
+    "courseDeg": 234.0
+  },
+  {
+    "index": 17,
+    "name": "",
+    "latitude": 46.68444,
+    "longitude": -71.5540305,
+    "distanceNm": 0.9,
+    "distanceFromStartNm": 17.9,
+    "courseDeg": 240.1
+  },
+  {
+    "index": 18,
+    "name": "",
+    "latitude": 46.67680017,
+    "longitude": -71.57335667,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 18.8,
+    "courseDeg": 249.9
+  },
+  {
+    "index": 19,
+    "name": "Pointe St Antoine",
+    "latitude": 46.67352667,
+    "longitude": -71.58637467,
+    "distanceNm": 1.0,
+    "distanceFromStartNm": 19.4,
+    "courseDeg": 250.2
+  },
+  {
+    "index": 20,
+    "name": "",
+    "latitude": 46.66789467,
+    "longitude": -71.60905417,
+    "distanceNm": 1.8,
+    "distanceFromStartNm": 20.4,
+    "courseDeg": 238.1
+  },
+  {
+    "index": 21,
+    "name": "",
+    "latitude": 46.65218833,
+    "longitude": -71.64575733,
+    "distanceNm": 2.1,
+    "distanceFromStartNm": 22.2,
+    "courseDeg": 251.9
+  },
+  {
+    "index": 22,
+    "name": "",
+    "latitude": 46.64126733,
+    "longitude": -71.6942155,
+    "distanceNm": 0.3,
+    "distanceFromStartNm": 24.3,
+    "courseDeg": 259.8
+  },
+  {
+    "index": 23,
+    "name": "CIP Ste Croix",
+    "latitude": 46.64038333,
+    "longitude": -71.70134583,
+    "distanceNm": 0.5,
+    "distanceFromStartNm": 24.6,
+    "courseDeg": 260.8
+  },
+  {
+    "index": 24,
+    "name": "",
+    "latitude": 46.6390795,
+    "longitude": -71.71303217,
+    "distanceNm": 0.5,
+    "distanceFromStartNm": 25.1,
+    "courseDeg": 270.0
+  },
+  {
+    "index": 25,
+    "name": "",
+    "latitude": 46.6390795,
+    "longitude": -71.72493133,
+    "distanceNm": 0.3,
+    "distanceFromStartNm": 25.6,
+    "courseDeg": 280.0
+  },
+  {
+    "index": 26,
+    "name": "Bouée Q50",
+    "latitude": 46.6399595,
+    "longitude": -71.73219867,
+    "distanceNm": 0.3,
+    "distanceFromStartNm": 25.9,
+    "courseDeg": 290.1
+  },
+  {
+    "index": 27,
+    "name": "",
+    "latitude": 46.64141967,
+    "longitude": -71.737988,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 26.1,
+    "courseDeg": 297.1
+  },
+  {
+    "index": 28,
+    "name": "Bouée Q51",
+    "latitude": 46.64578617,
+    "longitude": -71.750371,
+    "distanceNm": 3.0,
+    "distanceFromStartNm": 26.7,
+    "courseDeg": 296.9
+  },
+  {
+    "index": 29,
+    "name": "Bouée Q57",
+    "latitude": 46.668579,
+    "longitude": -71.81563283,
+    "distanceNm": 1.4,
+    "distanceFromStartNm": 29.7,
+    "courseDeg": 297.0
+  },
+  {
+    "index": 30,
+    "name": "PLATON",
+    "latitude": 46.67954383,
+    "longitude": -71.84688683,
+    "distanceNm": 0.8,
+    "distanceFromStartNm": 31.2,
+    "courseDeg": 275.2
+  },
+  {
+    "index": 31,
+    "name": "",
+    "latitude": 46.68072967,
+    "longitude": -71.865822,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 31.9,
+    "courseDeg": 255.0
+  },
+  {
+    "index": 32,
+    "name": "Quai Portneuf",
+    "latitude": 46.67899817,
+    "longitude": -71.87518283,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 32.3,
+    "courseDeg": 229.1
+  },
+  {
+    "index": 33,
+    "name": "",
+    "latitude": 46.675155,
+    "longitude": -71.88163433,
+    "distanceNm": 0.8,
+    "distanceFromStartNm": 32.7,
+    "courseDeg": 208.5
+  },
+  {
+    "index": 34,
+    "name": "",
+    "latitude": 46.6637045,
+    "longitude": -71.89066983,
+    "distanceNm": 0.8,
+    "distanceFromStartNm": 33.5,
+    "courseDeg": 215.0
+  },
+  {
+    "index": 35,
+    "name": "",
+    "latitude": 46.65225167,
+    "longitude": -71.90232383,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 34.3,
+    "courseDeg": 221.3
+  },
+  {
+    "index": 36,
+    "name": "Phare Richelieu",
+    "latitude": 46.64502217,
+    "longitude": -71.9115325,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 34.9,
+    "courseDeg": 221.7
+  },
+  {
+    "index": 37,
+    "name": "",
+    "latitude": 46.64028933,
+    "longitude": -71.917663,
+    "distanceNm": 0.5,
+    "distanceFromStartNm": 35.3,
+    "courseDeg": 225.6
+  },
+  {
+    "index": 38,
+    "name": "Bouée Q73",
+    "latitude": 46.63435583,
+    "longitude": -71.92645483,
+    "distanceNm": 1.0,
+    "distanceFromStartNm": 35.8,
+    "courseDeg": 233.5
+  },
+  {
+    "index": 39,
+    "name": "Barre Boulard",
+    "latitude": 46.6245905,
+    "longitude": -71.94561167,
+    "distanceNm": 2.0,
+    "distanceFromStartNm": 36.8,
+    "courseDeg": 234.3
+  },
+  {
+    "index": 40,
+    "name": "",
+    "latitude": 46.6051445,
+    "longitude": -71.98493267,
+    "distanceNm": 1.3,
+    "distanceFromStartNm": 38.8,
+    "courseDeg": 224.2
+  },
+  {
+    "index": 41,
+    "name": "",
+    "latitude": 46.58989883,
+    "longitude": -72.00641383,
+    "distanceNm": 1.3,
+    "distanceFromStartNm": 40.0,
+    "courseDeg": 238.5
+  },
+  {
+    "index": 42,
+    "name": "CIP Grondines",
+    "latitude": 46.57820917,
+    "longitude": -72.034099,
+    "distanceNm": 1.1,
+    "distanceFromStartNm": 41.4,
+    "courseDeg": 238.6
+  },
+  {
+    "index": 43,
+    "name": "",
+    "latitude": 46.5682225,
+    "longitude": -72.057781,
+    "distanceNm": 0.3,
+    "distanceFromStartNm": 42.5,
+    "courseDeg": 248.7
+  },
+  {
+    "index": 44,
+    "name": "",
+    "latitude": 46.56611017,
+    "longitude": -72.06565133,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 42.9,
+    "courseDeg": 260.4
+  },
+  {
+    "index": 45,
+    "name": "",
+    "latitude": 46.56447117,
+    "longitude": -72.07977117,
+    "distanceNm": 1.2,
+    "distanceFromStartNm": 43.5,
+    "courseDeg": 272.7
+  },
+  {
+    "index": 46,
+    "name": "Deschaillons",
+    "latitude": 46.56538983,
+    "longitude": -72.108401,
+    "distanceNm": 0.2,
+    "distanceFromStartNm": 44.6,
+    "courseDeg": 265.4
+  },
+  {
+    "index": 47,
+    "name": "",
+    "latitude": 46.56507367,
+    "longitude": -72.11414733,
+    "distanceNm": 0.2,
+    "distanceFromStartNm": 44.9,
+    "courseDeg": 255.0
+  },
+  {
+    "index": 48,
+    "name": "",
+    "latitude": 46.5643335,
+    "longitude": -72.11816483,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 45.1,
+    "courseDeg": 246.8
+  },
+  {
+    "index": 49,
+    "name": "Cap à la roche",
+    "latitude": 46.56038217,
+    "longitude": -72.13154967,
+    "distanceNm": 0.2,
+    "distanceFromStartNm": 45.7,
+    "courseDeg": 246.2
+  },
+  {
+    "index": 50,
+    "name": "",
+    "latitude": 46.55925783,
+    "longitude": -72.13524917,
+    "distanceNm": 0.5,
+    "distanceFromStartNm": 45.8,
+    "courseDeg": 238.5
+  },
+  {
+    "index": 51,
+    "name": "",
+    "latitude": 46.55532917,
+    "longitude": -72.14454583,
+    "distanceNm": 0.7,
+    "distanceFromStartNm": 46.3,
+    "courseDeg": 227.4
+  },
+  {
+    "index": 52,
+    "name": "Bouée D46",
+    "latitude": 46.54724233,
+    "longitude": -72.15727367,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 47.0,
+    "courseDeg": 227.0
+  },
+  {
+    "index": 53,
+    "name": "Bouée D49",
+    "latitude": 46.54097717,
+    "longitude": -72.16701267,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 47.5,
+    "courseDeg": 227.6
+  },
+  {
+    "index": 54,
+    "name": "",
+    "latitude": 46.53665,
+    "longitude": -72.17387733,
+    "distanceNm": 0.7,
+    "distanceFromStartNm": 47.9,
+    "courseDeg": 234.8
+  },
+  {
+    "index": 55,
+    "name": "",
+    "latitude": 46.5296585,
+    "longitude": -72.18825217,
+    "distanceNm": 1.0,
+    "distanceFromStartNm": 48.7,
+    "courseDeg": 240.2
+  },
+  {
+    "index": 56,
+    "name": "",
+    "latitude": 46.52169733,
+    "longitude": -72.20841117,
+    "distanceNm": 0.3,
+    "distanceFromStartNm": 49.6,
+    "courseDeg": 230.2
+  },
+  {
+    "index": 57,
+    "name": "",
+    "latitude": 46.518313,
+    "longitude": -72.2143035,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 49.9,
+    "courseDeg": 220.0
+  },
+  {
+    "index": 58,
+    "name": "",
+    "latitude": 46.510815,
+    "longitude": -72.22343033,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 50.5,
+    "courseDeg": 209.7
+  },
+  {
+    "index": 59,
+    "name": "",
+    "latitude": 46.50477267,
+    "longitude": -72.228429,
+    "distanceNm": 0.3,
+    "distanceFromStartNm": 50.9,
+    "courseDeg": 197.8
+  },
+  {
+    "index": 60,
+    "name": "CIP Batiscan",
+    "latitude": 46.49931717,
+    "longitude": -72.2309675,
+    "distanceNm": 0.9,
+    "distanceFromStartNm": 51.3,
+    "courseDeg": 197.6
+  },
+  {
+    "index": 61,
+    "name": "Bouée D77",
+    "latitude": 46.4847115,
+    "longitude": -72.2376685,
+    "distanceNm": 0.9,
+    "distanceFromStartNm": 52.2,
+    "courseDeg": 197.8
+  },
+  {
+    "index": 62,
+    "name": "",
+    "latitude": 46.47088867,
+    "longitude": -72.24408733,
+    "distanceNm": 1.5,
+    "distanceFromStartNm": 53.1,
+    "courseDeg": 208.6
+  },
+  {
+    "index": 63,
+    "name": "",
+    "latitude": 46.4490955,
+    "longitude": -72.26125583,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 54.6,
+    "courseDeg": 229.8
+  },
+  {
+    "index": 64,
+    "name": "",
+    "latitude": 46.44292067,
+    "longitude": -72.2718315,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 55.1,
+    "courseDeg": 250.1
+  },
+  {
+    "index": 65,
+    "name": "",
+    "latitude": 46.44054933,
+    "longitude": -72.281285,
+    "distanceNm": 0.9,
+    "distanceFromStartNm": 55.5,
+    "courseDeg": 264.0
+  },
+  {
+    "index": 66,
+    "name": "Bouée C7",
+    "latitude": 46.43896767,
+    "longitude": -72.3030785,
+    "distanceNm": 1.5,
+    "distanceFromStartNm": 56.5,
+    "courseDeg": 264.1
+  },
+  {
+    "index": 67,
+    "name": "",
+    "latitude": 46.436442,
+    "longitude": -72.338627,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 57.9,
+    "courseDeg": 255.2
+  },
+  {
+    "index": 68,
+    "name": "",
+    "latitude": 46.434825,
+    "longitude": -72.34746867,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 58.3,
+    "courseDeg": 235.1
+  },
+  {
+    "index": 69,
+    "name": "",
+    "latitude": 46.4311965,
+    "longitude": -72.35499833,
+    "distanceNm": 1.1,
+    "distanceFromStartNm": 58.7,
+    "courseDeg": 222.4
+  },
+  {
+    "index": 70,
+    "name": "C20 / C21",
+    "latitude": 46.41735083,
+    "longitude": -72.37330917,
+    "distanceNm": 3.1,
+    "distanceFromStartNm": 59.8,
+    "courseDeg": 230.2
+  },
+  {
+    "index": 71,
+    "name": "",
+    "latitude": 46.38470383,
+    "longitude": -72.429905,
+    "distanceNm": 0.5,
+    "distanceFromStartNm": 62.9,
+    "courseDeg": 245.2
+  },
+  {
+    "index": 72,
+    "name": "",
+    "latitude": 46.381028,
+    "longitude": -72.44139033,
+    "distanceNm": 0.8,
+    "distanceFromStartNm": 63.4,
+    "courseDeg": 255.6
+  },
+  {
+    "index": 73,
+    "name": "Bouée C39",
+    "latitude": 46.377567,
+    "longitude": -72.4609195,
+    "distanceNm": 0.5,
+    "distanceFromStartNm": 64.2,
+    "courseDeg": 256.3
+  },
+  {
+    "index": 74,
+    "name": "",
+    "latitude": 46.37566067,
+    "longitude": -72.47221383,
+    "distanceNm": 0.5,
+    "distanceFromStartNm": 64.7,
+    "courseDeg": 243.2
+  },
+  {
+    "index": 75,
+    "name": "",
+    "latitude": 46.37163883,
+    "longitude": -72.483733,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 65.2,
+    "courseDeg": 230.1
+  },
+  {
+    "index": 76,
+    "name": "",
+    "latitude": 46.3672475,
+    "longitude": -72.4913245,
+    "distanceNm": 0.1,
+    "distanceFromStartNm": 65.7,
+    "courseDeg": 215.0
+  },
+  {
+    "index": 77,
+    "name": "CIP Cap Madeleine",
+    "latitude": 46.36569283,
+    "longitude": -72.4928995,
+    "distanceNm": 0.8,
+    "distanceFromStartNm": 65.8,
+    "courseDeg": 217.9
+  },
+  {
+    "index": 78,
+    "name": "Wayagamak",
+    "latitude": 46.35495083,
+    "longitude": -72.50499267,
+    "distanceNm": 0.2,
+    "distanceFromStartNm": 66.6,
+    "courseDeg": 217.7
+  },
+  {
+    "index": 79,
+    "name": "",
+    "latitude": 46.3516925,
+    "longitude": -72.50862433,
+    "distanceNm": 0.5,
+    "distanceFromStartNm": 66.8,
+    "courseDeg": 225.0
+  },
+  {
+    "index": 80,
+    "name": "",
+    "latitude": 46.345782,
+    "longitude": -72.51714533,
+    "distanceNm": 1.3,
+    "distanceFromStartNm": 67.3,
+    "courseDeg": 225.0
+  },
+  {
+    "index": 81,
+    "name": "TRV 15",
+    "latitude": 46.3299175,
+    "longitude": -72.54008417,
+    "distanceNm": 0.4,
+    "distanceFromStartNm": 68.7,
+    "courseDeg": 220.0
+  },
+  {
+    "index": 82,
+    "name": "",
+    "latitude": 46.3248,
+    "longitude": -72.54627333,
+    "distanceNm": 1.0,
+    "distanceFromStartNm": 69.1,
+    "courseDeg": 208.0
+  },
+  {
+    "index": 83,
+    "name": "",
+    "latitude": 46.3099705,
+    "longitude": -72.55765333,
+    "distanceNm": 0.2,
+    "distanceFromStartNm": 70.1,
+    "courseDeg": 225.0
+  },
+  {
+    "index": 84,
+    "name": "",
+    "latitude": 46.30720333,
+    "longitude": -72.56164633,
+    "distanceNm": 0.6,
+    "distanceFromStartNm": 70.3,
+    "courseDeg": 231.8
+  },
+  {
+    "index": 85,
+    "name": "POR",
+    "latitude": 46.30124167,
+    "longitude": -72.57256483,
+    "distanceNm": null,
+    "distanceFromStartNm": 70.9,
+    "courseDeg": null
+  }
+];
+const OHPS_ERDDAP='https://erddap.ogsl.ca/erddap';
+const OHPS_DATASET='ecccShopNautilo';
+const OHPS_TARGET_SAMPLE_M=500;
+const OHPS_CACHE_PREFIX='ohps-qc-por-bidir-v3-meanpq:';
+const EPS=1e-6;
+const el=id=>document.getElementById(id);
+const OHPS_STATE={metadata:null,seriesCache:new Map(),lastUrls:[]};
+let jsonpSeq=0,lastText='';
+
+const CONFIG_ANCHORS=[
+  {idx:0,stationKey:'Neuville',cap:16,depth:15.0},
+  {idx:5,stationKey:'Neuville',cap:16,depth:15.0},
+  {idx:9,stationKey:'Neuville',cap:16,depth:10.7},
+  {idx:11,stationKey:'Neuville',cap:16,depth:10.7},
+  {idx:14,stationKey:'Neuville',cap:16,depth:10.7},
+  {idx:16,stationKey:'Neuville',cap:16,depth:10.7},
+  {idx:19,stationKey:'Neuville',cap:16,depth:11.2},
+  {idx:23,stationKey:'Neuville',cap:16,depth:12.1},
+  {idx:26,stationKey:'Portneuf',cap:13.5,depth:10.7},
+  {idx:28,stationKey:'Portneuf',cap:13.5,depth:10.7},
+  {idx:29,stationKey:'Portneuf',cap:17,depth:10.7},
+  {idx:38,stationKey:'Portneuf',cap:17,depth:10.7},
+  {idx:39,stationKey:'Portneuf',cap:15,depth:13.0},
+  {idx:42,stationKey:'Deschaillons',cap:13.5,depth:10.7},
+  {idx:52,stationKey:'Deschaillons',cap:13.5,depth:11.0},
+  {idx:53,stationKey:'Batiscan',cap:13.5,depth:11.0},
+  {idx:60,stationKey:'Batiscan',cap:13.5,depth:11.0},
+  {idx:61,stationKey:'Batiscan',cap:13.5,depth:11.3},
+  {idx:66,stationKey:'Bécancour',cap:13.5,depth:11.3},
+  {idx:73,stationKey:'Trois-Rivières',cap:14,depth:11.3},
+  {idx:77,stationKey:'Trois-Rivières',cap:14.5,depth:11.3},
+  {idx:78,stationKey:'Trois-Rivières',cap:9.5,depth:11.3},
+  {idx:85,stationKey:'Trois-Rivières',cap:9.5,depth:11.3}
+];
+
+function roundWidthEvenM(w){if(w<24)return 24;return Math.ceil(w/2)*2;}
+function selectTable(t){return t.toLowerCase().startsWith('cont')?TABLE_SQUAT_CONTENEUR:TABLE_SQUAT_AUTRE;}
+function bisectLeft(arr,x){let lo=0,hi=arr.length;while(lo<hi){const mid=(lo+hi)>>1;if(arr[mid]<x)lo=mid+1;else hi=mid;}return lo;}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function _dtParts(date,tz,opts){const parts=new Intl.DateTimeFormat('en-CA',{timeZone:tz,...opts}).formatToParts(date);const get=t=>(parts.find(p=>p.type===t)||{}).value;return{get};}
+function fmtLocal(ms,tz){const p=_dtParts(new Date(ms),tz,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false,timeZoneName:'short'});return `${p.get('year')}-${p.get('month')}-${p.get('day')} ${p.get('hour')}:${p.get('minute')} (${p.get('timeZoneName')||tz})`;}
+function fmtDuration(ms){const total=Math.round(ms/60000),h=Math.floor(total/60),m=total%60;return h?`${h} h ${String(m).padStart(2,'0')} min`:`${m} min`;}
+function fmtUtcIso(ms){return new Date(ms).toISOString().replace('.000Z','Z');}
+function tzOffsetMinutes(instantMs,timeZone){const p=_dtParts(new Date(instantMs),timeZone,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});return Math.round((Date.UTC(+p.get('year'),+p.get('month')-1,+p.get('day'),+p.get('hour'),+p.get('minute'),+p.get('second'))-instantMs)/60000);}
+function localWallToMs(dateStr,timeStr,timeZone){const m=`${dateStr}T${timeStr}`.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);if(!m)throw new Error('Date/heure invalide.');const wall=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],0);let off=tzOffsetMinutes(wall,timeZone);let inst=wall-off*60000;const off2=tzOffsetMinutes(inst,timeZone);if(off2!==off)inst=wall-off2*60000;return inst;}
+function seriesToSorted(series){const pairs=[];for(const row of series){const t=Date.parse(row.eventDate),v=Number(row.value);if(Number.isFinite(t)&&Number.isFinite(v))pairs.push([t,v]);}pairs.sort((a,b)=>a[0]-b[0]);return{times:pairs.map(x=>x[0]),vals:pairs.map(x=>x[1])};}
+function findValueNearEvent(sorted,target,tolMin=6,interp=true){const {times,vals}=sorted;if(!times.length)return{value:null,usedMs:null,interp:false};const i=bisectLeft(times,target);if(interp&&i>0&&i<times.length&&times[i-1]<=target&&target<=times[i]){const t0=times[i-1],t1=times[i];if(target-t0<=tolMin*60000&&t1-target<=tolMin*60000){const a=(target-t0)/(t1-t0);return{value:vals[i-1]+a*(vals[i]-vals[i-1]),usedMs:target,interp:true};}}let best=null;if(i>0)best=[Math.abs(times[i-1]-target),i-1];if(i<times.length&&(!best||Math.abs(times[i]-target)<best[0]))best=[Math.abs(times[i]-target),i];if(best&&best[0]<=tolMin*60000)return{value:vals[best[1]],usedMs:times[best[1]],interp:false};return{value:null,usedMs:null,interp:false};}
+function dsqReqForSpeed(tbl,speed){
+  const keys=Object.keys(tbl).map(Number).sort((a,b)=>a-b);
+  if(speed>15+EPS){
+    const req15=dsqReqForSpeed(tbl,15);
+    return Number.isFinite(req15)?req15+0.60*(speed-15):Infinity;
+  }
+  if(speed<=keys[0])return tbl[keys[0]];
+  if(speed>=keys.at(-1))return tbl[keys.at(-1)];
+  const lo=Math.floor(speed),hi=Math.ceil(speed);
+  if(lo===hi)return tbl[lo];
+  if(tbl[lo]==null||tbl[hi]==null)return Infinity;
+  return tbl[lo]+(speed-lo)/(hi-lo)*(tbl[hi]-tbl[lo]);
+}
+function allowedSow(tbl,dsq,maxSow,extraCandidate=null){
+  let eligible=Object.entries(tbl).filter(([,req])=>req<=dsq+EPS).map(([s])=>Number(s));
+  const tableSpeeds=Object.keys(tbl).map(Number).sort((a,b)=>a-b);
+  if(maxSow>=tableSpeeds[0]-EPS&&maxSow<=tableSpeeds.at(-1)+EPS&&dsqReqForSpeed(tbl,maxSow)<=dsq+EPS)eligible.push(maxSow);
+  if(Number.isFinite(extraCandidate)&&extraCandidate>=tableSpeeds[0]-EPS&&extraCandidate<=maxSow+EPS&&dsqReqForSpeed(tbl,extraCandidate)<=dsq+EPS)eligible.push(extraCandidate);
+  if(maxSow>15+EPS){
+    const req15=dsqReqForSpeed(tbl,15);
+    if(Number.isFinite(req15)&&req15<=dsq+EPS){
+      const dsqLimited=15+Math.max(0,(dsq-req15)/0.60);
+      const candidate=Math.min(maxSow,20,dsqLimited);
+      const candidateTenth=Math.floor((candidate+EPS)*10)/10;
+      if(candidateTenth>=15-EPS)eligible.push(candidateTenth);
+      if(maxSow<=candidate+EPS&&maxSow<=20+EPS)eligible.push(maxSow);
+    }
+  }
+  eligible=eligible.filter(s=>s<=maxSow+EPS&&s<=20+EPS&&dsqReqForSpeed(tbl,s)<=dsq+EPS);
+  return eligible.length?Math.max(...eligible):0;
+}
+
+
+const Q73_LEVEL_CURRENT_TABLE=[
+  {diffM:-0.50,currentKn:9.0},
+  {diffM:-0.25,currentKn:8.0},
+  {diffM: 0.00,currentKn:7.0},
+  {diffM: 0.25,currentKn:6.0},
+  {diffM: 0.50,currentKn:5.0},
+  {diffM: 0.75,currentKn:4.0},
+  {diffM: 1.00,currentKn:3.0},
+  {diffM: 1.25,currentKn:2.0},
+  {diffM: 1.50,currentKn:1.0}
+];
+const Q73_SOG_BEAM_SPLIT_M=24.0;
+const Q73_SOG_MIN_UNDER_24_KN=2.5;
+const Q73_SOG_MIN_24_PLUS_KN=3.0;
+
+function q73MinSogKnForBeam(beamM){
+  return Number(beamM)<Q73_SOG_BEAM_SPLIT_M-EPS?Q73_SOG_MIN_UNDER_24_KN:Q73_SOG_MIN_24_PLUS_KN;
+}
+function q73CurrentFromLevelDifference(diffM){
+  if(!Number.isFinite(diffM))return{error:'Différence Portneuf − Deschaillons invalide.'};
+  const pts=Q73_LEVEL_CURRENT_TABLE;
+  const first=pts[0],last=pts.at(-1);
+  // Hors plage: utiliser la valeur limite du tableau, sans extrapolation ni erreur.
+  if(diffM<first.diffM-EPS)return{currentKn:first.currentKn,interpolated:false,clamped:true,tableDiffUsedM:first.diffM};
+  if(diffM>last.diffM+EPS)return{currentKn:last.currentKn,interpolated:false,clamped:true,tableDiffUsedM:last.diffM};
+  for(const p of pts){if(Math.abs(diffM-p.diffM)<=EPS)return{currentKn:p.currentKn,interpolated:false,clamped:false,tableDiffUsedM:p.diffM};}
+  for(let i=0;i<pts.length-1;i++){
+    const a=pts[i],b=pts[i+1];
+    if(diffM>=a.diffM-EPS&&diffM<=b.diffM+EPS){
+      const f=(diffM-a.diffM)/(b.diffM-a.diffM);
+      return{currentKn:a.currentKn+f*(b.currentKn-a.currentKn),interpolated:true,clamped:false,tableDiffUsedM:diffM};
+    }
+  }
+  return{error:'Interpolation Q73 impossible.'};
+}
+function q73SpecialCurrentForEta(inputData,targetMs,direction){
+  if(direction!=='QPOR')return null;
+  const portneuf=inputData?.seriesByStation?.Portneuf;
+  const deschaillons=inputData?.seriesByStation?.Deschaillons;
+  if(!portneuf||!deschaillons)return{error:'Niveaux Portneuf / Deschaillons indisponibles pour le courant spécial Q73.'};
+  const p=findValueNearEvent(portneuf,targetMs,6,true);
+  const d=findValueNearEvent(deschaillons,targetMs,6,true);
+  if(p.value==null||d.value==null)return{error:'Niveau Portneuf ou Deschaillons indisponible à l’heure de passage Q73.'};
+  const portneufLevel=Number(p.value),deschaillonsLevel=Number(d.value),levelDifferenceM=portneufLevel-deschaillonsLevel;
+  const mapped=q73CurrentFromLevelDifference(levelDifferenceM);
+  if(mapped.error)return mapped;
+  const speedKnots=mapped.currentKn;
+  return{
+    speedKnots,
+    currentType:'DESCENDANT',
+    hydroSignedKn:speedKnots,
+    baseEffectKn:-speedKnots,
+    descendingMultiplier:1.0,
+    effectKn:-speedKnots,
+    source:'Q73_PORTNEUF_DESCHAILLONS',
+    portneufLevel,
+    deschaillonsLevel,
+    levelDifferenceM,
+    interpolatedFromLevelTable:mapped.interpolated,
+    clampedToLevelTable:!!mapped.clamped,
+    tableDiffUsedM:mapped.tableDiffUsedM
+  };
+}
+
+function ohpsNorm(s){return String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'');}
+function ohpsAsNum(v){if(typeof v==='number')return Number.isFinite(v)?v:null;if(typeof v==='string'){const m=v.replace(',','.').match(/[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);if(m){const n=Number(m[0]);return Number.isFinite(n)?n:null;}}return null;}
+function ohpsSafeStorageGet(k){try{return localStorage.getItem(k)}catch(_){return null}}
+function ohpsSafeStorageSet(k,v){try{localStorage.setItem(k,v);return true}catch(_){return false}}
+function ohpsJsonp(url,timeoutMs=60000){return new Promise((resolve,reject)=>{const cb=`__ohps_${Date.now()}_${++jsonpSeq}`,sep=url.includes('?')?'&':'?';const script=document.createElement('script');let done=false;const cleanup=()=>{if(done)return;done=true;clearTimeout(timer);try{delete window[cb]}catch(_){window[cb]=undefined}script.remove();};window[cb]=d=>{cleanup();resolve(d)};script.async=true;script.onerror=()=>{cleanup();reject(new Error('ERDDAP n’a pas pu charger la réponse JSONP.'))};const timer=setTimeout(()=>{cleanup();reject(new Error('ERDDAP ne répond pas dans le délai prévu.'))},timeoutMs);script.src=`${url}${sep}.jsonp=${encodeURIComponent(cb)}`;document.head.appendChild(script);});}
+function ohpsTable(json){const t=json?.table;if(!t||!Array.isArray(t.columnNames)||!Array.isArray(t.rows))throw new Error('Réponse ERDDAP inattendue.');return{names:t.columnNames,types:t.columnTypes||[],units:t.columnUnits||[],rows:t.rows};}
+function ohpsParseInfo(json){const t=ohpsTable(json),idx={};t.names.forEach((n,i)=>idx[ohpsNorm(n)]=i);const gi=(row,k)=>row[idx[ohpsNorm(k)]];const vars=new Map(),dimensions=[],globalAttrs={};for(const row of t.rows){const rt=String(gi(row,'Row Type')??'').toLowerCase(),vn=String(gi(row,'Variable Name')??''),an=String(gi(row,'Attribute Name')??''),value=gi(row,'Value'),dt=gi(row,'Data Type');if(vn==='NC_GLOBAL'&&rt==='attribute'){globalAttrs[ohpsNorm(an)]=value;continue;}if(!vn)continue;if(!vars.has(vn))vars.set(vn,{name:vn,rowType:rt,dataType:dt,attrs:{},dimensionValue:null});const v=vars.get(vn);if(rt==='dimension'){if(!dimensions.includes(vn))dimensions.push(vn);v.dimensionValue=value;}if(rt==='attribute'&&an)v.attrs[ohpsNorm(an)]=value;}const candidates=[...vars.values()].filter(v=>!dimensions.includes(v.name));const text=v=>ohpsNorm(v.name+' '+Object.values(v.attrs).join(' '));function best(kind){let winner=null,score=-1e9;for(const v of candidates){const s=text(v),n=ohpsNorm(v.name);let q=0;if(kind==='u'){if(/eastwardseawatervelocity/.test(s))q+=1500;if(/rivervelocityx/.test(s)||/velocityx/.test(n))q+=1200;if(/xdirection|xcomponent/.test(s))q+=900;if(/eastward|eastcomponent/.test(s))q+=700;if(/^(u|uo|ucurrent|currentu|vx)$/.test(n))q+=800;if(/rivervelocityy|northward|ydirection|ycomponent/.test(s))q-=1600;}if(kind==='v'){if(/northwardseawatervelocity/.test(s))q+=1500;if(/rivervelocityy/.test(s)||/velocityy/.test(n))q+=1200;if(/ydirection|ycomponent/.test(s))q+=900;if(/northward|northcomponent/.test(s))q+=700;if(/^(v|vo|vcurrent|currentv|vy)$/.test(n))q+=800;if(/rivervelocityx|eastward|xdirection|xcomponent/.test(s))q-=1600;}if(kind==='speed'){if(n==='rivervelocity')q+=1500;if(/magnitude.*rivervelocity|rivervelocity.*magnitude/.test(s))q+=1200;if(/currentspeed|velocitymagnitude|magnitude/.test(s))q+=800;if(/rivervelocityx|rivervelocityy|direction/.test(s))q-=1000;}if(kind==='dir'){if(/currentdirection|river.*velocity.*direction|direction.*river.*velocity/.test(s))q+=1500;if(/direction|bearing|angle/.test(s))q+=800;}if(q>score){score=q;winner=v;}}return score>0?winner:null;}function axis(kind){let winner=null,score=-1;for(const name of dimensions){const v=vars.get(name),s=text(v),n=ohpsNorm(name);let q=0;if(kind==='time'){if(n==='time')q+=1000;if(ohpsNorm(v.attrs.axis)==='t')q+=800;if(/standardnametime/.test(s))q+=700;}if(kind==='lat'){if(n==='latitude'||n==='lat')q+=1000;if(ohpsNorm(v.attrs.standardname)==='latitude')q+=900;if(ohpsNorm(v.attrs.units).includes('degreesnorth'))q+=700;}if(kind==='lon'){if(n==='longitude'||n==='lon')q+=1000;if(ohpsNorm(v.attrs.standardname)==='longitude')q+=900;if(ohpsNorm(v.attrs.units).includes('degreeseast'))q+=700;}if(q>score){score=q;winner=v;}}return winner;}const u=best('u'),v=best('v'),speed=best('speed'),dir=best('dir'),time=axis('time'),lat=axis('lat'),lon=axis('lon');if(!time||!lat||!lon)throw new Error('Axes OHPS non reconnus.');if(!(u&&v)&&!(speed&&dir))throw new Error('Variables de courant OHPS non reconnues.');function resolution(kind,dim){const g=ohpsAsNum(globalAttrs[ohpsNorm(`geospatial_${kind}_resolution`)]);if(g&&g>0)return Math.abs(g);const s=String(dim?.dimensionValue??''),m=s.match(/averageSpacing\s*=\s*([+-]?[0-9.eE+-]+)/i),n=m?Number(m[1]):NaN;return Number.isFinite(n)&&n!==0?Math.abs(n):null;}return{dimensions,u:u?.name||null,v:v?.name||null,speed:speed?.name||null,dir:dir?.name||null,time:time.name,lat:lat.name,lon:lon.name,latRes:resolution('lat',lat),lonRes:resolution('lon',lon),attrs:{u:u?.attrs||{},v:v?.attrs||{},speed:speed?.attrs||{},dir:dir?.attrs||{}}};}
+async function ohpsLoadMetadata(){if(OHPS_STATE.metadata)return OHPS_STATE.metadata;const ck=OHPS_CACHE_PREFIX+'meta',cached=ohpsSafeStorageGet(ck);if(cached){try{const x=JSON.parse(cached);if(Date.now()-x.savedAt<7*86400000){OHPS_STATE.metadata=x.meta;return x.meta}}catch(_){}}const json=await ohpsJsonp(`${OHPS_ERDDAP}/info/${OHPS_DATASET}/index.json`,45000);const meta=ohpsParseInfo(json);OHPS_STATE.metadata=meta;ohpsSafeStorageSet(ck,JSON.stringify({savedAt:Date.now(),meta}));return meta;}
+function ohpsFloorHourIso(ms){return new Date(Math.floor(ms/3600000)*3600000).toISOString().replace('.000Z','Z');}
+function ohpsCeilHourIso(ms){return new Date(Math.ceil(ms/3600000)*3600000).toISOString().replace('.000Z','Z');}
+function ohpsBboxForPoints(points,radiusKm=1.5){const lats=points.map(p=>p.latitude),lons=points.map(p=>p.longitude),mid=lats.reduce((a,b)=>a+b,0)/lats.length,dLat=radiusKm/111.32,dLon=radiusKm/(111.32*Math.max(.2,Math.cos(mid*Math.PI/180)));return{latMin:Math.min(...lats)-dLat,latMax:Math.max(...lats)+dLat,lonMin:Math.min(...lons)-dLon,lonMax:Math.max(...lons)+dLon};}
+function ohpsStridePlan(meta,b){const mid=(b.latMin+b.latMax)/2,latRes=meta.latRes||.0009,lonRes=meta.lonRes||.0012,latCell=111320*latRes,lonCell=111320*Math.cos(mid*Math.PI/180)*lonRes;return{latStride:Math.max(1,Math.min(30,Math.round(OHPS_TARGET_SAMPLE_M/latCell))),lonStride:Math.max(1,Math.min(30,Math.round(OHPS_TARGET_SAMPLE_M/lonCell)))};}
+function ohpsDimConstraint(name,meta,b,startIso,endIso,plan){if(name===meta.time)return startIso===endIso?`[(${startIso})]`:`[(${startIso}):1:(${endIso})]`;if(name===meta.lat)return `[(${b.latMin.toFixed(7)}):${plan.latStride}:(${b.latMax.toFixed(7)})]`;if(name===meta.lon)return `[(${b.lonMin.toFixed(7)}):${plan.lonStride}:(${b.lonMax.toFixed(7)})]`;return '[0]';}
+function ohpsSpeedToMs(v,unit){if(v==null)return null;const u=ohpsNorm(unit);if(u.includes('knot')||u==='kn'||u==='kt')return v/1.9438444924406;if(u.includes('cms')||u.includes('centimeterpersecond'))return v/100;return v;}
+function ohpsDirectionToToward(deg,attrs){if(deg==null)return null;let d=((deg%360)+360)%360;const text=ohpsNorm(Object.values(attrs||{}).join(' '));if(text.includes('directionfrom')||text.includes('fromwhich'))d=(d+180)%360;return d;}
+function ohpsVectorFromRow(row,series){const m=series.meta;let u=row.u,v=row.v;if(u!=null&&v!=null)return{u,v};const speed=ohpsSpeedToMs(row.speed,series.units[m.speed]||m.attrs.speed?.units||''),dir=ohpsDirectionToToward(row.dir,m.attrs.dir);if(speed==null||dir==null)return null;const rad=dir*Math.PI/180;return{u:speed*Math.sin(rad),v:speed*Math.cos(rad)};}
+function ohpsDistanceKm(aLat,aLon,bLat,bLon){const ky=111.32,kx=111.32*Math.cos(((aLat+bLat)/2)*Math.PI/180);return Math.hypot((aLat-bLat)*ky,(aLon-bLon)*kx);}
+function ohpsRowsForTime(series,targetIso){let best=null,dt=Infinity,t=Date.parse(targetIso);for(const [iso,rows] of series.rowsByTime.entries()){const d=Math.abs(Date.parse(iso)-t);if(d<dt){dt=d;best=rows}}return dt<=31*60000?best:null;}
+function ohpsSampleAtHour(point,rows,series){if(!rows||!rows.length)return{error:'Aucune donnée OHPS pour cette heure.'};let best=null,bestD=Infinity;for(const r of rows){const d=ohpsDistanceKm(point.latitude,point.longitude,r.lat,r.lon);if(d<bestD){bestD=d;best=r}}if(!best||bestD>5)return{error:'Aucune cellule OHPS valide à moins de 5 km.'};const vec=ohpsVectorFromRow(best,series);if(!vec)return{error:'Vecteur OHPS incomplet.'};return{u:vec.u,v:vec.v,distanceToGridKm:bestD};}
+function ohpsCurrentType(uEastMs,speedKnots){if(speedKnots<0.1)return 'SLACK';if(uEastMs<0)return 'MONTANT';if(uEastMs>0)return 'DESCENDANT';return 'INDÉTERMINÉ';}
+function descendingCurrentMultiplier(point){
+  const idx=Number(point?.index);
+  const zonePontQuebecStNicolas=Number.isFinite(idx) && idx>=5 && idx<=12;
+  const zonePhareRichelieuBarreBoulard=Number.isFinite(idx) && idx>=36 && idx<=39;
+  if(zonePhareRichelieuBarreBoulard) return 1.30;
+  if(zonePontQuebecStNicolas) return 1.20;
+  return 1.14;
+}
+function ohpsHydroSignedKn(c,point){
+  if(c.currentType==='DESCENDANT') return c.speedKnots*descendingCurrentMultiplier(point);
+  if(c.currentType==='MONTANT') return -c.speedKnots;
+  if(c.currentType==='SLACK') return 0;
+  return null;
+}
+function descendingEffectSign(direction){return direction==='QPOR'?-1:1;}
+function ohpsCurrentEffectKn(c,direction,point){
+  if(c.currentType==='SLACK') return 0;
+  if(c.currentType==='MONTANT') return direction==='QPOR'?c.speedKnots:-c.speedKnots;
+  if(c.currentType==='DESCENDANT'){
+    const boosted=c.speedKnots*descendingCurrentMultiplier(point);
+    return direction==='QPOR'?-boosted:boosted;
+  }
+  return null;
+}
+function localMaxSowKnForDistance(distanceFromQuebecNm,userMaxSowKn,beamM){
+  let localMax=userMaxSowKn;
+  if(distanceFromQuebecNm<=2.0+EPS) localMax=Math.min(localMax,11.0);
+  else if(distanceFromQuebecNm<=6.3+EPS) localMax=Math.min(localMax,12.0);
+  if(Number.isFinite(beamM) && beamM>=30.0-EPS){
+    if(distanceFromQuebecNm<=41.4+EPS) localMax=Math.min(localMax,15.0);
+    else localMax=Math.min(localMax,14.0);
+  }
+  if(distanceFromQuebecNm>=66.6-EPS && distanceFromQuebecNm<=70.9+EPS) localMax=Math.min(localMax,11.0);
+  return localMax;
+}
+function localSpeedPieces(p,q,userMaxSowKn,beamM){
+  const a=Number(p.distanceFromStartNm),b=Number(q.distanceFromStartNm);
+  const total=Math.abs(b-a);
+  if(!(total>0)) return [{distanceNm:0,maxSowKn:localMaxSowKnForDistance((a+b)/2,userMaxSowKn,beamM)}];
+  const lo=Math.min(a,b),hi=Math.max(a,b);
+  const cuts=[lo,hi];
+  for(const boundary of [2.0,6.3,41.4,66.6]){
+    if(boundary>lo+EPS && boundary<hi-EPS) cuts.push(boundary);
+  }
+  cuts.sort((x,y)=>x-y);
+  const pieces=[];
+  for(let i=0;i<cuts.length-1;i++){
+    const x0=cuts[i],x1=cuts[i+1],mid=(x0+x1)/2;
+    pieces.push({distanceNm:x1-x0,maxSowKn:localMaxSowKnForDistance(mid,userMaxSowKn,beamM)});
+  }
+  if(b<a) pieces.reverse();
+  return pieces;
+}
+function ohpsSampleSeries(point,series,targetMs){const aMs=Math.floor(targetMs/3600000)*3600000,bMs=Math.ceil(targetMs/3600000)*3600000,aIso=fmtUtcIso(aMs),bIso=fmtUtcIso(bMs);const a=ohpsSampleAtHour(point,ohpsRowsForTime(series,aIso),series);if(a.error)return a;let u=a.u,v=a.v,interp=false,f=0;if(bMs!==aMs){const b=ohpsSampleAtHour(point,ohpsRowsForTime(series,bIso),series);if(b.error)return b;f=(targetMs-aMs)/(bMs-aMs);u=a.u+(b.u-a.u)*f;v=a.v+(b.v-a.v)*f;interp=true;}const speedKnots=Math.hypot(u,v)*1.9438444924406;return{uEastMs:u,vNorthMs:v,speedKnots,directionTowardDeg:(Math.atan2(u,v)*180/Math.PI+360)%360,currentType:ohpsCurrentType(u,speedKnots),interpolated:interp,interpolationFraction:f};}
+async function ohpsLoadPathSeries(key,pathPoints,startIso,endIso,radiusKm=1.5){const cacheKey=`${key}|${startIso}|${endIso}|${radiusKm}`;if(OHPS_STATE.seriesCache.has(cacheKey))return OHPS_STATE.seriesCache.get(cacheKey);const meta=await ohpsLoadMetadata(),b=ohpsBboxForPoints(pathPoints,radiusKm),plan=ohpsStridePlan(meta,b),dims=meta.dimensions.map(d=>ohpsDimConstraint(d,meta,b,startIso,endIso,plan)).join(''),vars=[meta.u,meta.v,meta.speed,meta.dir].filter((x,i,a)=>x&&a.indexOf(x)===i),projection=vars.map(v=>`${v}${dims}`).join(','),url=`${OHPS_ERDDAP}/griddap/${OHPS_DATASET}.json?${encodeURIComponent(projection)}`;OHPS_STATE.lastUrls.push(url);const json=await ohpsJsonp(url,60000),t=ohpsTable(json),col={};t.names.forEach((n,i)=>col[n]=i);const rows=[],rowsByTime=new Map();for(const r of t.rows){const lat=ohpsAsNum(r[col[meta.lat]]),lon=ohpsAsNum(r[col[meta.lon]]);if(lat==null||lon==null)continue;const item={lat,lon,time:r[col[meta.time]],u:meta.u&&col[meta.u]!=null?ohpsAsNum(r[col[meta.u]]):null,v:meta.v&&col[meta.v]!=null?ohpsAsNum(r[col[meta.v]]):null,speed:meta.speed&&col[meta.speed]!=null?ohpsAsNum(r[col[meta.speed]]):null,dir:meta.dir&&col[meta.dir]!=null?ohpsAsNum(r[col[meta.dir]]):null};if((item.u!=null&&item.v!=null)||(item.speed!=null&&item.dir!=null)){rows.push(item);const k=fmtUtcIso(Date.parse(item.time));if(!rowsByTime.has(k))rowsByTime.set(k,[]);rowsByTime.get(k).push(item);}}if(!rows.length&&radiusKm<3)return ohpsLoadPathSeries(key,pathPoints,startIso,endIso,3);if(!rows.length&&radiusKm<5)return ohpsLoadPathSeries(key,pathPoints,startIso,endIso,5);if(!rows.length)throw new Error(`Aucune cellule OHPS dans le secteur ${key}.`);const units={};vars.forEach(v=>units[v]=t.units[col[v]]||'');const series={rows,rowsByTime,meta,units};OHPS_STATE.seriesCache.set(cacheKey,series);return series;}
+async function promisePool(items,limit,worker,onProgress){let next=0,done=0;const out=new Array(items.length);async function run(){while(true){const i=next++;if(i>=items.length)return;try{out[i]=await worker(items[i],i)}catch(e){out[i]={error:String(e?.message??e)}}done++;onProgress?.(done,items.length,items[i],out[i]);}}await Promise.all(Array.from({length:Math.min(limit,items.length)},run));return out;}
+
+function displayName(p){if(p.index===0)return 'Station Québec';if(p.index===85)return 'Station Pointe-des-Ormes';return p.name;}
+function namedPoints(direction){const pts=OHPS_ROUTE_POINTS.filter(p=>p.name||p.index===0||p.index===85);return direction==='QPOR'?pts:pts.slice().reverse();}
+function pathBetween(a,b){const step=b.index>a.index?1:-1,arr=[];for(let i=a.index;;i+=step){arr.push(OHPS_ROUTE_POINTS[i]);if(i===b.index)break;}return arr;}
+function buildSegments(direction){const n=namedPoints(direction),out=[];for(let i=0;i<n.length-1;i++){const a=n[i],b=n[i+1],path=pathBetween(a,b);out.push({key:`${a.index}-${b.index}`,start:a,end:b,path,distanceNm:Math.abs(Number(b.distanceFromStartNm)-Number(a.distanceFromStartNm))});}return{named:n,segments:out};}
+function configForIndex(x){if(x<9)return{stationKey:'Neuville',cap:16,depth:15.0};let best=CONFIG_ANCHORS[0],d=Infinity;for(const c of CONFIG_ANCHORS){const dd=Math.abs(c.idx-x);if(dd<d){d=dd;best=c}}return best;}
+function geoDistanceNm(a,b){return ohpsDistanceKm(a.latitude,a.longitude,b.latitude,b.longitude)/1.852;}
+async function fetchStationSeries(stationId,fromIso,toIso){const url=`https://api-iwls.dfo-mpo.gc.ca/api/v1/stations/${stationId}/data?time-series-code=wlf-spine&from=${encodeURIComponent(fromIso)}&to=${encodeURIComponent(toIso)}`;const r=await fetch(url);if(!r.ok)throw new Error(`IWLS HTTP ${r.status}`);const d=await r.json();if(!Array.isArray(d))throw new Error('Réponse IWLS inattendue.');return d;}
+async function loadInputs(depMs,setProgress){const fromIso=fmtUtcIso(depMs-6*3600000),toIso=fmtUtcIso(depMs+60*3600000);const stationKeys=[...new Set(CONFIG_ANCHORS.map(c=>c.stationKey))];setProgress('Téléchargement des niveaux IWLS…',5);const seriesByStation={};await Promise.all(stationKeys.map(async k=>{const raw=await fetchStationSeries(STATIONS[k][0],fromIso,toIso);seriesByStation[k]=seriesToSorted(raw);}));setProgress('Préparation du modèle OHPS…',15);await ohpsLoadMetadata();return{seriesByStation,fromIso,toIso};}
+
+async function ohpsRouteSeriesForTime(targetMs){const aMs=Math.floor(targetMs/3600000)*3600000,bMs=Math.ceil(targetMs/3600000)*3600000,startIso=fmtUtcIso(aMs),endIso=fmtUtcIso(bMs),key=`route-${startIso}-${endIso}`;try{return await ohpsLoadPathSeries(key,OHPS_ROUTE_POINTS,startIso,endIso,1.5);}catch(e){await new Promise(r=>setTimeout(r,500));return await ohpsLoadPathSeries(key,OHPS_ROUTE_POINTS,startIso,endIso,1.5);}}
+
+async function sampleCurrentForEta(point,targetMs,direction,inputData=null){
+  if(direction==='QPOR' && Number(point?.index)===38){
+    const special=q73SpecialCurrentForEta(inputData,targetMs,direction);
+    if(special)return special;
+  }
+  const series=await ohpsRouteSeriesForTime(targetMs);
+  const c=ohpsSampleSeries(point,series,targetMs);
+  if(c.error) return c;
+  const hydroSignedKn=ohpsHydroSignedKn(c,point);
+  const effectKn=ohpsCurrentEffectKn(c,direction,point);
+  if(effectKn==null || hydroSignedKn==null) return {error:'Sens du courant indéterminé (composante Est/Ouest nulle).'};
+  const descendingMultiplier=c.currentType==='DESCENDANT'?descendingCurrentMultiplier(point):1.0;
+  return {...c,hydroSignedKn,baseEffectKn:effectKn,descendingMultiplier,effectKn};
+}
+
+async function calcTrip(params,inputData,trip,setProgress){
+  const {direction,vesselType,draftM,beamM,maxSowKn,depMs,tzName,preQ73SowCapKn=null}=params;
+  const beam=roundWidthEvenM(beamM),tbl=selectTable(vesselType);
+  if(!tbl[beam]) throw new Error(`Largeur ${beam} m non prise en charge. Choix: ${Object.keys(tbl).sort().join(', ')}`);
+  const dsqTable=tbl[beam],rows=[],logs=[];
+  let eta=depMs,totalDist=0,doneSegments=0,q73Plan=null;
+  rows.push({name:displayName(trip.named[0]),etaMs:eta,status:'DÉPART',level:null,dsqMin:null,currentKn:null,sowPermise:null,sowUsed:null,sog:null,detail:null});
+  logs.push(`Direction: ${displayName(trip.named[0])} → ${displayName(trip.named.at(-1))}`);
+  logs.push(`Départ: ${fmtLocal(depMs,tzName)} | SOW max utilisateur: ${maxSowKn.toFixed(1)} kn`);
+  logs.push(direction==='QPOR'?'Règle courant Québec → Pointe-des-Ormes: MONTANT = ajouté | DESCENDANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.':'Règle courant Pointe-des-Ormes → Québec: DESCENDANT = ajouté | MONTANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.');
+  logs.push("SOW locale: maximum 11,0 kn sur les 2,0 premiers NM depuis Québec; puis maximum 12,0 kn jusqu'au Pont de Québec; maximum 11,0 kn entre Wayagamak et Station Pointe-des-Ormes (ou la limite utilisateur si elle est plus basse).");
+  if(beamM>=30-EPS) logs.push('Navire de largeur réelle >= 30 m: maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes, dans les deux directions; toute limite locale plus basse demeure prioritaire.');
+  else logs.push('Navire de largeur réelle < 30 m: vitesse maximale saisie jusqu’à 20,0 kn. Jusqu’à 15,0 kn, table SQ initiale inchangée; au-dessus de 15,0 kn, dégagement requis = exigence à 15,0 kn + 0,60 m par nœud supplémentaire, avec interpolation linéaire.');
+  logs.push('Majoration du courant DESCENDANT OHPS: +14 % par défaut; +20 % entre Pont de Québec et CIP St-Nicolas (incluant Bouée Q19); +30 % entre Phare Richelieu et Barre Boulard. Exception: au point Q73 en direction Québec → Trois-Rivières, le courant OHPS est remplacé par la table Portneuf − Deschaillons.');
+  logs.push('Les anciennes corrections locales fixes de +0,5 kn / +1,0 kn ont été retirées.');
+  logs.push('Plancher SOW: 7,0 kn partout. À Q73 en direction Québec → Trois-Rivières, le passage dépend de la SOG: minimum 2,5 kn si largeur < 24 m; minimum 3,0 kn si largeur ≥ 24 m.');
+  if(direction==='QPOR'&&Number.isFinite(preQ73SowCapKn)) logs.push(`Synchronisation Q73: départ conservé lorsque possible; plafond volontaire de ${preQ73SowCapKn.toFixed(1)} kn avant Q73 seulement. À Q73 et après, retour à la SOW maximale permise par le DSQ, la vitesse saisie et les limites locales.`);
+  logs.push("Profondeur de référence spéciale: 10,8 m de Pointe Deschambeault jusqu'au point intermédiaire non nommé (11,5 NM), puis 10,7 m jusqu'à Bouée Q19, dans les deux directions.");
+  logs.push('');
+
+  for(const seg of trip.segments){
+    let segHours=0,segDist=0,wCur=0,wSow=0,minDsq=Infinity,minSowPerm=Infinity,lastLevel=null,lastStation='',currentMin=Infinity,currentMax=-Infinity;
+    let montantCount=0,descendantCount=0,slackCount=0;
+
+    for(let i=0;i<seg.path.length-1;i++){
+      const p=seg.path[i],q=seg.path[i+1];
+      const dist=Math.abs(Number(q.distanceFromStartNm)-Number(p.distanceFromStartNm))||geoDistanceNm(p,q);
+      const cfg=configForIndex((p.index+q.index)/2),sorted=inputData.seriesByStation[cfg.stationKey];
+      const lv=findValueNearEvent(sorted,eta,6,true);
+      if(lv.value==null){
+        rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:`IWLS ${cfg.stationKey}: niveau indisponible`});
+        return{rows,logs:logs.join('\n'),ok:false,error:`Niveau IWLS indisponible (${cfg.stationKey})`,depMs,etaMs:eta,distanceNm:totalDist};
+      }
+      const beforeQ73Sector=direction==='QPOR' && q.index<=38;
+      const planningMaxSowKn=(beforeQ73Sector&&Number.isFinite(preQ73SowCapKn))?Math.max(7,Math.min(maxSowKn,preQ73SowCapKn)):maxSowKn;
+      const speedPieces=localSpeedPieces(p,q,planningMaxSowKn,beamM);
+      const inDeschambeaultToMidpointDepthZone=Math.min(p.index,q.index)===9 && Math.max(p.index,q.index)===10;
+      const referenceDepthM=inDeschambeaultToMidpointDepthZone?10.8:cfg.depth;
+      const level=Number(lv.value),dsq=level+referenceDepthM-draftM;
+      for(const piece of speedPieces){
+        piece.sowPerm=allowedSow(dsqTable,dsq,piece.maxSowKn);
+        piece.sow=Math.min(piece.sowPerm,piece.maxSowKn);
+      }
+      const sowPerm=Math.min(...speedPieces.map(x=>x.sowPerm));
+      const sow=(speedPieces.reduce((a,x)=>a+x.sow*x.distanceNm,0))/(speedPieces.reduce((a,x)=>a+x.distanceNm,0)||1);
+      if(speedPieces.some(x=>!(x.sow>0))){
+        const dsqMin7=dsqReqForSpeed(dsqTable,7);
+        rows.push({name:displayName(seg.end),etaMs:eta,status:'ABANDON',level,dsqMin:dsq,error:'DSQ insuffisant'});
+        return{rows,logs:logs.join('\n'),ok:false,error:`DSQ insuffisant près de ${displayName(p)}`,failureKind:'DSQ',failurePointName:displayName(p),failurePointIndex:p.index,failureEtaMs:eta,failureDsq:dsq,failureRequiredDsq:dsqMin7,failureStation:cfg.stationKey,depMs,etaMs:eta,distanceNm:totalDist};
+      }
+
+      let cP;
+      try{cP=await sampleCurrentForEta(p,eta,direction,inputData);}catch(e){
+        const msg=String(e?.message??e);
+        rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:`OHPS: ${msg}`});
+        logs.push(`[${displayName(seg.end)}] ERREUR OHPS à ${fmtLocal(eta,tzName)}: ${msg}`);
+        return{rows,logs:logs.join('\n'),ok:false,error:`OHPS indisponible à ${fmtLocal(eta,tzName)} dans ${displayName(seg.start)} → ${displayName(seg.end)}`,depMs,etaMs:eta,distanceNm:totalDist};
+      }
+      if(cP.error){
+        rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:cP.error});
+        return{rows,logs:logs.join('\n'),ok:false,error:`${direction==='QPOR'&&p.index===38?'Courant spécial Q73':'OHPS'}: ${cP.error}`,depMs,etaMs:eta,distanceNm:totalDist};
+      }
+
+      const q73Passage=(direction==='QPOR' && p.index===38 && q.index===39);
+      let q73RuleAtEntry=null;
+      if(q73Passage){
+        const minSogKn=q73MinSogKnForBeam(beamM);
+        const q73SogKn=sow+cP.effectKn;
+        q73RuleAtEntry={
+          entryEtaMs:eta,
+          sowPerm,
+          sowUsed:sow,
+          currentKn:cP.speedKnots,
+          sogKn:q73SogKn,
+          minSogKn,
+          portneufLevel:cP.portneufLevel,
+          deschaillonsLevel:cP.deschaillonsLevel,
+          levelDifferenceM:cP.levelDifferenceM,
+          interpolatedFromLevelTable:!!cP.interpolatedFromLevelTable,
+          clampedToLevelTable:!!cP.clampedToLevelTable,
+          tableDiffUsedM:cP.tableDiffUsedM
+        };
+        logs.push(`[Q73 spécial] ${fmtLocal(eta,tzName)} | Portneuf ${cP.portneufLevel.toFixed(2)} m − Deschaillons ${cP.deschaillonsLevel.toFixed(2)} m = ${cP.levelDifferenceM>=0?'+':''}${cP.levelDifferenceM.toFixed(2)} m | courant baissant ${cP.speedKnots.toFixed(2)} kn${cP.clampedToLevelTable?` (borne de table ${cP.tableDiffUsedM>=0?'+':''}${cP.tableDiffUsedM.toFixed(2)} m)`:''} | SOW ${sow.toFixed(1)} kn | SOG ${q73SogKn.toFixed(2)} kn | minimum ${minSogKn.toFixed(1)} kn`);
+        if(!(q73SogKn>=minSogKn-EPS)){
+          rows.push({name:displayName(seg.end),etaMs:eta,status:'ABANDON',level,dsqMin:dsq,currentKn:-cP.speedKnots,sowPermise:sowPerm,sowUsed:sow,sog:q73SogKn,error:`SOG Q73 ${q73SogKn.toFixed(2)} kn inférieure au minimum ${minSogKn.toFixed(1)} kn`});
+          return{rows,logs:logs.join('\n'),ok:false,error:`Passage Q73 impossible à ${fmtLocal(eta,tzName)}: SOG ${q73SogKn.toFixed(2)} kn, minimum requis ${minSogKn.toFixed(1)} kn.`,failureKind:'Q73_SOG',failureReason:'SOG_MIN',failurePointName:'Bouée Q73',failurePointIndex:38,failureEtaMs:eta,failureDsq:dsq,failureCurrentKn:cP.speedKnots,failureSogKn:q73SogKn,failureMinSogKn:minSogKn,q73Plan:q73RuleAtEntry,depMs,etaMs:eta,distanceNm:totalDist};
+        }
+      }
+
+      // 1) Première estimation de l'heure d'arrivée à Q avec le courant de P.
+      let estimateHours=0;
+      for(const piece of speedPieces){
+        const pieceSog=piece.sow+cP.effectKn;
+        if(!(pieceSog>0)){
+          rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:'SOG non positive'});
+          return{rows,logs:logs.join('\n'),ok:false,error:'SOG non positive',depMs,etaMs:eta,distanceNm:totalDist};
+        }
+        estimateHours+=piece.distanceNm/pieceSog;
+      }
+      let etaQ=eta+estimateHours*3600000;
+
+      // 2) Courant à Q à l'heure d'arrivée estimée, puis moyenne arithmétique P-Q.
+      let cQ;
+      try{cQ=await sampleCurrentForEta(q,etaQ,direction,inputData);}catch(e){
+        const msg=String(e?.message??e);
+        rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:`OHPS: ${msg}`});
+        return{rows,logs:logs.join('\n'),ok:false,error:`OHPS indisponible près de ${displayName(q)}`,depMs,etaMs:eta,distanceNm:totalDist};
+      }
+      if(cQ.error){
+        rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:cQ.error});
+        return{rows,logs:logs.join('\n'),ok:false,error:`OHPS: ${cQ.error}`,depMs,etaMs:eta,distanceNm:totalDist};
+      }
+      let curKn=(cP.effectKn+cQ.effectKn)/2;
+      let h=0;
+      for(const piece of speedPieces){
+        const pieceSog=piece.sow+curKn;
+        if(!(pieceSog>0)){
+          rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:'SOG non positive'});
+          return{rows,logs:logs.join('\n'),ok:false,error:'SOG non positive',depMs,etaMs:eta,distanceNm:totalDist};
+        }
+        h+=piece.distanceNm/pieceSog;
+      }
+
+      // 3) Une correction: recalcule Q avec l'ETA issue de la moyenne P-Q.
+      const etaQ2=eta+h*3600000;
+      if(Math.abs(etaQ2-etaQ)>1000){
+        try{
+          const refinedQ=await sampleCurrentForEta(q,etaQ2,direction,inputData);
+          if(!refinedQ.error){
+            cQ=refinedQ;
+            curKn=(cP.effectKn+cQ.effectKn)/2;
+            h=0;
+            for(const piece of speedPieces){
+              const pieceSog=piece.sow+curKn;
+              if(!(pieceSog>0)){
+                rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:'SOG non positive'});
+                return{rows,logs:logs.join('\n'),ok:false,error:'SOG non positive',depMs,etaMs:eta,distanceNm:totalDist};
+              }
+              h+=piece.distanceNm/pieceSog;
+            }
+          }
+        }catch(_){/* conserve la première moyenne P-Q */}
+      }
+
+      eta+=h*3600000;
+      if(q73RuleAtEntry) q73Plan={...q73RuleAtEntry,exitEtaMs:eta,dsq};
+      segHours+=h; segDist+=dist; totalDist+=dist;
+      wCur+=curKn*dist; wSow+=speedPieces.reduce((a,x)=>a+x.sow*x.distanceNm,0);
+      minDsq=Math.min(minDsq,dsq); minSowPerm=Math.min(minSowPerm,sowPerm);
+      lastLevel=level; lastStation=cfg.stationKey;
+      currentMin=Math.min(currentMin,curKn); currentMax=Math.max(currentMax,curKn);
+      for(const c of [cP,cQ]){
+        if(c.currentType==='MONTANT') montantCount++;
+        else if(c.currentType==='DESCENDANT') descendantCount++;
+        else if(c.currentType==='SLACK') slackCount++;
+      }
+    }
+
+    const avgCur=wCur/segDist,avgSow=wSow/segDist,effectiveSog=segDist/segHours;
+    rows.push({name:displayName(seg.end),etaMs:eta,status:'OK',level:lastLevel,station:lastStation,dsqMin:minDsq,currentKn:avgCur,sowPermise:minSowPerm,sowUsed:avgSow,sog:effectiveSog,detail:{distanceNm:segDist,pointCount:seg.path.length,currentMin,currentMax,montantCount,descendantCount,slackCount}});
+    logs.push(`[${displayName(seg.end)}] ETA ${fmtLocal(eta,tzName)} | ${segDist.toFixed(2)} NM | courant moyen P-Q ${(avgCur>=0?'+':'')}${avgCur.toFixed(2)} kn | SOW ${avgSow.toFixed(1)} | SOG ${effectiveSog.toFixed(1)} | DSQ min ${minDsq.toFixed(2)} m`);
+    doneSegments++;
+    setProgress?.(`Calcul OHPS point par point… ${doneSegments}/${trip.segments.length} secteurs`,20+Math.round(doneSegments/trip.segments.length*75));
+  }
+  return{rows,logs:logs.join('\n'),ok:true,depMs,etaMs:eta,distanceNm:totalDist,q73Plan,preQ73SowCapKn:Number.isFinite(preQ73SowCapKn)?preQ73SowCapKn:null};
+}
+
+
+const Q73_PLAN_SEARCH_HOURS=30;
+const Q73_PLAN_DEPART_STEP_MIN=5;
+const Q73_PLAN_PACE_STEP_KN=0.5;
+
+function q73PaceCaps(maxSowKn){
+  const vals=[];
+  const add=v=>{
+    v=Math.round(v*10)/10;
+    if(v>=7-EPS&&v<=maxSowKn+EPS&&!vals.some(x=>Math.abs(x-v)<EPS)) vals.push(v);
+  };
+  add(maxSowKn);
+  for(let v=Math.floor((maxSowKn-EPS)/Q73_PLAN_PACE_STEP_KN)*Q73_PLAN_PACE_STEP_KN;v>=7-EPS;v-=Q73_PLAN_PACE_STEP_KN) add(v);
+  add(7);
+  vals.sort((a,b)=>b-a);
+  return vals;
+}
+
+async function tryQ73PlanAtDeparture(baseParams,inputData,trip,depMs){
+  const caps=q73PaceCaps(baseParams.maxSowKn);
+  let previousFailedCap=null,lastFailure=null;
+
+  for(const cap of caps){
+    const result=await calcTrip({...baseParams,depMs,preQ73SowCapKn:cap},inputData,trip,null);
+    if(result.ok){
+      let bestCap=cap,bestResult=result;
+      // Raffine par dixièmes entre le dernier plafond échoué et le premier plafond réussi
+      // afin de conserver la vitesse pré-Q73 la plus élevée possible.
+      if(previousFailedCap!=null && previousFailedCap>cap+0.11){
+        for(let fine=Math.round((previousFailedCap-0.1)*10)/10;fine>cap+EPS;fine=Math.round((fine-0.1)*10)/10){
+          const refined=await calcTrip({...baseParams,depMs,preQ73SowCapKn:fine},inputData,trip,null);
+          if(refined.ok){bestCap=fine;bestResult=refined;break;}
+          if(refined.failureKind!=='DSQ'&&refined.failureKind!=='Q73_SOG'&&!String(refined.error||'').startsWith('DSQ insuffisant')){
+            return{ok:false,dataError:true,error:refined.error||'Erreur de données pendant la recherche.'};
+          }
+        }
+      }
+      return{ok:true,depMs,paceCapKn:bestCap,result:bestResult};
+    }
+    if(result.failureKind!=='DSQ'&&result.failureKind!=='Q73_SOG'&&!String(result.error||'').startsWith('DSQ insuffisant')){
+      return{ok:false,dataError:true,error:result.error||'Erreur de données pendant la recherche.'};
+    }
+    previousFailedCap=cap;
+    lastFailure=result;
+  }
+  return{ok:false,lastFailure};
+}
+
+async function findQ73SogPlan(baseParams,inputData,trip,setProgress){
+  const startMs=baseParams.depMs;
+  const endMs=startMs+Q73_PLAN_SEARCH_HOURS*3600000;
+  const stepMs=Q73_PLAN_DEPART_STEP_MIN*60000;
+  let attempts=0;
+
+  // Priorité 1: conserver exactement l'heure demandée et synchroniser Q73 en ralentissant
+  // seulement avant Q73. Dès Q73, la vitesse redevient la vitesse maximale permise.
+  setProgress?.('Tentative de conserver l’heure de départ en ajustant la vitesse avant Q73…',20);
+  const sameDeparture=await tryQ73PlanAtDeparture(baseParams,inputData,trip,startMs);
+  if(sameDeparture.dataError)return sameDeparture;
+  if(sameDeparture.ok)return{...sameDeparture,waitMs:0,sameDeparture:true,attempts};
+
+  // Priorité 2: si aucun profil pré-Q73 ne fonctionne au départ demandé, chercher le premier
+  // départ ultérieur; pour chacun, on conserve la même stratégie de synchronisation avant Q73.
+  let firstFeasible=null;
+  for(let candidateMs=startMs+stepMs;candidateMs<=endMs;candidateMs+=stepMs){
+    attempts++;
+    if(setProgress&&(attempts===1||attempts%3===0)){
+      const pct=45+Math.min(45,Math.round((candidateMs-startMs)/(endMs-startMs)*45));
+      setProgress(`Recherche du prochain départ faisable… ${fmtLocal(candidateMs,baseParams.tzName)}`,pct);
+    }
+    const trial=await tryQ73PlanAtDeparture(baseParams,inputData,trip,candidateMs);
+    if(trial.dataError)return trial;
+    if(trial.ok){firstFeasible=trial;break;}
+  }
+  if(!firstFeasible)return{ok:false,notFound:true,searchHours:Q73_PLAN_SEARCH_HOURS,attempts};
+
+  // Raffinement à la minute sur l'heure de départ, tout en recalculant le meilleur plafond pré-Q73.
+  const refineStart=Math.max(startMs+60000,firstFeasible.depMs-(Q73_PLAN_DEPART_STEP_MIN-1)*60000);
+  let best=firstFeasible;
+  for(let candidateMs=refineStart;candidateMs<firstFeasible.depMs;candidateMs+=60000){
+    const trial=await tryQ73PlanAtDeparture(baseParams,inputData,trip,candidateMs);
+    if(trial.dataError)return trial;
+    if(trial.ok){best=trial;break;}
+  }
+  return{...best,waitMs:best.depMs-startMs,sameDeparture:false,attempts};
+}
+
+function appendQ73SogPlanResult(search,initialRes,tzName,maxSowKn){
+  const summary=el('summary');
+  if(search.ok){
+    const q=search.result.q73Plan||{};
+    const origin=search.result.rows?.[0]?.name||'origine';
+    const paceAdjusted=Number.isFinite(search.paceCapKn)&&search.paceCapKn<maxSowKn-EPS;
+    const speedText=paceAdjusted?`Départ ${search.sameDeparture?'conservé':'retenu'} avec un plafond de synchronisation de <b>${search.paceCapKn.toFixed(1)} kn</b> avant Q73 seulement; à Q73 et après, retour à la SOW maximale permise par le DSQ, la vitesse saisie et les restrictions locales.`:`SOW maximale permise par le DSQ, la vitesse maximale saisie (${maxSowKn.toFixed(1)} kn) et les restrictions locales.`;
+    summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-blue-50 border-blue-200 p-3"><div class="font-semibold">Plan de passage Q73</div><div class="mt-1">Départ ${escapeHtml(origin)} : <b>${escapeHtml(fmtLocal(search.depMs,tzName))}</b></div><div class="mt-1">${speedText}</div><div class="mt-1">Passage Q73 : <b>${q.entryEtaMs?escapeHtml(fmtLocal(q.entryEtaMs,tzName)):'—'}</b> — Portneuf : <b>${Number.isFinite(q.portneufLevel)?q.portneufLevel.toFixed(2):'—'} m</b> — Deschaillons : <b>${Number.isFinite(q.deschaillonsLevel)?q.deschaillonsLevel.toFixed(2):'—'} m</b> — différence : <b>${Number.isFinite(q.levelDifferenceM)?`${q.levelDifferenceM>=0?'+':''}${q.levelDifferenceM.toFixed(2)}`:'—'} m</b>.</div><div class="mt-1">Courant baissant Q73 : <b>${Number.isFinite(q.currentKn)?q.currentKn.toFixed(2):'—'} kn</b> — SOW : <b>${Number.isFinite(q.sowUsed)?q.sowUsed.toFixed(1):'—'} kn</b> — SOG : <b>${Number.isFinite(q.sogKn)?q.sogKn.toFixed(2):'—'} kn</b> — minimum requis : <b>${Number.isFinite(q.minSogKn)?q.minSogKn.toFixed(1):'—'} kn</b>.</div><div class="mt-1">ETA destination : <b>${escapeHtml(fmtLocal(search.result.etaMs,tzName))}</b>${search.waitMs?` — attente avant départ : <b>${escapeHtml(fmtDuration(search.waitMs))}</b>`:''}.</div><div class="mt-1">Le tableau est recalculé avec ce départ et les vitesses maximales permises à chaque étape.</div></div>`);
+    const extra=`\n\n[PLAN PASSAGE Q73]\nDépart ${origin}: ${fmtLocal(search.depMs,tzName)}\nRègle de vitesse: SOW maximale permise à chaque position par le DSQ, la vitesse maximale saisie et les restrictions locales; plancher 7 kn; aucun plafond artificiel.\nPassage Q73: ${q.entryEtaMs?fmtLocal(q.entryEtaMs,tzName):'—'} | Portneuf ${Number.isFinite(q.portneufLevel)?q.portneufLevel.toFixed(2):'—'} m | Deschaillons ${Number.isFinite(q.deschaillonsLevel)?q.deschaillonsLevel.toFixed(2):'—'} m | différence ${Number.isFinite(q.levelDifferenceM)?q.levelDifferenceM.toFixed(2):'—'} m | courant baissant ${Number.isFinite(q.currentKn)?q.currentKn.toFixed(2):'—'} kn | SOW ${Number.isFinite(q.sowUsed)?q.sowUsed.toFixed(1):'—'} kn | SOG ${Number.isFinite(q.sogKn)?q.sogKn.toFixed(2):'—'} kn | minimum ${Number.isFinite(q.minSogKn)?q.minSogKn.toFixed(1):'—'} kn\nETA destination: ${fmtLocal(search.result.etaMs,tzName)}`;
+    el('log').textContent=(el('log').textContent||'')+extra;
+    lastText=el('log').textContent;
+  }else if(search.notFound){
+    summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-amber-50 border-amber-200 p-3"><div class="font-semibold">Aucun passage Q73 trouvé</div><div class="mt-1">Aucun départ n'a permis un transit continu respectant le DSQ et la SOG minimale à Q73 au cours des ${search.searchHours} heures suivantes.</div></div>`);
+  }else if(search.dataError){
+    summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-amber-50 border-amber-200 p-3"><div class="font-semibold">Recherche Q73 interrompue</div><div class="mt-1">${escapeHtml(search.error||'Données indisponibles.')}</div></div>`);
+  }
+}
+
+
+const NEXT_PASSAGE_SEARCH_HOURS=30;
+const NEXT_PASSAGE_STEP_MIN=5;
+
+async function findNextContinuousDeparture(baseParams,inputData,trip,setProgress){
+  const startMs=baseParams.depMs;
+  const endMs=startMs+NEXT_PASSAGE_SEARCH_HOURS*3600000;
+  const coarseStepMs=NEXT_PASSAGE_STEP_MIN*60000;
+  let firstFeasible=null;
+  let attempts=0;
+
+  for(let candidateMs=startMs+coarseStepMs;candidateMs<=endMs;candidateMs+=coarseStepMs){
+    attempts++;
+    if(setProgress && (attempts===1 || attempts%6===0)){
+      const pct=45+Math.min(45,Math.round((candidateMs-startMs)/(endMs-startMs)*45));
+      setProgress(`Recherche du prochain départ continu… ${fmtLocal(candidateMs,baseParams.tzName)}`,pct);
+    }
+    const candidate=await calcTrip({...baseParams,depMs:candidateMs},inputData,trip,null);
+    if(candidate.ok){
+      firstFeasible={depMs:candidateMs,result:candidate};
+      break;
+    }
+    // Une erreur de données ne permet pas de conclure sur la faisabilité du transit.
+    if(candidate.failureKind!=='DSQ' && !String(candidate.error||'').startsWith('DSQ insuffisant')){
+      return{ok:false,dataError:true,error:candidate.error||'Erreur de données pendant la recherche.',attempts};
+    }
+  }
+
+  if(!firstFeasible){
+    return{ok:false,notFound:true,searchHours:NEXT_PASSAGE_SEARCH_HOURS,attempts};
+  }
+
+  // Raffinement à la minute dans la fenêtre précédant le premier départ faisable trouvé.
+  const refineStart=Math.max(startMs+60000,firstFeasible.depMs-(NEXT_PASSAGE_STEP_MIN-1)*60000);
+  let best=firstFeasible;
+  for(let candidateMs=refineStart;candidateMs<firstFeasible.depMs;candidateMs+=60000){
+    const candidate=await calcTrip({...baseParams,depMs:candidateMs},inputData,trip,null);
+    if(candidate.ok){
+      best={depMs:candidateMs,result:candidate};
+      break;
+    }
+  }
+
+  return{ok:true,depMs:best.depMs,result:best.result,waitMs:best.depMs-startMs,attempts};
+}
+
+function appendNextPassageResult(search,initialRes,tzName){
+  const summary=el('summary');
+  if(search.ok){
+    const origin=initialRes.rows?.[0]?.name||'origine';
+    const destination=search.result.rows?.at(-1)?.name||'destination';
+    summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-blue-50 border-blue-200 p-3"><div class="font-semibold">Prochain transit continu possible</div><div class="mt-1">Départ ${escapeHtml(origin)} : <b>${escapeHtml(fmtLocal(search.depMs,tzName))}</b></div><div class="mt-1">ETA ${escapeHtml(destination)} : <b>${escapeHtml(fmtLocal(search.result.etaMs,tzName))}</b></div><div class="mt-1">Attente avant départ : <b>${escapeHtml(fmtDuration(search.waitMs))}</b> — transit calculé sans interruption avec SOW ≥ 7 kn.</div></div>`);
+    const extra=`\n\n[RECHERCHE PROCHAIN PASSAGE]\nÉchec initial: ${initialRes.failurePointName||'point inconnu'} à ${fmtLocal(initialRes.failureEtaMs||initialRes.etaMs,tzName)}${Number.isFinite(initialRes.failureDsq)?` | DSQ ${initialRes.failureDsq.toFixed(2)} m | requis à 7 kn ${Number(initialRes.failureRequiredDsq).toFixed(2)} m`:''}\nProchain départ continu: ${fmtLocal(search.depMs,tzName)}\nETA destination: ${fmtLocal(search.result.etaMs,tzName)}\nAttente: ${fmtDuration(search.waitMs)}\nCritère: aucun arrêt DSQ, SOW minimale 7 kn.`;
+    el('log').textContent=(el('log').textContent||'')+extra;
+    lastText=el('log').textContent;
+  }else if(search.notFound){
+    summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-amber-50 border-amber-200 p-3"><div class="font-semibold">Aucun départ continu trouvé</div><div class="mt-1">Aucun transit sans interruption n’a été trouvé dans les ${search.searchHours} heures suivant le départ demandé.</div></div>`);
+    const extra=`\n\n[RECHERCHE PROCHAIN PASSAGE]\nAucun départ continu trouvé dans les ${search.searchHours} h suivantes.`;
+    el('log').textContent=(el('log').textContent||'')+extra;
+    lastText=el('log').textContent;
+  }else if(search.dataError){
+    summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-amber-50 border-amber-200 p-3"><div class="font-semibold">Recherche du prochain passage interrompue</div><div class="mt-1">${escapeHtml(search.error||'Données indisponibles.')}</div></div>`);
+  }
+}
+
+let pendingRecalcContext=null;
+
+function renderRowsInto(tbodyId,res){
+  const tbody=el(tbodyId);
+  tbody.innerHTML='';
+  for(const r of res.rows||[]){
+    const tr=document.createElement('tr');
+    tr.className=r.status==='ERREUR'||r.status==='ABANDON'?'bg-red-50':'';
+    const statClass=r.status==='OK'?'text-emerald-700':r.status==='DÉPART'?'text-slate-600':'text-red-700 font-semibold';
+    tr.classList.add('result-row');
+    tr.innerHTML=`<td data-label="Waypoint" class="p-2 font-medium">${escapeHtml(r.name)}</td><td data-label="ETA" class="p-2 whitespace-nowrap">${escapeHtml(fmtLocal(r.etaMs,LOCAL_TZ))}</td><td data-label="Niveau (m)" class="p-2">${r.level==null?'—':r.level.toFixed(2)}</td><td data-label="DSQ min (m)" class="p-2">${r.dsqMin==null?'—':r.dsqMin.toFixed(2)}</td><td data-label="Courant moy. (kn)" class="p-2">${r.currentKn==null?'—':`${r.currentKn>=0?'+':''}${r.currentKn.toFixed(2)}`}</td><td data-label="SOW permise min. (kn)" class="p-2">${r.sowPermise==null?'—':r.sowPermise.toFixed(1)}</td><td data-label="SOW utilisée moy. (kn)" class="p-2">${r.sowUsed==null?'—':r.sowUsed.toFixed(1)}</td><td data-label="SOG (kn)" class="p-2 font-semibold">${r.sog==null?'—':r.sog.toFixed(1)}</td><td data-label="Statut" class="p-2 ${statClass}">${escapeHtml(r.status)}</td>`;
+    tbody.appendChild(tr);
+    if(r.detail||r.error){
+      const d=document.createElement('tr');
+      const detail=r.error?r.error:`${r.detail.pointCount} positions | ${r.detail.distanceNm.toFixed(2)} NM | courant moyen P-Q ${r.detail.currentMin.toFixed(2)} à ${r.detail.currentMax.toFixed(2)} kn | MONTANT ${r.detail.montantCount}, DESCENDANT ${r.detail.descendantCount}, SLACK ${r.detail.slackCount}${r.station?` | niveau: ${r.station}`:''}`;
+      d.className='result-detail';
+      d.innerHTML=`<td colspan="9" class="px-2 pb-2 text-xs text-slate-500">${escapeHtml(detail)}</td>`;
+      tbody.appendChild(d);
+    }
+  }
+}
+
+function q73ControlHtml(res){
+  if(!res?.q73Plan)return'';
+  const q=res.q73Plan;
+  return `<div class="mt-3 rounded-2xl border bg-blue-50 border-blue-200 p-3"><div class="font-semibold">Contrôle Q73 — Québec → Trois-Rivières</div><div class="mt-1">Portneuf ${Number.isFinite(q.portneufLevel)?q.portneufLevel.toFixed(2):'—'} m − Deschaillons ${Number.isFinite(q.deschaillonsLevel)?q.deschaillonsLevel.toFixed(2):'—'} m = <b>${Number.isFinite(q.levelDifferenceM)?`${q.levelDifferenceM>=0?'+':''}${q.levelDifferenceM.toFixed(2)}`:'—'} m</b> → courant baissant <b>${Number.isFinite(q.currentKn)?q.currentKn.toFixed(2):'—'} kn</b>${q.clampedToLevelTable?` <span class="text-xs">(valeur limite de la table)</span>`:''}.</div><div class="mt-1">SOW <b>${Number.isFinite(q.sowUsed)?q.sowUsed.toFixed(1):'—'} kn</b> — SOG Q73 <b>${Number.isFinite(q.sogKn)?q.sogKn.toFixed(2):'—'} kn</b> — minimum requis <b>${Number.isFinite(q.minSogKn)?q.minSogKn.toFixed(1):'—'} kn</b>.</div></div>`;
+}
+
+function failureExplanation(res){
+  const when=fmtLocal(res.failureEtaMs||res.etaMs,LOCAL_TZ);
+  if(res.failureKind==='Q73_SOG'){
+    const sog=Number.isFinite(res.failureSogKn)?res.failureSogKn.toFixed(2):'—';
+    const min=Number.isFinite(res.failureMinSogKn)?res.failureMinSogKn.toFixed(1):'—';
+    const cur=Number.isFinite(res.failureCurrentKn)?res.failureCurrentKn.toFixed(2):'—';
+    return `Bris du plan initial à Bouée Q73 vers <b>${escapeHtml(when)}</b> : SOG calculée <b>${sog} kn</b>, inférieure au minimum requis de <b>${min} kn</b> avec un courant baissant de <b>${cur} kn</b>.`;
+  }
+  if(res.failureKind==='DSQ'||String(res.error||'').startsWith('DSQ insuffisant')){
+    const point=res.failurePointName||'un point de la route';
+    const dsq=Number.isFinite(res.failureDsq)?`${res.failureDsq.toFixed(2)} m`:'insuffisant';
+    const req=Number.isFinite(res.failureRequiredDsq)?`${res.failureRequiredDsq.toFixed(2)} m`:'le minimum requis';
+    return `Bris du plan initial près de <b>${escapeHtml(point)}</b> vers <b>${escapeHtml(when)}</b> : DSQ disponible <b>${dsq}</b>, alors que <b>${req}</b> est requis pour maintenir le plancher de 7 kn.`;
+  }
+  return `Le transit initial est interrompu : ${escapeHtml(res.error||'raison non précisée')}.`;
+}
+
+function renderInitialResult(res){
+  renderRowsInto('tbody',res);
+  el('log').textContent=res.logs||'';
+  lastText=res.logs||'';
+  el('recalcSection').classList.add('hidden');
+  el('recalcTbody').innerHTML='';
+  el('recalcSummary').innerHTML='';
+  el('recalcPrompt').classList.add('hidden');
+  el('recalcReason').innerHTML='';
+
+  if(res.ok){
+    el('summary').innerHTML=`<div class="rounded-2xl border bg-emerald-50 border-emerald-200 p-3"><div class="font-semibold">Plan initial réalisable</div><div class="mt-1">ETA destination : <b>${escapeHtml(fmtLocal(res.etaMs,LOCAL_TZ))}</b></div><div class="mt-1">Temps de transit : <b>${escapeHtml(fmtDuration(res.etaMs-res.depMs))}</b> — Distance calculée : ${res.distanceNm.toFixed(1)} NM</div></div>${q73ControlHtml(res)}`;
+  }else{
+    const explanation=failureExplanation(res);
+    el('summary').innerHTML=`<div class="rounded-2xl border bg-red-50 border-red-200 p-3"><div class="font-semibold">Plan initial interrompu</div><div class="mt-1">${explanation}</div></div>${q73ControlHtml(res)}`;
+    if(res.failureKind==='DSQ'||res.failureKind==='Q73_SOG'||String(res.error||'').startsWith('DSQ insuffisant')){
+      el('recalcReason').innerHTML=explanation+' Le tableau ci-dessus demeure le calcul du départ initial.';
+      el('recalcPrompt').classList.remove('hidden');
+    }
+  }
+}
+
+function renderRecalcResult(search,initialRes){
+  const section=el('recalcSection');
+  section.classList.remove('hidden');
+  const summary=el('recalcSummary');
+  const tbody=el('recalcTbody');
+  tbody.innerHTML='';
+  if(search.ok){
+    const res=search.result;
+    renderRowsInto('recalcTbody',res);
+    const origin=res.rows?.[0]?.name||'origine';
+    const destination=res.rows?.at(-1)?.name||'destination';
+    const maxInput=Number.isFinite(pendingRecalcContext?.baseParams?.maxSowKn)?pendingRecalcContext.baseParams.maxSowKn:null;
+    const hasPace=Number.isFinite(search.paceCapKn)&&Number.isFinite(maxInput)&&search.paceCapKn<maxInput-EPS;
+    const departureText=search.sameDeparture?'Heure de départ demandée conservée':`Départ retardé de ${escapeHtml(fmtDuration(search.waitMs||0))}`;
+    const paceHtml=hasPace?`<div class="mt-1">Synchronisation Q73 : plafond volontaire de <b>${search.paceCapKn.toFixed(1)} kn</b> avant Q73 seulement. À Q73 et après, retour à la SOW maximale permise par le DSQ, la vitesse maximale saisie et les limites locales.</div>`:`<div class="mt-1">Les vitesses sont recalculées à chaque position avec la SOW maximale permise par le DSQ, la vitesse maximale saisie et les limites locales.</div>`;
+    summary.innerHTML=`<div class="rounded-2xl border bg-emerald-50 border-emerald-200 p-3"><div class="font-semibold">Nouveau plan réalisable</div><div class="mt-1">${departureText} : <b>${escapeHtml(fmtLocal(search.depMs,LOCAL_TZ))}</b>.</div><div class="mt-1">ETA ${escapeHtml(destination)} : <b>${escapeHtml(fmtLocal(res.etaMs,LOCAL_TZ))}</b>.</div>${paceHtml}</div>${q73ControlHtml(res)}`;
+    const extra=`\n\n[NOUVEAU PLAN DE PASSAGE]\nDépart: ${fmtLocal(search.depMs,LOCAL_TZ)}\nAttente: ${fmtDuration(search.waitMs||0)}\nSynchronisation avant Q73: ${hasPace?`plafond ${search.paceCapKn.toFixed(1)} kn avant Q73 seulement; vitesse maximale permise à Q73 et après`:'aucun ralentissement volontaire requis'}\nETA destination: ${fmtLocal(res.etaMs,LOCAL_TZ)}`;
+    el('log').textContent=(initialRes.logs||'')+extra+'\n\n'+(res.logs||'');
+    lastText=el('log').textContent;
+  }else if(search.notFound){
+    summary.innerHTML=`<div class="rounded-2xl border bg-amber-50 border-amber-200 p-3"><div class="font-semibold">Aucun nouveau plan trouvé</div><div class="mt-1">Aucun départ continu n'a été trouvé dans les ${search.searchHours} heures suivant le départ demandé.</div></div>`;
+  }else{
+    summary.innerHTML=`<div class="rounded-2xl border bg-amber-50 border-amber-200 p-3"><div class="font-semibold">Recalcul interrompu</div><div class="mt-1">${escapeHtml(search.error||'Données indisponibles.')}</div></div>`;
+  }
+}
+
+function setStatus(msg,kind='info'){el('status').textContent=msg;el('status').className='text-sm '+(kind==='err'?'text-red-700':kind==='ok'?'text-emerald-700':'text-slate-700');}
+function setProgress(msg,pct){setStatus(msg);el('progressBar').style.width=`${Math.max(0,Math.min(100,pct))}%`;}
+
+el('runBtn').addEventListener('click',async()=>{
+  el('runBtn').disabled=true;
+  el('tbody').innerHTML='';
+  el('summary').innerHTML='';
+  el('recalcPrompt').classList.add('hidden');
+  el('recalcSection').classList.add('hidden');
+  el('log').textContent='';
+  el('progressBar').style.width='0%';
+  pendingRecalcContext=null;
+  try{
+    const direction=el('direction').value;
+    const vesselType=el('vesselType').value;
+    const draftM=Number(el('draftM').value);
+    const beamM=Number(el('beamM').value);
+    const maxSowKn=Number(el('maxSowKn').value);
+    const tzName=LOCAL_TZ;
+    if(!Number.isFinite(maxSowKn)||maxSowKn<7||maxSowKn>20)throw new Error('La vitesse sur l’eau maximum doit être entre 7,0 et 20,0 kn.');
+    const depMs=localWallToMs(el('depDate').value,el('depTime').value,tzName);
+    const trip=buildSegments(direction);
+    const inputs=await loadInputs(depMs,setProgress);
+    const baseParams={direction,vesselType,draftM,beamM,maxSowKn,depMs,tzName};
+    setProgress('Calcul du plan initial…',20);
+    const res=await calcTrip(baseParams,inputs,trip,setProgress);
+    renderInitialResult(res);
+    const canRecalc=!res.ok&&(res.failureKind==='DSQ'||res.failureKind==='Q73_SOG'||String(res.error||'').startsWith('DSQ insuffisant'));
+    if(canRecalc) pendingRecalcContext={baseParams,inputs,trip,res};
+    setProgress(res.ok?'Plan initial calculé.':'Plan initial interrompu — voir la raison et le bouton Recalculer.',100);
+    setStatus(res.ok?'Plan initial réalisable.':'Plan initial interrompu — tableau conservé pour diagnostic.',res.ok?'ok':'err');
+  }catch(e){
+    console.error(e);
+    setStatus(String(e?.message??e),'err');
+    el('log').textContent='Erreur: '+String(e?.message??e);
+    lastText=el('log').textContent;
+  }finally{
+    el('runBtn').disabled=false;
+  }
+});
+
+el('recalcBtn').addEventListener('click',async()=>{
+  const ctx=pendingRecalcContext;
+  if(!ctx)return;
+  const btn=el('recalcBtn');
+  btn.disabled=true;
+  el('recalcSection').classList.add('hidden');
+  try{
+    setProgress('Recherche du plan le plus tôt possible : même départ d’abord, avec synchronisation avant Q73…',10);
+    let search;
+    if(ctx.baseParams.direction==='QPOR'&&(ctx.res.failureKind==='DSQ'||ctx.res.failureKind==='Q73_SOG')){
+      search=await findQ73SogPlan(ctx.baseParams,ctx.inputs,ctx.trip,setProgress);
+    }else{
+      search=await findNextContinuousDeparture(ctx.baseParams,ctx.inputs,ctx.trip,setProgress);
+    }
+    renderRecalcResult(search,ctx.res);
+    setProgress('Recalcul terminé.',100);
+    setStatus(search.ok?'Nouveau plan trouvé — voir le second tableau.':search.notFound?'Aucun nouveau plan trouvé dans la fenêtre de recherche.':'Recalcul interrompu.',search.ok?'ok':'err');
+  }catch(e){
+    console.error(e);
+    renderRecalcResult({ok:false,dataError:true,error:String(e?.message??e)},ctx.res);
+    setStatus(String(e?.message??e),'err');
+  }finally{
+    btn.disabled=false;
+  }
+});
+
+el('copyBtn').addEventListener('click',async()=>{if(!lastText)return;try{await navigator.clipboard.writeText(lastText);setStatus('Journal copié.','ok')}catch{setStatus('Impossible de copier.','err')}});
+el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new Blob([lastText],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='transit_quebec_pointe_des_ormes.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);});
+(function init(){const tz=LOCAL_TZ,now=new Date(),p=_dtParts(now,tz,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});el('depDate').value=`${p.get('year')}-${p.get('month')}-${p.get('day')}`;el('depTime').value=`${p.get('hour')}:${p.get('minute')}`;})();
+</script>
+</body>
+</html>
