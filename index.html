@@ -211,7 +211,7 @@
           <li>Courants OHPS échantillonnés sur la route et interpolés dans le temps; courant du sous-segment = moyenne P–Q, sans projection sur le cap.</li>
           <li>Québec → Pointe-des-Ormes : MONTANT ajouté, DESCENDANT soustrait. Pointe-des-Ormes → Québec : DESCENDANT ajouté, MONTANT soustrait. Le courant est appliqué directement à la SOW pour calculer la SOG; SLACK &lt; 0,10 kn = 0.</li>
           <li>Majoration du courant DESCENDANT OHPS : +14 % par défaut; +20 % de Pont de Québec à CIP St-Nicolas; +30 % de Phare Richelieu à Barre Boulard. Exception : au point Q73 en direction Québec → Trois-Rivières, le courant est remplacé par la règle Portneuf − Deschaillons ci-dessous.</li>
-          <li>Courant spécial Q73, Québec → Trois-Rivières : Δ niveau = Portneuf − Deschaillons à l'heure réelle de passage. Table Δ→courant baissant : +1,50→1 kn; +1,25→2; +1,00→3; +0,75→4; +0,50→5; +0,25→6; 0,00→7; −0,25→8; −0,50→9. Interpolation linéaire entre les valeurs. Hors de la plage −0,50 à +1,50 m, la valeur limite la plus proche du tableau est utilisée : 9 kn sous −0,50 m et 1 kn au-dessus de +1,50 m.</li>
+          <li>Courant spécial Q73, Québec → Trois-Rivières : Δ niveau = Portneuf − Deschaillons à l'heure réelle de passage. Table Δ→courant : −0,75→10 kn baissant; −0,50→9; −0,25→8; 0,00→7; +0,25→6; +0,50→5; +0,75→4; +1,00→3; +1,25→2; +1,50→1 kn baissant; +1,80→0 kn; +2,05→1 kn montant. Interpolation linéaire entre les valeurs. Sous −0,75 m, la valeur reste 10 kn baissant; à +2,05 m et plus, elle reste 1 kn montant.</li>
           <li>À Q73 en direction Québec → Trois-Rivières, critère de passage basé sur la SOG avec ce courant spécial : largeur réelle &lt; 24 m → SOG minimale 2,5 kn; largeur réelle ≥ 24 m → SOG minimale 3,0 kn.</li>
           <li>Heures : toutes les heures sont affichées en heure locale du Saint-Laurent (America/Montreal); aucun choix de fuseau n'est demandé.</li>
           <li>DSQ : aucune marge additionnelle n'est ajoutée au calcul. Le dégagement disponible est calculé à partir du niveau, de la profondeur de référence et du tirant d'eau saisi.</li>
@@ -1095,16 +1095,20 @@ function allowedSow(tbl,dsq,maxSow,extraCandidate=null){
 }
 
 
+// Convention Q73: currentKn > 0 = courant baissant, currentKn < 0 = courant montant.
 const Q73_LEVEL_CURRENT_TABLE=[
-  {diffM:-0.50,currentKn:9.0},
-  {diffM:-0.25,currentKn:8.0},
-  {diffM: 0.00,currentKn:7.0},
-  {diffM: 0.25,currentKn:6.0},
-  {diffM: 0.50,currentKn:5.0},
-  {diffM: 0.75,currentKn:4.0},
-  {diffM: 1.00,currentKn:3.0},
-  {diffM: 1.25,currentKn:2.0},
-  {diffM: 1.50,currentKn:1.0}
+  {diffM:-0.75,currentKn:10.0},
+  {diffM:-0.50,currentKn: 9.0},
+  {diffM:-0.25,currentKn: 8.0},
+  {diffM: 0.00,currentKn: 7.0},
+  {diffM: 0.25,currentKn: 6.0},
+  {diffM: 0.50,currentKn: 5.0},
+  {diffM: 0.75,currentKn: 4.0},
+  {diffM: 1.00,currentKn: 3.0},
+  {diffM: 1.25,currentKn: 2.0},
+  {diffM: 1.50,currentKn: 1.0},
+  {diffM: 1.80,currentKn: 0.0},
+  {diffM: 2.05,currentKn:-1.0}
 ];
 const Q73_SOG_BEAM_SPLIT_M=24.0;
 const Q73_SOG_MIN_UNDER_24_KN=2.5;
@@ -1141,14 +1145,17 @@ function q73SpecialCurrentForEta(inputData,targetMs,direction){
   const portneufLevel=Number(p.value),deschaillonsLevel=Number(d.value),levelDifferenceM=portneufLevel-deschaillonsLevel;
   const mapped=q73CurrentFromLevelDifference(levelDifferenceM);
   if(mapped.error)return mapped;
-  const speedKnots=mapped.currentKn;
+  const signedCurrentKn=mapped.currentKn;
+  const speedKnots=Math.abs(signedCurrentKn);
+  const currentType=Math.abs(signedCurrentKn)<0.1?'SLACK':signedCurrentKn>0?'DESCENDANT':'MONTANT';
+  const effectKn=-signedCurrentKn; // Québec → Trois-Rivières : baissant soustrait, montant ajouté.
   return{
     speedKnots,
-    currentType:'DESCENDANT',
-    hydroSignedKn:speedKnots,
-    baseEffectKn:-speedKnots,
+    currentType,
+    hydroSignedKn:signedCurrentKn,
+    baseEffectKn:effectKn,
     descendingMultiplier:1.0,
-    effectKn:-speedKnots,
+    effectKn,
     source:'Q73_PORTNEUF_DESCHAILLONS',
     portneufLevel,
     deschaillonsLevel,
@@ -1335,6 +1342,8 @@ async function calcTrip(params,inputData,trip,setProgress){
           sowPerm,
           sowUsed:sow,
           currentKn:cP.speedKnots,
+          currentType:cP.currentType,
+          currentEffectKn:cP.effectKn,
           sogKn:q73SogKn,
           minSogKn,
           portneufLevel:cP.portneufLevel,
@@ -1344,10 +1353,11 @@ async function calcTrip(params,inputData,trip,setProgress){
           clampedToLevelTable:!!cP.clampedToLevelTable,
           tableDiffUsedM:cP.tableDiffUsedM
         };
-        logs.push(`[Q73 spécial] ${fmtLocal(eta,tzName)} | Portneuf ${cP.portneufLevel.toFixed(2)} m − Deschaillons ${cP.deschaillonsLevel.toFixed(2)} m = ${cP.levelDifferenceM>=0?'+':''}${cP.levelDifferenceM.toFixed(2)} m | courant baissant ${cP.speedKnots.toFixed(2)} kn${cP.clampedToLevelTable?` (borne de table ${cP.tableDiffUsedM>=0?'+':''}${cP.tableDiffUsedM.toFixed(2)} m)`:''} | SOW ${sow.toFixed(1)} kn | SOG ${q73SogKn.toFixed(2)} kn | minimum ${minSogKn.toFixed(1)} kn`);
+        const q73CurrentLabel=cP.currentType==='DESCENDANT'?'courant baissant':cP.currentType==='MONTANT'?'courant montant':'courant nul';
+        logs.push(`[Q73 spécial] ${fmtLocal(eta,tzName)} | Portneuf ${cP.portneufLevel.toFixed(2)} m − Deschaillons ${cP.deschaillonsLevel.toFixed(2)} m = ${cP.levelDifferenceM>=0?'+':''}${cP.levelDifferenceM.toFixed(2)} m | ${q73CurrentLabel} ${cP.speedKnots.toFixed(2)} kn${cP.clampedToLevelTable?` (borne de table ${cP.tableDiffUsedM>=0?'+':''}${cP.tableDiffUsedM.toFixed(2)} m)`:''} | SOW ${sow.toFixed(1)} kn | SOG ${q73SogKn.toFixed(2)} kn | minimum ${minSogKn.toFixed(1)} kn`);
         if(!(q73SogKn>=minSogKn-EPS)){
-          rows.push({name:displayName(seg.end),etaMs:eta,status:'ABANDON',level,dsqMin:dsq,currentKn:-cP.speedKnots,sowPermise:sowPerm,sowUsed:sow,sog:q73SogKn,error:`SOG Q73 ${q73SogKn.toFixed(2)} kn inférieure au minimum ${minSogKn.toFixed(1)} kn`});
-          return{rows,logs:logs.join('\n'),ok:false,error:`Passage Q73 impossible à ${fmtLocal(eta,tzName)}: SOG ${q73SogKn.toFixed(2)} kn, minimum requis ${minSogKn.toFixed(1)} kn.`,failureKind:'Q73_SOG',failureReason:'SOG_MIN',failurePointName:'Bouée Q73',failurePointIndex:38,failureEtaMs:eta,failureDsq:dsq,failureCurrentKn:cP.speedKnots,failureSogKn:q73SogKn,failureMinSogKn:minSogKn,q73Plan:q73RuleAtEntry,depMs,etaMs:eta,distanceNm:totalDist};
+          rows.push({name:displayName(seg.end),etaMs:eta,status:'ABANDON',level,dsqMin:dsq,currentKn:cP.effectKn,sowPermise:sowPerm,sowUsed:sow,sog:q73SogKn,error:`SOG Q73 ${q73SogKn.toFixed(2)} kn inférieure au minimum ${minSogKn.toFixed(1)} kn`});
+          return{rows,logs:logs.join('\n'),ok:false,error:`Passage Q73 impossible à ${fmtLocal(eta,tzName)}: SOG ${q73SogKn.toFixed(2)} kn, minimum requis ${minSogKn.toFixed(1)} kn.`,failureKind:'Q73_SOG',failureReason:'SOG_MIN',failurePointName:'Bouée Q73',failurePointIndex:38,failureEtaMs:eta,failureDsq:dsq,failureCurrentKn:cP.speedKnots,failureCurrentType:cP.currentType,failureSogKn:q73SogKn,failureMinSogKn:minSogKn,q73Plan:q73RuleAtEntry,depMs,etaMs:eta,distanceNm:totalDist};
         }
       }
 
@@ -1624,7 +1634,8 @@ function renderRowsInto(tbodyId,res){
 function q73ControlHtml(res){
   if(!res?.q73Plan)return'';
   const q=res.q73Plan;
-  return `<div class="mt-3 rounded-2xl border bg-blue-50 border-blue-200 p-3"><div class="font-semibold">Contrôle Q73 — Québec → Trois-Rivières</div><div class="mt-1">Portneuf ${Number.isFinite(q.portneufLevel)?q.portneufLevel.toFixed(2):'—'} m − Deschaillons ${Number.isFinite(q.deschaillonsLevel)?q.deschaillonsLevel.toFixed(2):'—'} m = <b>${Number.isFinite(q.levelDifferenceM)?`${q.levelDifferenceM>=0?'+':''}${q.levelDifferenceM.toFixed(2)}`:'—'} m</b> → courant baissant <b>${Number.isFinite(q.currentKn)?q.currentKn.toFixed(2):'—'} kn</b>${q.clampedToLevelTable?` <span class="text-xs">(valeur limite de la table)</span>`:''}.</div><div class="mt-1">SOW <b>${Number.isFinite(q.sowUsed)?q.sowUsed.toFixed(1):'—'} kn</b> — SOG Q73 <b>${Number.isFinite(q.sogKn)?q.sogKn.toFixed(2):'—'} kn</b> — minimum requis <b>${Number.isFinite(q.minSogKn)?q.minSogKn.toFixed(1):'—'} kn</b>.</div></div>`;
+  const currentLabel=q.currentType==='DESCENDANT'?'courant baissant':q.currentType==='MONTANT'?'courant montant':'courant nul';
+  return `<div class="mt-3 rounded-2xl border bg-blue-50 border-blue-200 p-3"><div class="font-semibold">Contrôle Q73 — Québec → Trois-Rivières</div><div class="mt-1">Portneuf ${Number.isFinite(q.portneufLevel)?q.portneufLevel.toFixed(2):'—'} m − Deschaillons ${Number.isFinite(q.deschaillonsLevel)?q.deschaillonsLevel.toFixed(2):'—'} m = <b>${Number.isFinite(q.levelDifferenceM)?`${q.levelDifferenceM>=0?'+':''}${q.levelDifferenceM.toFixed(2)}`:'—'} m</b> → ${currentLabel} <b>${Number.isFinite(q.currentKn)?q.currentKn.toFixed(2):'—'} kn</b>${q.clampedToLevelTable?` <span class="text-xs">(valeur limite de la table)</span>`:''}.</div><div class="mt-1">SOW <b>${Number.isFinite(q.sowUsed)?q.sowUsed.toFixed(1):'—'} kn</b> — SOG Q73 <b>${Number.isFinite(q.sogKn)?q.sogKn.toFixed(2):'—'} kn</b> — minimum requis <b>${Number.isFinite(q.minSogKn)?q.minSogKn.toFixed(1):'—'} kn</b>.</div></div>`;
 }
 
 function failureExplanation(res){
@@ -1633,7 +1644,8 @@ function failureExplanation(res){
     const sog=Number.isFinite(res.failureSogKn)?res.failureSogKn.toFixed(2):'—';
     const min=Number.isFinite(res.failureMinSogKn)?res.failureMinSogKn.toFixed(1):'—';
     const cur=Number.isFinite(res.failureCurrentKn)?res.failureCurrentKn.toFixed(2):'—';
-    return `Bris du plan initial à Bouée Q73 vers <b>${escapeHtml(when)}</b> : SOG calculée <b>${sog} kn</b>, inférieure au minimum requis de <b>${min} kn</b> avec un courant baissant de <b>${cur} kn</b>.`;
+    const currentLabel=res.failureCurrentType==='MONTANT'?'courant montant':res.failureCurrentType==='SLACK'?'courant nul':'courant baissant';
+    return `Bris du plan initial à Bouée Q73 vers <b>${escapeHtml(when)}</b> : SOG calculée <b>${sog} kn</b>, inférieure au minimum requis de <b>${min} kn</b> avec un ${currentLabel} de <b>${cur} kn</b>.`;
   }
   if(res.failureKind==='DSQ'||String(res.error||'').startsWith('DSQ insuffisant')){
     const point=res.failurePointName||'un point de la route';
