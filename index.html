@@ -56,6 +56,27 @@
     body.app-night #progressBar { background-color: #70a8d1 !important; }
 
 
+    .full-table-details { margin-top: 1rem; }
+    .full-table-details > summary {
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-weight: 600;
+      color: #b9cadc;
+    }
+    .full-table-details > summary::-webkit-details-marker { display: none; }
+    .full-table-details > summary::before {
+      content: '▶';
+      font-size: .72rem;
+      transition: transform .15s ease;
+    }
+    .full-table-details[open] > summary::before { transform: rotate(90deg); }
+    .report-table-wrap { margin-top: 1rem; }
+
+
     /* Affichage mobile : les lignes du tableau deviennent des cartes lisibles sans défilement horizontal. */
     @media (max-width: 767px) {
       .max-w-7xl { padding-left: .75rem !important; padding-right: .75rem !important; }
@@ -137,7 +158,7 @@
           <select id="vesselType" class="w-full border rounded-xl px-3 py-2"><option>Conteneur</option><option>Autre</option></select>
         </label>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <label class="text-sm"><span class="block text-slate-700 mb-1">Tirant (m)</span><input id="draftM" type="number" step="0.01" value="9.70" class="w-full border rounded-xl px-3 py-2" /></label>
+          <label class="text-sm"><span class="block text-slate-700 mb-1">Tirant (m)</span><input id="draftM" type="number" step="0.01" value="8.10" class="w-full border rounded-xl px-3 py-2" /></label>
           <label class="text-sm"><span class="block text-slate-700 mb-1">Largeur (m)</span><input id="beamM" type="number" step="0.1" value="33" class="w-full border rounded-xl px-3 py-2" /></label>
         </div>
         <label class="text-sm">
@@ -156,37 +177,28 @@
 
     <section class="bg-white rounded-2xl shadow-sm border p-4 lg:col-span-2">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h2 class="text-lg font-semibold">Plan initial — ETA par waypoint</h2>
+        <h2 class="text-lg font-semibold">Plan initial — points de rapport</h2>
         <div class="flex flex-wrap gap-2"><button id="copyBtn" class="border rounded-xl px-3 py-2 text-sm hover:bg-slate-50">Copier journal</button><button id="downloadBtn" class="border rounded-xl px-3 py-2 text-sm hover:bg-slate-50">Télécharger .txt</button></div>
       </div>
       <div id="summary" class="mt-3 text-sm"></div>
-      <div class="mt-4 overflow-auto border rounded-2xl">
+      <div class="report-table-wrap overflow-auto border rounded-2xl">
         <table class="results-table min-w-full text-sm">
           <thead class="bg-slate-100 text-slate-700"><tr>
-            <th class="text-left p-2">Waypoint</th>
+            <th class="text-left p-2">Point de rapport</th>
             <th class="text-left p-2">ETA (local)</th>
             <th class="text-left p-2">Niveau (m)</th>
-            <th class="text-left p-2">DSQ min (m)</th>
-            <th class="text-left p-2">Courant moy. (kn)</th>
-            <th class="text-left p-2">SOW permise min. (kn)</th>
-            <th class="text-left p-2">SOW utilisée moy. (kn)</th>
-            <th class="text-left p-2 leading-tight">SOG<br><span class="font-normal">(Kts)</span></th>
-            <th class="text-left p-2">Statut</th>
+            <th class="text-left p-2">DSQ (m)</th>
+            <th class="text-left p-2">SOW max permise au point (kn)</th>
+            <th class="text-left p-2">Courant au point (kn)</th>
+            <th class="text-left p-2">SOG au point (kn)</th>
           </tr></thead>
-          <tbody id="tbody"></tbody>
+          <tbody id="reportTbody"></tbody>
         </table>
       </div>
 
-      <div id="recalcPrompt" class="hidden mt-4 rounded-2xl border bg-amber-50 border-amber-200 p-4 text-sm">
-        <div class="font-semibold">Le plan initial ne permet pas un transit continu</div>
-        <div id="recalcReason" class="mt-1"></div>
-        <button id="recalcBtn" class="mt-3 rounded-xl border px-4 py-2 font-semibold">Recalculer le prochain passage</button>
-      </div>
-
-      <div id="recalcSection" class="hidden mt-6">
-        <h3 class="text-lg font-semibold">Nouveau plan de passage</h3>
-        <div id="recalcSummary" class="mt-3 text-sm"></div>
-        <div class="mt-4 overflow-auto border rounded-2xl">
+      <details id="fullTableDetails" class="full-table-details">
+        <summary>Afficher le tableau complet</summary>
+        <div class="mt-3 overflow-auto border rounded-2xl">
           <table class="results-table min-w-full text-sm">
             <thead class="bg-slate-100 text-slate-700"><tr>
               <th class="text-left p-2">Waypoint</th>
@@ -199,18 +211,67 @@
               <th class="text-left p-2 leading-tight">SOG<br><span class="font-normal">(Kts)</span></th>
               <th class="text-left p-2">Statut</th>
             </tr></thead>
-            <tbody id="recalcTbody"></tbody>
+            <tbody id="tbody"></tbody>
           </table>
         </div>
+      </details>
+
+      <div id="recalcPrompt" class="hidden mt-4 rounded-2xl border bg-amber-50 border-amber-200 p-4 text-sm">
+        <div class="font-semibold">Le plan initial ne permet pas un transit continu</div>
+        <div id="recalcReason" class="mt-1"></div>
+        <button id="recalcBtn" class="mt-3 rounded-xl border px-4 py-2 font-semibold">Recalculer le prochain passage</button>
       </div>
 
-      <div class="mt-4"><h3 class="font-semibold">Journal (diagnostic)</h3><pre id="log" class="mt-2 bg-slate-900 text-slate-50 rounded-2xl p-3 text-xs overflow-auto max-h-[360px]"></pre></div>
-      <div id="directivesSummary" class="hidden mt-4 rounded-2xl border bg-slate-50 p-4 text-sm">
-        <h3 class="font-semibold">Résumé des directives appliquées</h3>
-        <ul class="mt-2 list-disc pl-5 space-y-1 text-slate-700">
+      <div id="recalcSection" class="hidden mt-6">
+        <h3 class="text-lg font-semibold">Nouveau plan — points de rapport</h3>
+        <div id="recalcSummary" class="mt-3 text-sm"></div>
+        <div class="report-table-wrap overflow-auto border rounded-2xl">
+          <table class="results-table min-w-full text-sm">
+            <thead class="bg-slate-100 text-slate-700"><tr>
+              <th class="text-left p-2">Point de rapport</th>
+              <th class="text-left p-2">ETA (local)</th>
+              <th class="text-left p-2">Niveau (m)</th>
+              <th class="text-left p-2">DSQ (m)</th>
+              <th class="text-left p-2">SOW max permise au point (kn)</th>
+              <th class="text-left p-2">Courant au point (kn)</th>
+              <th class="text-left p-2">SOG au point (kn)</th>
+            </tr></thead>
+            <tbody id="recalcReportTbody"></tbody>
+          </table>
+        </div>
+        <details id="recalcFullTableDetails" class="full-table-details">
+          <summary>Afficher le tableau complet</summary>
+          <div class="mt-3 overflow-auto border rounded-2xl">
+            <table class="results-table min-w-full text-sm">
+              <thead class="bg-slate-100 text-slate-700"><tr>
+                <th class="text-left p-2">Waypoint</th>
+                <th class="text-left p-2">ETA (local)</th>
+                <th class="text-left p-2">Niveau (m)</th>
+                <th class="text-left p-2">DSQ min (m)</th>
+                <th class="text-left p-2">Courant moy. (kn)</th>
+                <th class="text-left p-2">SOW permise min. (kn)</th>
+                <th class="text-left p-2">SOW utilisée moy. (kn)</th>
+                <th class="text-left p-2 leading-tight">SOG<br><span class="font-normal">(Kts)</span></th>
+                <th class="text-left p-2">Statut</th>
+              </tr></thead>
+              <tbody id="recalcTbody"></tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+
+      <details id="diagnosticDetails" class="full-table-details mt-4">
+        <summary>Journal (diagnostic)</summary>
+        <pre id="log" class="mt-3 bg-slate-900 text-slate-50 rounded-2xl p-3 text-xs overflow-auto max-h-[360px]"></pre>
+      </details>
+      <details id="directivesSummary" class="hidden full-table-details mt-4 rounded-2xl border bg-slate-50 p-4 text-sm">
+        <summary>Afficher les critères et instructions</summary>
+        <div class="mt-3">
+          <h3 class="font-semibold">Résumé des directives appliquées</h3>
+          <ul class="mt-2 list-disc pl-5 space-y-1 text-slate-700">
           <li>Courants OHPS échantillonnés sur la route et interpolés dans le temps; courant du sous-segment = moyenne P–Q, sans projection sur le cap.</li>
           <li>Québec → Pointe-des-Ormes : MONTANT ajouté, DESCENDANT soustrait. Pointe-des-Ormes → Québec : DESCENDANT ajouté, MONTANT soustrait. Le courant est appliqué directement à la SOW pour calculer la SOG; SLACK &lt; 0,10 kn = 0.</li>
-          <li>Majoration du courant DESCENDANT OHPS : +14 % par défaut; +20 % de Pont de Québec à CIP St-Nicolas; +30 % de Phare Richelieu à Barre Boulard. Exception : au point Q73 en direction Québec → Trois-Rivières, le courant est remplacé par la règle Portneuf − Deschaillons ci-dessous.</li>
+          <li>Majoration du courant DESCENDANT OHPS : +14 % par défaut; +20 % de Pont de Québec à CIP St-Nicolas; +30 % de Phare Richelieu à Barre Boulard. Entre CIP Grondines et Cap à la roche inclusivement, le courant DESCENDANT calculé reçoit ensuite +13 % supplémentaires; le courant MONTANT n'est pas modifié par cette correction. Exception : au point Q73 en direction Québec → Trois-Rivières, le courant est remplacé par la règle Portneuf − Deschaillons ci-dessous.</li>
           <li>Courant spécial Q73, Québec → Trois-Rivières : Δ niveau = Portneuf − Deschaillons à l'heure réelle de passage. Table Δ→courant : −0,75→10 kn baissant; −0,50→9; −0,25→8; 0,00→7; +0,25→6; +0,50→5; +0,75→4; +1,00→3; +1,25→2; +1,50→1 kn baissant; +1,80→0 kn; +2,05→1 kn montant. Interpolation linéaire entre les valeurs. Sous −0,75 m, la valeur reste 10 kn baissant; à +2,05 m et plus, elle reste 1 kn montant.</li>
           <li>À Q73 en direction Québec → Trois-Rivières, critère de passage basé sur la SOG avec ce courant spécial : largeur réelle &lt; 24 m → SOG minimale 2,5 kn; largeur réelle ≥ 24 m → SOG minimale 3,0 kn.</li>
           <li>Heures : toutes les heures sont affichées en heure locale du Saint-Laurent (America/Montreal); aucun choix de fuseau n'est demandé.</li>
@@ -222,14 +283,15 @@
           <li>Navires de largeur réelle ≥ 30 m, dans les deux directions : maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes. Toute limite locale plus basse demeure prioritaire.</li>
           <li>Table SQ porte-conteneurs complète utilisée de 7 à 15 kn pour toutes les largeurs 24 à 44 m; au-dessus de 15 kn, l'exigence augmente de 0,60 m par nœud supplémentaire, avec interpolation.</li>
           <li>La SOW utilisée reste la plus élevée permise par le DSQ, la vitesse maximale saisie et les limites locales applicables; le plancher de 7 kn n'est pas un plafond.</li>
-          <li>Affichage par secteur : « SOW permise min. » = plus faible SOW permise rencontrée dans le secteur; « SOW utilisée moy. » = moyenne pondérée par la distance des SOW réellement utilisées. Il est donc possible que la moyenne utilisée soit supérieure au minimum permis sans qu'aucun sous-segment ne dépasse sa propre limite.</li>
+          <li>Tableau principal : seuls les points de rapport Station Québec, CIP Saint-Nicolas, CIP Sainte-Croix, CIP Grondines, CIP Batiscan et Pointe-des-Ormes sont affichés. Pour chaque point, le tableau donne le niveau, le DSQ, la SOW maximale permise au point, le courant instantané au point et la SOG au point (SOW maximale permise + effet signé du courant). Le tableau complet repliable demeure inchangé avec tous les waypoints, le courant moyen par secteur, la SOW permise minimale et la SOW utilisée moyenne.</li>
           <li>Le bouton Calculer affiche toujours d'abord le plan initial demandé. Si le transit est interrompu, le tableau initial demeure visible avec la raison du bris.</li>
           <li>Le bouton « Recalculer le prochain passage » essaie d'abord de conserver exactement l'heure de départ demandée. Pour un bris lié à Q73 en direction Québec → Pointe-des-Ormes, il réduit au besoin la SOW avant Q73 seulement, en recherchant le plafond pré-Q73 le plus élevé qui permet le passage.</li>
           <li>Dès Q73, le ralentissement de synchronisation cesse : la SOW revient à la vitesse maximale permise par le DSQ, la vitesse maximale saisie et les restrictions locales. Si aucun profil ne fonctionne à l'heure demandée, le logiciel cherche ensuite le prochain départ possible sur 30 h, par pas de 5 min puis avec raffinement à 1 min, en appliquant la même stratégie.</li>
           <li>Le plancher de 7 kn demeure uniquement le minimum absolu; il n'est jamais utilisé comme plafond général de planification.</li>
           <li>Si les données nécessaires sont indisponibles, le calcul s'arrête avec une erreur visible.</li>
-        </ul>
-      </div>
+          </ul>
+        </div>
+      </details>
     </section>
   </div>
 </div>
@@ -1190,9 +1252,13 @@ function descendingCurrentMultiplier(point){
   const idx=Number(point?.index);
   const zonePontQuebecStNicolas=Number.isFinite(idx) && idx>=5 && idx<=12;
   const zonePhareRichelieuBarreBoulard=Number.isFinite(idx) && idx>=36 && idx<=39;
-  if(zonePhareRichelieuBarreBoulard) return 1.30;
-  if(zonePontQuebecStNicolas) return 1.20;
-  return 1.14;
+  const zoneGrondinesCapRoche=Number.isFinite(idx) && idx>=42 && idx<=49;
+  let multiplier=1.14;
+  if(zonePhareRichelieuBarreBoulard) multiplier=1.30;
+  else if(zonePontQuebecStNicolas) multiplier=1.20;
+  // Correction supplémentaire uniquement sur le courant DESCENDANT entre CIP Grondines et Cap à la roche inclusivement.
+  if(zoneGrondinesCapRoche) multiplier*=1.13;
+  return multiplier;
 }
 function ohpsHydroSignedKn(c,point){
   if(c.currentType==='DESCENDANT') return c.speedKnots*descendingCurrentMultiplier(point);
@@ -1275,14 +1341,15 @@ async function calcTrip(params,inputData,trip,setProgress){
   if(!tbl[beam]) throw new Error(`Largeur ${beam} m non prise en charge. Choix: ${Object.keys(tbl).sort().join(', ')}`);
   const dsqTable=tbl[beam],rows=[],logs=[];
   let eta=depMs,totalDist=0,doneSegments=0,q73Plan=null;
-  rows.push({name:displayName(trip.named[0]),etaMs:eta,status:'DÉPART',level:null,dsqMin:null,currentKn:null,sowPermise:null,sowUsed:null,sog:null,detail:null});
+  const startRow={name:displayName(trip.named[0]),etaMs:eta,status:'DÉPART',level:null,dsqMin:null,currentKn:null,pointCurrentKn:null,pointCurrentType:null,pointLevel:null,pointDsq:null,pointSowPerm:null,pointSog:null,sowPermise:null,sowUsed:null,sog:null,detail:null};
+  rows.push(startRow);
   logs.push(`Direction: ${displayName(trip.named[0])} → ${displayName(trip.named.at(-1))}`);
   logs.push(`Départ: ${fmtLocal(depMs,tzName)} | SOW max utilisateur: ${maxSowKn.toFixed(1)} kn`);
   logs.push(direction==='QPOR'?'Règle courant Québec → Pointe-des-Ormes: MONTANT = ajouté | DESCENDANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.':'Règle courant Pointe-des-Ormes → Québec: DESCENDANT = ajouté | MONTANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.');
   logs.push("SOW locale: maximum 11,0 kn sur les 2,0 premiers NM depuis Québec; puis maximum 12,0 kn jusqu'au Pont de Québec; maximum 11,0 kn entre Wayagamak et Station Pointe-des-Ormes (ou la limite utilisateur si elle est plus basse).");
   if(beamM>=30-EPS) logs.push('Navire de largeur réelle >= 30 m: maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes, dans les deux directions; toute limite locale plus basse demeure prioritaire.');
   else logs.push('Navire de largeur réelle < 30 m: vitesse maximale saisie jusqu’à 20,0 kn. Jusqu’à 15,0 kn, table SQ initiale inchangée; au-dessus de 15,0 kn, dégagement requis = exigence à 15,0 kn + 0,60 m par nœud supplémentaire, avec interpolation linéaire.');
-  logs.push('Majoration du courant DESCENDANT OHPS: +14 % par défaut; +20 % entre Pont de Québec et CIP St-Nicolas (incluant Bouée Q19); +30 % entre Phare Richelieu et Barre Boulard. Exception: au point Q73 en direction Québec → Trois-Rivières, le courant OHPS est remplacé par la table Portneuf − Deschaillons.');
+  logs.push('Majoration du courant DESCENDANT OHPS: +14 % par défaut; +20 % entre Pont de Québec et CIP St-Nicolas (incluant Bouée Q19); +30 % entre Phare Richelieu et Barre Boulard; +13 % supplémentaires sur le courant DESCENDANT calculé entre CIP Grondines et Cap à la roche inclusivement. Le courant MONTANT n’est pas modifié par cette correction. Exception: au point Q73 en direction Québec → Trois-Rivières, le courant OHPS est remplacé par la table Portneuf − Deschaillons.');
   logs.push('Les anciennes corrections locales fixes de +0,5 kn / +1,0 kn ont été retirées.');
   logs.push('Plancher SOW: 7,0 kn partout. À Q73 en direction Québec → Trois-Rivières, le passage dépend de la SOG: minimum 2,5 kn si largeur < 24 m; minimum 3,0 kn si largeur ≥ 24 m.');
   if(direction==='QPOR'&&Number.isFinite(preQ73SowCapKn)) logs.push(`Synchronisation Q73: départ conservé lorsque possible; plafond volontaire de ${preQ73SowCapKn.toFixed(1)} kn avant Q73 seulement. À Q73 et après, retour à la SOW maximale permise par le DSQ, la vitesse saisie et les limites locales.`);
@@ -1291,6 +1358,7 @@ async function calcTrip(params,inputData,trip,setProgress){
 
   for(const seg of trip.segments){
     let segHours=0,segDist=0,wCur=0,wSow=0,minDsq=Infinity,minSowPerm=Infinity,lastLevel=null,lastStation='',currentMin=Infinity,currentMax=-Infinity;
+    let lastPointCurrentKn=null,lastPointCurrentType=null,lastPointLevel=null,lastPointDsq=null,lastPointSowPerm=null,lastPointSog=null;
     let montantCount=0,descendantCount=0,slackCount=0;
 
     for(let i=0;i<seg.path.length-1;i++){
@@ -1330,6 +1398,16 @@ async function calcTrip(params,inputData,trip,setProgress){
       if(cP.error){
         rows.push({name:displayName(seg.end),etaMs:eta,status:'ERREUR',error:cP.error});
         return{rows,logs:logs.join('\n'),ok:false,error:`${direction==='QPOR'&&p.index===38?'Courant spécial Q73':'OHPS'}: ${cP.error}`,depMs,etaMs:eta,distanceNm:totalDist};
+      }
+      if(startRow.pointCurrentKn==null && totalDist<=EPS && p.index===trip.named[0].index){
+        const pPointMaxSow=localMaxSowKnForDistance(Number(p.distanceFromStartNm),planningMaxSowKn,beamM);
+        const pPointSowPerm=allowedSow(dsqTable,dsq,pPointMaxSow);
+        startRow.pointCurrentKn=cP.effectKn;
+        startRow.pointCurrentType=cP.currentType;
+        startRow.pointLevel=level;
+        startRow.pointDsq=dsq;
+        startRow.pointSowPerm=pPointSowPerm;
+        startRow.pointSog=(pPointSowPerm>0&&Number.isFinite(cP.effectKn))?pPointSowPerm+cP.effectKn:null;
       }
 
       const q73Passage=(direction==='QPOR' && p.index===38 && q.index===39);
@@ -1416,7 +1494,25 @@ async function calcTrip(params,inputData,trip,setProgress){
         }catch(_){/* conserve la première moyenne P-Q */}
       }
 
+      // Valeur instantanée au point Q, conservée uniquement pour l'affichage des points de rapport.
+      lastPointCurrentKn=cQ.effectKn;
+      lastPointCurrentType=cQ.currentType;
+
       eta+=h*3600000;
+
+      // Valeurs au point de rapport à l'heure réelle de passage. Elles servent uniquement au tableau résumé.
+      const qCfg=configForIndex(q.index),qSorted=inputData.seriesByStation[qCfg.stationKey];
+      const qLv=findValueNearEvent(qSorted,eta,6,true);
+      const qLevel=qLv.value==null?null:Number(qLv.value);
+      const qDsq=qLevel==null?null:qLevel+qCfg.depth-draftM;
+      const qBeforeQ73=direction==='QPOR' && q.index<=38;
+      const qPlanningMaxSowKn=(qBeforeQ73&&Number.isFinite(preQ73SowCapKn))?Math.max(7,Math.min(maxSowKn,preQ73SowCapKn)):maxSowKn;
+      const qPointMaxSow=localMaxSowKnForDistance(Number(q.distanceFromStartNm),qPlanningMaxSowKn,beamM);
+      const qPointSowPerm=qDsq==null?null:allowedSow(dsqTable,qDsq,qPointMaxSow);
+      lastPointLevel=qLevel;
+      lastPointDsq=qDsq;
+      lastPointSowPerm=qPointSowPerm;
+      lastPointSog=(Number.isFinite(qPointSowPerm)&&qPointSowPerm>0&&Number.isFinite(cQ.effectKn))?qPointSowPerm+cQ.effectKn:null;
       if(q73RuleAtEntry) q73Plan={...q73RuleAtEntry,exitEtaMs:eta,dsq};
       segHours+=h; segDist+=dist; totalDist+=dist;
       wCur+=curKn*dist; wSow+=speedPieces.reduce((a,x)=>a+x.sow*x.distanceNm,0);
@@ -1431,7 +1527,7 @@ async function calcTrip(params,inputData,trip,setProgress){
     }
 
     const avgCur=wCur/segDist,avgSow=wSow/segDist,effectiveSog=segDist/segHours;
-    rows.push({name:displayName(seg.end),etaMs:eta,status:'OK',level:lastLevel,station:lastStation,dsqMin:minDsq,currentKn:avgCur,sowPermise:minSowPerm,sowUsed:avgSow,sog:effectiveSog,detail:{distanceNm:segDist,pointCount:seg.path.length,currentMin,currentMax,montantCount,descendantCount,slackCount}});
+    rows.push({name:displayName(seg.end),etaMs:eta,status:'OK',level:lastLevel,station:lastStation,dsqMin:minDsq,currentKn:avgCur,pointCurrentKn:lastPointCurrentKn,pointCurrentType:lastPointCurrentType,pointLevel:lastPointLevel,pointDsq:lastPointDsq,pointSowPerm:lastPointSowPerm,pointSog:lastPointSog,sowPermise:minSowPerm,sowUsed:avgSow,sog:effectiveSog,detail:{distanceNm:segDist,pointCount:seg.path.length,currentMin,currentMax,montantCount,descendantCount,slackCount}});
     logs.push(`[${displayName(seg.end)}] ETA ${fmtLocal(eta,tzName)} | ${segDist.toFixed(2)} NM | courant moyen P-Q ${(avgCur>=0?'+':'')}${avgCur.toFixed(2)} kn | SOW ${avgSow.toFixed(1)} | SOG ${effectiveSog.toFixed(1)} | DSQ min ${minDsq.toFixed(2)} m`);
     doneSegments++;
     setProgress?.(`Calcul OHPS point par point… ${doneSegments}/${trip.segments.length} secteurs`,20+Math.round(doneSegments/trip.segments.length*75));
@@ -1611,6 +1707,32 @@ function appendNextPassageResult(search,initialRes,tzName){
 
 let pendingRecalcContext=null;
 
+const REPORT_POINT_LABELS=new Map([
+  ['Station Québec','Station Québec'],
+  ['CIP St-Nicolas','CIP Saint-Nicolas'],
+  ['CIP Ste Croix','CIP Sainte-Croix'],
+  ['CIP Grondines','CIP Grondines'],
+  ['CIP Batiscan','CIP Batiscan'],
+  ['Station Pointe-des-Ormes','Pointe-des-Ormes']
+]);
+
+function renderReportRowsInto(tbodyId,res){
+  const tbody=el(tbodyId);
+  tbody.innerHTML='';
+  for(const r of (res.rows||[]).filter(x=>REPORT_POINT_LABELS.has(x.name))){
+    const tr=document.createElement('tr');
+    tr.className=r.status==='ERREUR'||r.status==='ABANDON'?'bg-red-50':'';
+    tr.classList.add('result-row');
+    const pointLevel=r.pointLevel??r.level;
+    const pointDsq=r.pointDsq??r.dsqMin;
+    const pointSowPerm=r.pointSowPerm;
+    const pointCurrent=r.pointCurrentKn;
+    const pointSog=r.pointSog;
+    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA" class="p-2 whitespace-nowrap">${escapeHtml(fmtLocal(r.etaMs,LOCAL_TZ))}</td><td data-label="Niveau (m)" class="p-2">${pointLevel==null?'—':pointLevel.toFixed(2)}</td><td data-label="DSQ (m)" class="p-2">${pointDsq==null?'—':pointDsq.toFixed(2)}</td><td data-label="SOW max permise au point (kn)" class="p-2">${pointSowPerm==null?'—':pointSowPerm.toFixed(1)}</td><td data-label="Courant au point (kn)" class="p-2">${pointCurrent==null?'—':`${pointCurrent>=0?'+':''}${pointCurrent.toFixed(2)}`}</td><td data-label="SOG au point (kn)" class="p-2 font-semibold">${pointSog==null?'—':pointSog.toFixed(1)}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
 function renderRowsInto(tbodyId,res){
   const tbody=el(tbodyId);
   tbody.innerHTML='';
@@ -1658,11 +1780,16 @@ function failureExplanation(res){
 
 function renderInitialResult(res){
   el('directivesSummary').classList.remove('hidden');
+  el('directivesSummary').open=false;
+  renderReportRowsInto('reportTbody',res);
   renderRowsInto('tbody',res);
+  el('fullTableDetails').open=false;
   el('log').textContent=res.logs||'';
   lastText=res.logs||'';
   el('recalcSection').classList.add('hidden');
+  el('recalcReportTbody').innerHTML='';
   el('recalcTbody').innerHTML='';
+  el('recalcFullTableDetails').open=false;
   el('recalcSummary').innerHTML='';
   el('recalcPrompt').classList.add('hidden');
   el('recalcReason').innerHTML='';
@@ -1685,8 +1812,11 @@ function renderRecalcResult(search,initialRes){
   const summary=el('recalcSummary');
   const tbody=el('recalcTbody');
   tbody.innerHTML='';
+  el('recalcReportTbody').innerHTML='';
+  el('recalcFullTableDetails').open=false;
   if(search.ok){
     const res=search.result;
+    renderReportRowsInto('recalcReportTbody',res);
     renderRowsInto('recalcTbody',res);
     const origin=res.rows?.[0]?.name||'origine';
     const destination=res.rows?.at(-1)?.name||'destination';
@@ -1710,7 +1840,9 @@ function setProgress(msg,pct){setStatus(msg);el('progressBar').style.width=`${Ma
 
 el('runBtn').addEventListener('click',async()=>{
   el('runBtn').disabled=true;
+  el('reportTbody').innerHTML='';
   el('tbody').innerHTML='';
+  el('fullTableDetails').open=false;
   el('summary').innerHTML='';
   el('recalcPrompt').classList.add('hidden');
   el('recalcSection').classList.add('hidden');
