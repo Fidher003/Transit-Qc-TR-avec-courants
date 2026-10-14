@@ -4,7 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Transit Québec Trois-Rivières</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <style id="tailwind-local">
+/* Self-contained equivalents of the Tailwind 3 utilities already used by the
+   original file. No new layout, controls, typography scale or colour palette.
+   Preflight follows Tailwind CSS v3.4.17 (MIT, Tailwind Labs, Inc.). */
+*,::before,::after{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}
+::before,::after{--tw-content:''}
+html,:host{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}
+body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){text-decoration:underline dotted}
+h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}
+code,kbd,samp,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}
+small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}
+table{text-indent:0;border-color:inherit;border-collapse:collapse}
+button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}
+button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}
+:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}
+[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}
+summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}
+ol,ul,menu{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}
+button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canvas,audio,iframe,embed,object{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}
+.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:.25rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}
+.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-2{height:.5rem}.w-full{width:100%}.min-w-full{min-width:100%}.max-w-7xl{max-width:80rem}.max-h-\[360px\]{max-height:360px}
+.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}
+.space-y-1>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.25rem * (1 - var(--tw-space-y-reverse)));margin-bottom:calc(.25rem * var(--tw-space-y-reverse))}
+.overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}.whitespace-nowrap{white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-xl{border-radius:.75rem}.rounded-full{border-radius:9999px}.border{border-width:1px}
+.border-slate-200{border-color:#e2e8f0}.border-amber-200{border-color:#fde68a}.border-blue-200{border-color:#bfdbfe}.border-emerald-200{border-color:#a7f3d0}.border-red-200{border-color:#fecaca}
+.bg-amber-50{background-color:#fffbeb}.bg-blue-50{background-color:#eff6ff}.bg-emerald-50{background-color:#ecfdf5}.bg-red-50{background-color:#fef2f2}.bg-slate-50{background-color:#f8fafc}.bg-slate-100{background-color:#f1f5f9}.bg-slate-700{background-color:#334155}.bg-slate-900{background-color:#0f172a}.bg-white{background-color:#fff}
+.p-2{padding:.5rem}.p-3{padding:.75rem}.p-4{padding:1rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.pb-2{padding-bottom:.5rem}.pl-5{padding-left:1.25rem}
+.text-left{text-align:left}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xs{font-size:.75rem;line-height:1rem}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.leading-tight{line-height:1.25}.list-disc{list-style-type:disc}
+.text-slate-50{color:#f8fafc}.text-slate-500{color:#64748b}.text-slate-600{color:#475569}.text-slate-700{color:#334155}.text-slate-800{color:#1e293b}.text-slate-900{color:#0f172a}.text-white{color:#fff}.text-emerald-700{color:#047857}.text-red-700{color:#b91c1c}
+.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / .05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}
+.hover\:bg-slate-50:hover{background-color:#f8fafc}.hover\:bg-slate-800:hover{background-color:#1e293b}
+@media(min-width:640px){.sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:justify-between{justify-content:space-between}}
+@media(min-width:768px){.md\:p-6{padding:1.5rem}.md\:text-3xl{font-size:1.875rem;line-height:2.25rem}}
+@media(min-width:1024px){.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+  </style>
 
   <style>
     :root { color-scheme: dark; }
@@ -1309,6 +1344,481 @@ function ohpsSampleSeries(point,series,targetMs){const aMs=Math.floor(targetMs/3
 async function ohpsLoadPathSeries(key,pathPoints,startIso,endIso,radiusKm=1.5){const cacheKey=`${key}|${startIso}|${endIso}|${radiusKm}`;if(OHPS_STATE.seriesCache.has(cacheKey))return OHPS_STATE.seriesCache.get(cacheKey);const meta=await ohpsLoadMetadata(),b=ohpsBboxForPoints(pathPoints,radiusKm),plan=ohpsStridePlan(meta,b),dims=meta.dimensions.map(d=>ohpsDimConstraint(d,meta,b,startIso,endIso,plan)).join(''),vars=[meta.u,meta.v,meta.speed,meta.dir].filter((x,i,a)=>x&&a.indexOf(x)===i),projection=vars.map(v=>`${v}${dims}`).join(','),url=`${OHPS_ERDDAP}/griddap/${OHPS_DATASET}.json?${encodeURIComponent(projection)}`;OHPS_STATE.lastUrls.push(url);const json=await ohpsJsonp(url,60000),t=ohpsTable(json),col={};t.names.forEach((n,i)=>col[n]=i);const rows=[],rowsByTime=new Map();for(const r of t.rows){const lat=ohpsAsNum(r[col[meta.lat]]),lon=ohpsAsNum(r[col[meta.lon]]);if(lat==null||lon==null)continue;const item={lat,lon,time:r[col[meta.time]],u:meta.u&&col[meta.u]!=null?ohpsAsNum(r[col[meta.u]]):null,v:meta.v&&col[meta.v]!=null?ohpsAsNum(r[col[meta.v]]):null,speed:meta.speed&&col[meta.speed]!=null?ohpsAsNum(r[col[meta.speed]]):null,dir:meta.dir&&col[meta.dir]!=null?ohpsAsNum(r[col[meta.dir]]):null};if((item.u!=null&&item.v!=null)||(item.speed!=null&&item.dir!=null)){rows.push(item);const k=fmtUtcIso(Date.parse(item.time));if(!rowsByTime.has(k))rowsByTime.set(k,[]);rowsByTime.get(k).push(item);}}if(!rows.length&&radiusKm<3)return ohpsLoadPathSeries(key,pathPoints,startIso,endIso,3);if(!rows.length&&radiusKm<5)return ohpsLoadPathSeries(key,pathPoints,startIso,endIso,5);if(!rows.length)throw new Error(`Aucune cellule OHPS dans le secteur ${key}.`);const units={};vars.forEach(v=>units[v]=t.units[col[v]]||'');const series={rows,rowsByTime,meta,units};OHPS_STATE.seriesCache.set(cacheKey,series);return series;}
 async function promisePool(items,limit,worker,onProgress){let next=0,done=0;const out=new Array(items.length);async function run(){while(true){const i=next++;if(i>=items.length)return;try{out[i]=await worker(items[i],i)}catch(e){out[i]={error:String(e?.message??e)}}done++;onProgress?.(done,items.length,items[i],out[i]);}}await Promise.all(Array.from({length:Math.min(limit,items.length)},run));return out;}
 
+// BEGIN SHOP DATA ADAPTER
+/* Compact numeric GeoTIFF reader for WCS. No image colours are interpreted as currents.
+ * TIFF 6: strips/tiles, contiguous/separate samples, integer and IEEE float data,
+ * uncompressed, PackBits, TIFF-LZW and Deflate; predictors 1, 2 and 3.
+ * Unsupported encodings fail explicitly. All offsets and decoded sizes are bounded.
+ */
+async function shopReadTiff(buffer){
+  if(!(buffer instanceof ArrayBuffer)||buffer.byteLength<8)throw new Error('SHOP : fichier TIFF incomplet.');
+  const d=new DataView(buffer),b=new Uint8Array(buffer),little=d.getUint16(0,false)===0x4949;
+  if(!little&&d.getUint16(0,false)!==0x4d4d)throw new Error('SHOP : la r\u00e9ponse n\u2019est pas un GeoTIFF num\u00e9rique.');
+  const check=(o,n)=>{if(!Number.isSafeInteger(o)||!Number.isSafeInteger(n)||o<0||n<0||o+n>buffer.byteLength)throw new Error('SHOP : offset TIFF invalide.');};
+  const u16=o=>{check(o,2);return d.getUint16(o,little);},u32=o=>{check(o,4);return d.getUint32(o,little);};
+  if(u16(2)!==42)throw new Error('SHOP : variante TIFF non prise en charge (BigTIFF).');
+  const start=u32(4),count=u16(start),tags={};
+  if(count>512)throw new Error('SHOP : trop de balises TIFF.');
+  const size={1:1,2:1,3:2,4:4,5:8,6:1,7:1,8:2,9:4,10:8,11:4,12:8};
+  for(let i=0;i<count;i++){
+    const e=start+2+i*12;check(e,12);const tag=u16(e),type=u16(e+2),n=u32(e+4),s=size[type];
+    if(!s)continue;if(n>4000000)throw new Error('SHOP : balise TIFF trop grande.');
+    const off=n*s<=4?e+8:u32(e+8);check(off,n*s);
+    if(type===2){tags[tag]=new TextDecoder().decode(b.subarray(off,off+n)).replace(/\0+$/,'');continue;}
+    const a=[];for(let k=0;k<n;k++){
+      const p=off+k*s;
+      if(type===1||type===7)a.push(d.getUint8(p));else if(type===3)a.push(d.getUint16(p,little));
+      else if(type===4)a.push(d.getUint32(p,little));else if(type===6)a.push(d.getInt8(p));
+      else if(type===8)a.push(d.getInt16(p,little));else if(type===9)a.push(d.getInt32(p,little));
+      else if(type===11)a.push(d.getFloat32(p,little));else if(type===12)a.push(d.getFloat64(p,little));
+      else if(type===5)a.push(d.getUint32(p,little)/d.getUint32(p+4,little));
+      else if(type===10)a.push(d.getInt32(p,little)/d.getInt32(p+4,little));
+    }tags[tag]=a;
+  }
+  const one=(t,f)=>tags[t]?.[0]??f;
+  const width=one(256,0),height=one(257,0),samples=one(277,1),planar=one(284,1),compression=one(259,1),predictor=one(317,1);
+  if(!(width>0&&height>0&&samples>0&&samples<=16&&width*height*samples<=8000000))throw new Error('SHOP : dimensions TIFF invalides ou trop grandes.');
+  if(one(274,1)!==1||![1,2].includes(planar))throw new Error('SHOP : orientation TIFF non reconnue.');
+  if([2,3,5,6,8,9,10].includes(one(262,1)))throw new Error('SHOP : image de couleur refus\u00e9e, donn\u00e9es num\u00e9riques requises.');
+  const expand=(a,def)=>Array.from({length:samples},(_,i)=>a?.[i]??a?.[0]??def),bits=expand(tags[258],8),formats=expand(tags[339],1);
+  if(bits.some(x=>x!==bits[0]||![8,16,32,64].includes(x))||formats.some(x=>![1,2,3].includes(x)))throw new Error('SHOP : types TIFF non pris en charge.');
+  if(formats.some((f,i)=>f===3&&![32,64].includes(bits[i])||f!==3&&bits[i]===64))throw new Error('SHOP : type num\u00e9rique TIFF non pris en charge.');
+  const bytes=bits[0]/8,channels=planar===2?1:samples,tiles=!!tags[324],bw=tiles?one(322,0):width,bh=tiles?one(323,0):Math.min(one(278,height),height);
+  if(!(bw>0&&bh>0&&bw*bh*channels*bytes<=64000000))throw new Error('SHOP : blocs TIFF invalides.');
+  const nx=Math.ceil(width/bw),ny=Math.ceil(height/bh),perBand=nx*ny,offsets=tags[tiles?324:273],lengths=tags[tiles?325:279];
+  if(!offsets||!lengths||offsets.length!==perBand*(planar===2?samples:1)||lengths.length!==offsets.length)throw new Error('SHOP : table de blocs TIFF incoh\u00e9rente.');
+  const arrays=Array.from({length:samples},()=>new Float64Array(width*height));
+  for(let block=0;block<offsets.length;block++){
+    const tile=block%perBand,x0=(tile%nx)*bw,y0=Math.floor(tile/nx)*bh,h=tiles?bh:Math.min(bh,height-y0),expected=bw*h*channels*bytes;
+    check(offsets[block],lengths[block]);const enc=b.slice(offsets[block],offsets[block]+lengths[block]);
+    let raw;
+    if(compression===1)raw=enc;
+    else if(compression===8||compression===32946){
+      if(typeof DecompressionStream==='undefined')throw new Error('SHOP : utiliser un navigateur r\u00e9cent pour lire les donn\u00e9es compress\u00e9es.');
+      const reader=new Blob([enc]).stream().pipeThrough(new DecompressionStream('deflate')).getReader(),chunks=[];let total=0;
+      try{while(true){const r=await reader.read();if(r.done)break;total+=r.value.length;if(total>expected){await reader.cancel();throw new Error('Bloc TIFF d\u00e9compress\u00e9 trop grand.');}chunks.push(r.value);}}finally{reader.releaseLock();}
+      raw=new Uint8Array(total);let o=0;for(const c of chunks){raw.set(c,o);o+=c.length;}
+    }else if(compression===5)raw=shopTiffLzw(enc,expected);
+    else if(compression===32773){raw=new Uint8Array(expected);let p=0,j=0;while(p<enc.length&&j<expected){const n=(enc[p++]<<24)>>24;if(n>=0){if(p+n+1>enc.length||j+n+1>expected)throw new Error('PackBits invalide.');raw.set(enc.subarray(p,p+n+1),j);p+=n+1;j+=n+1;}else if(n>-128){if(p>=enc.length||j+1-n>expected)throw new Error('PackBits invalide.');raw.fill(enc[p++],j,j+1-n);j+=1-n;}}if(j!==expected)throw new Error('PackBits incomplet.');}
+    else throw new Error(`SHOP : compression TIFF ${compression} non prise en charge.`);
+    if(raw.length!==expected)throw new Error(`SHOP : bloc TIFF incomplet (${raw.length}/${expected}).`);
+    shopTiffPredict(raw,predictor,bw,h,channels,bytes,little,formats[planar===2?Math.floor(block/perBand):0]);
+    const view=new DataView(raw.buffer,raw.byteOffset,raw.byteLength),littleData=predictor===3?true:little;
+    const value=(o,f)=>f===3?(bytes===4?view.getFloat32(o,littleData):view.getFloat64(o,littleData)):
+      f===2?(bytes===1?view.getInt8(o):bytes===2?view.getInt16(o,littleData):view.getInt32(o,littleData)):
+      (bytes===1?view.getUint8(o):bytes===2?view.getUint16(o,littleData):view.getUint32(o,littleData));
+    for(let y=0;y<Math.min(h,height-y0);y++)for(let x=0;x<Math.min(bw,width-x0);x++)for(let c=0;c<channels;c++){
+      const s=planar===2?Math.floor(block/perBand):c,o=((y*bw+x)*channels+c)*bytes;
+      arrays[s][(y0+y)*width+x0+x]=value(o,formats[s]);
+    }
+  }
+  const keyList=tags[34735]||[],keys={};
+  if(keyList.length>=4)for(let i=0;i<keyList[3];i++){const k=4+i*4;if(k+3>=keyList.length)throw new Error('GeoKeys TIFF incomplets.');const id=keyList[k],loc=keyList[k+1],n=keyList[k+2],off=keyList[k+3];if(loc===0)keys[id]=off;else if(typeof tags[loc]==='string')keys[id]=tags[loc].slice(off,off+n);else keys[id]=tags[loc]?.slice(off,off+n);}
+  const pixelOffset=keys[1025]===2?0:0.5;
+  let xy;
+  if(tags[34264]?.length===16){const m=tags[34264];xy=(x,y)=>[m[0]*(x+pixelOffset)+m[1]*(y+pixelOffset)+m[3],m[4]*(x+pixelOffset)+m[5]*(y+pixelOffset)+m[7]];}
+  else if(tags[33550]?.length>=2&&tags[33922]?.length>=6){const s=tags[33550],t=tags[33922];xy=(x,y)=>[t[3]+(x+pixelOffset-t[0])*s[0],t[4]-(y+pixelOffset-t[1])*s[1]];}
+  else throw new Error('SHOP : g\u00e9or\u00e9f\u00e9rencement absent du TIFF.');
+  if(keys[2048]!==4326)throw new Error(`SHOP : le GeoTIFF n\u2019est pas en WGS84 (code ${keys[2048]??keys[3072]??'absent'}).`);
+  const bandMeta=Array.from({length:samples},()=>({})),globalMeta={};
+  if(tags[42112]){
+    const doc=shopXml(tags[42112]);for(const item of shopNodes(doc,'Item')){
+      const idx=item.getAttribute('sample'),name=(item.getAttribute('name')||'').toLowerCase();
+      const target=idx===null?globalMeta:bandMeta[Number(idx)];if(target)target[name]=item.textContent.trim();
+    }
+  }
+  const nodata=tags[42113]===undefined?null:shopNumber(String(tags[42113]).trim());
+  return{width,height,samples,arrays,xy,bandMeta,globalMeta,nodata,keys,tags};
+}
+function shopTiffPredict(a,predictor,width,height,channels,bytes,little,format){
+  if(predictor===1)return;if(![2,3].includes(predictor))throw new Error('SHOP : pr\u00e9dicteur TIFF non reconnu.');
+  const rowLength=width*channels*bytes;
+  if(predictor===2&&(bytes>4||format===3))throw new Error('SHOP : pr\u00e9dicteur entier incompatible avec le type TIFF.');
+  if(predictor===3&&format!==3)throw new Error('SHOP : pr\u00e9dicteur flottant incompatible avec le type TIFF.');
+  for(let y=0;y<height;y++){
+    const row=a.subarray(y*rowLength,(y+1)*rowLength);
+    if(predictor===2){const v=new DataView(row.buffer,row.byteOffset,row.byteLength);for(let i=channels;i<width*channels;i++){const o=i*bytes,q=(i-channels)*bytes;if(bytes===1)row[o]=(row[o]+row[q])&255;else if(bytes===2)v.setUint16(o,(v.getUint16(o,little)+v.getUint16(q,little))&65535,little);else v.setUint32(o,(v.getUint32(o,little)+v.getUint32(q,little))>>>0,little);}}
+    else {for(let i=channels;i<rowLength;i++)row[i]=(row[i]+row[i-channels])&255;const copy=row.slice(),n=width*channels;for(let i=0;i<n;i++)for(let j=0;j<bytes;j++)row[i*bytes+j]=copy[(bytes-1-j)*n+i];}
+  }
+}
+function shopTiffLzw(input,expected){
+  const output=new Uint8Array(expected),prefix=new Int16Array(4096),suffix=new Uint8Array(4096),stack=new Uint8Array(4097);
+  let pos=0,bits=9,next=258,old=-1,first=0,at=0;
+  const read=()=>{if(pos+bits>input.length*8)return-1;let n=0;for(let k=0;k<bits;k++){n=(n<<1)|((input[pos>>3]>>(7-(pos&7)))&1);pos++;}return n;};
+  while(true){let code=read();if(code<0||code===257)break;if(code===256){bits=9;next=258;old=-1;continue;}
+    const original=code;let top=0;
+    if(code>=next){if(code!==next||old<0)throw new Error('SHOP : code LZW invalide.');stack[top++]=first;code=old;}
+    let loops=0;while(code>=256){if(code>=next||++loops>4096)throw new Error('SHOP : dictionnaire LZW invalide.');stack[top++]=suffix[code];code=prefix[code];}
+    first=code;stack[top++]=code;if(at+top>expected)throw new Error('SHOP : bloc LZW trop grand.');while(top)output[at++]=stack[--top];
+    if(old>=0&&next<4096){prefix[next]=old;suffix[next]=first;next++;if(next===(1<<bits)-1&&bits<12)bits++;}old=original;
+  }
+  if(at!==expected)throw new Error(`SHOP : bloc LZW incomplet (${at}/${expected}).`);return output;
+}
+
+/* SHOP acquisition adapter, 2026-10-14.
+ * Only SHOP/OHPS is allowed. No fallback to another hydrodynamic model.
+ * Preferred endpoint: GeoServer WCS (raw numeric coverage), not map colours.
+ * Layer identity supplied in the correspondence: raster-harvester:ohps_mosaic.
+ * Model metadata: https://catalogue.cioos.ca/en/dataset/ca-cioos_45ded553-38a5-4874-b43f-1855007f31b0
+ * WCS protocol: https://docs.geoserver.org/latest/en/user/services/wcs/reference/
+ * The live service schema is checked at runtime; band numbers are never guessed.
+ */
+const SHOP_CONFIG=Object.freeze({
+  geoserver:'https://geoserver.prod.ogsl.ca/geoserver',
+  layer:'raster-harvester:ohps_mosaic',
+  erddap:'https://erddap.ogsl.ca/erddap',
+  dataset:'ecccShopNautilo',
+  radiusKm:5,
+  initialRadiusKm:1.5,
+  targetMetres:100,
+  timeoutMs:25000,
+  maxBytes:24000000
+});
+const SHOP_STATE={source:null,hours:new Map(),pending:new Map(),diagnostic:[],metadataKey:new Set(),fetchedAt:null};
+function shopNote(s){SHOP_STATE.diagnostic.push(String(s));}
+function shopNumber(x){if(x===null||x===undefined||typeof x==='boolean'||typeof x==='string'&&!x.trim())return null;const n=Number(x);return Number.isFinite(n)?n:null;}
+function shopNorm(s){return String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');}
+function shopUtc(x){if(typeof x!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(x.trim()))return NaN;const s=x.trim();return Date.parse(/(?:Z|[+-]\d{2}:?\d{2})$/i.test(s)?s:s+'Z');}
+function shopNodes(n,name){return Array.from(n.getElementsByTagNameNS('*',name));}
+function shopChild(n,name){return Array.from(n.children||[]).find(c=>c.localName===name)||null;}
+function shopText(n,name){return shopChild(n,name)?.textContent.trim()||'';}
+function shopXml(text){
+  const d=new DOMParser().parseFromString(text,'application/xml');
+  if(shopNodes(d,'parsererror').length)throw new Error('SHOP : document XML illisible.');
+  const errors=[...shopNodes(d,'ServiceException'),...shopNodes(d,'ExceptionText')].map(x=>x.textContent.trim()).filter(Boolean);
+  if(errors.length)throw new Error('SHOP : '+errors.join(' | ').slice(0,650));return d;
+}
+function shopUrl(base,params){const u=new URL(base);for(const [k,v]of Object.entries(params))if(v!==null&&v!==undefined)u.searchParams.set(k,String(v));return u.href;}
+async function shopFetch(url,kind='m\u00e9tadonn\u00e9es',binary=false){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),SHOP_CONFIG.timeoutMs);
+  shopNote(`[REQUETE ${kind}] ${url}`);
+  try{
+    const r=await fetch(url,{mode:'cors',credentials:'omit',cache:'no-store',signal:controller.signal});
+    if(!r.ok){const detail=(await r.text()).replace(/\s+/g,' ').slice(0,300);throw new Error(`HTTP ${r.status} ${detail}`);}
+    if(Number(r.headers.get('content-length'))>SHOP_CONFIG.maxBytes)throw new Error('R\u00e9ponse trop grande.');
+    const reader=r.body?.getReader();let buf;
+    if(reader){const chunks=[];let size=0;try{while(true){const q=await reader.read();if(q.done)break;size+=q.value.length;if(size>SHOP_CONFIG.maxBytes){await reader.cancel();throw new Error('R\u00e9ponse trop grande.');}chunks.push(q.value);}}finally{reader.releaseLock();}const a=new Uint8Array(size);let o=0;for(const c of chunks){a.set(c,o);o+=c.length;}buf=a.buffer;}
+    else {buf=await r.arrayBuffer();if(buf.byteLength>SHOP_CONFIG.maxBytes)throw new Error('R\u00e9ponse trop grande.');}
+    if(binary){const a=new Uint8Array(buf);if(a[0]===60||new TextDecoder().decode(a.subarray(0,100)).trimStart().startsWith('<'))shopXml(new TextDecoder().decode(a));return buf;}
+    return new TextDecoder().decode(buf);
+  }catch(e){const reason=e.name==='AbortError'?`d\u00e9lai de ${SHOP_CONFIG.timeoutMs/1000} s d\u00e9pass\u00e9`:String(e.message||e);shopNote(`[ECHEC ${kind}] ${reason}`);throw new Error(`${kind} : ${reason}`);}
+  finally{clearTimeout(timer);}
+}
+async function shopJson(url){const s=await shopFetch(url,'SHOP ERDDAP');let j;try{j=JSON.parse(s);}catch(_){throw new Error('SHOP ERDDAP : r\u00e9ponse JSON invalide.');}if(j.error)throw new Error(JSON.stringify(j.error));return j;}
+function shopTimes(text){
+  const out=[];
+  const add=x=>{const n=shopUtc(x);if(!Number.isFinite(n))throw new Error(`Heure SHOP non reconnue : ${x}`);out.push(n);};
+  for(const token of String(text).split(',').map(s=>s.trim()).filter(Boolean)){
+    const parts=token.split('/');if(parts.length===1){add(token);continue;}
+    if(parts.length!==3)throw new Error('SHOP : plage temporelle incompl\u00e8te.');
+    const a=shopUtc(parts[0]),b=shopUtc(parts[1]),p=parts[2].match(/^P(?:(\d+(?:\.\d+)?)D)?(?:T(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?)?$/i);
+    const step=p?((+p[1]||0)*86400+(+p[2]||0)*3600+(+p[3]||0)*60+(+p[4]||0))*1000:NaN;
+    if(!Number.isFinite(a)||!Number.isFinite(b)||!(b>=a&&step>0&&(b-a)/step<=10000))throw new Error('SHOP : intervalle de pr\u00e9vision non exploitable.');
+    for(let t=a;t<=b+1;t+=step)out.push(t);
+  }
+  const times=[...new Set(out)].sort((a,b)=>a-b);if(times.length<2||times.length>20000)throw new Error('SHOP : calendrier des donn\u00e9es absent ou incomplet.');return times;
+}
+function shopBracket(times,target){
+  if(!Number.isFinite(target)||!times?.length)throw new Error('SHOP : heure invalide.');
+  const i=bisectLeft(times,target);if(i<times.length&&Math.abs(times[i]-target)<1)return{a:times[i],b:times[i],f:0};
+  if(i===0||i===times.length)throw new Error(`SHOP hors plage \u00e0 ${fmtLocal(target,LOCAL_TZ)}. Donn\u00e9es disponibles : ${fmtLocal(times[0],LOCAL_TZ)} \u00e0 ${fmtLocal(times.at(-1),LOCAL_TZ)}.`);
+  const a=times[i-1],b=times[i];if(b-a>2*3600000)throw new Error('SHOP : plus de deux heures entre les donn\u00e9es disponibles.');return{a,b,f:(target-a)/(b-a)};
+}
+function shopMetadataError(message){
+  const e=new Error(message);e.code='SHOP_METADATA';return e;
+}
+function shopUnitKey(unit){
+  let u=String(unit??'').trim();
+  if(/^https?:\/\//i.test(u))u=decodeURIComponent(u.split('/').filter(Boolean).at(-1));
+  return u.toLowerCase().replace(/\u207b|\u2212/g,'-').replace(/\u00b9/g,'1').replace(/\u00b2/g,'2')
+    .replace(/[\s._*^{}\u00b7]/g,'');
+}
+function shopSpeedFactor(unit){
+  const u=shopUnitKey(unit);
+  if(['m/s','ms-1','m/sec','msec-1','meter/sec','metre/sec','meter/second','metre/second','meters/second','metres/second','meterpersecond','metrepersecond','meterspersecond','metrespersecond'].includes(u))return 1;
+  if(['cm/s','cms-1','cm/sec','centimeterpersecond','centimetrepersecond','centimeterspersecond','centimetrespersecond'].includes(u))return 0.01;
+  if(['kn','kt','kts','knot','knots'].includes(u))return 1/1.9438444924406;
+  throw shopMetadataError(`SHOP : unit\u00e9 de vitesse non confirm\u00e9e (${unit||'non d\u00e9clar\u00e9e'}).`);
+}
+function shopDirectionFactor(unit){
+  const u=shopUnitKey(unit);
+  if(['degree','degrees','deg','degre','degres','\u00b0'].includes(u))return Math.PI/180;
+  if(['radian','radians','rad'].includes(u))return 1;
+  throw shopMetadataError(`SHOP : unit\u00e9 de direction non confirm\u00e9e (${unit||'non d\u00e9clar\u00e9e'}).`);
+}
+function shopIsWcsPlaceholder(unit){return shopUnitKey(unit)==='wm-2sr-1';}
+function shopBandUnit(band,kind){
+  const candidates=(band.unitCandidates?.length?band.unitCandidates:[{unit:band.units,origin:'m\u00e9tadonn\u00e9es'}])
+    .filter(c=>String(c.unit??'').trim());
+  const valid=[],invalid=[],placeholders=[];
+  for(const c of candidates){
+    // GeoServer DescribeCoverage uses this radiance label when UoM is null.
+    // This is NOT a conversion from radiance to velocity; a separate, explicit
+    // velocity unit must still be found in the same data product.
+    if(/^WCS/.test(c.origin)&&shopIsWcsPlaceholder(c.unit)){placeholders.push(c);continue;}
+    try{valid.push({...c,factor:kind==='dir'?shopDirectionFactor(c.unit):shopSpeedFactor(c.unit)});}
+    catch(_){invalid.push(c);}
+  }
+  if(!valid.length)throw shopMetadataError(`SHOP : unit\u00e9 non confirm\u00e9e pour ${band.name||kind}. `+
+    (placeholders.length?'W.m-2.Sr-1 est un libell\u00e9 WCS par d\u00e9faut possible, pas une vitesse. ':'')+
+    'Aucune unit\u00e9 physique exploitable dans les m\u00e9tadonn\u00e9es re\u00e7ues.');
+  if(invalid.length||valid.some(c=>Math.abs(c.factor-valid[0].factor)>1e-12))throw shopMetadataError(
+    `SHOP : unit\u00e9s contradictoires pour ${band.name||kind} : `+candidates.map(c=>`${c.origin}=${c.unit}`).join(' | '));
+  return {factor:valid[0].factor,unit:valid[0].unit,origin:valid[0].origin,ignoredPlaceholders:placeholders};
+}
+function shopBandKind(b){
+  const name=shopNorm(b.name),s=shopNorm([b.name,b.label,b.definition,b.description,b.standardname].join(' '));
+  const east=/eastward|eastcomponent|velocityx|xvelocity|currentx|xcurrent/.test(s)||['u','ux','uos','uo','vx'].includes(name);
+  const north=/northward|northcomponent|velocityy|yvelocity|currenty|ycurrent/.test(s)||['v','vy','vos','vo'].includes(name);
+  if(east&&!north)return'u';if(north&&!east)return'v';if(east||north)return null;
+  if(/direction|bearing/.test(s))return'dir';if(/magnitude|currentspeed|riverspeed/.test(s)||['speed','rivervelocity','watervelocity'].includes(name))return'speed';return null;
+}
+function shopBandPlan(bands){
+  const choose=k=>{const a=bands.map((b,i)=>({b,i})).filter(({b})=>shopBandKind(b)===k);
+    if(a.length>1)throw shopMetadataError(`SHOP : plusieurs bandes ${k}; correspondance ambigu\u00eb.`);
+    return a[0]||null;};
+  const errors=[];
+  const attempt=(ka,kb,kind)=>{
+    try{
+      const a=choose(ka),b=choose(kb);if(!a||!b)return null;
+      const au=shopBandUnit(a.b,ka),bu=shopBandUnit(b.b,kb);
+      const from=kind==='sd'&&/directionfrom|fromwhich/.test(shopNorm([b.b.name,b.b.definition,b.b.description].join(' ')));
+      return{kind,a:a.i,b:b.i,af:au.factor,bf:bu.factor,from,unitEvidence:{a:au,b:bu}};
+    }catch(e){errors.push(e.message);return null;}
+  };
+  // Missing units on u/v must not hide a fully described speed/direction pair.
+  const plan=attempt('u','v','uv')||attempt('speed','dir','sd');
+  if(plan)return plan;
+  throw shopMetadataError('SHOP : m\u00e9tadonn\u00e9es de courant non exploitables. '+
+    (errors.length?errors.join(' | '):'Aucune paire u/v ou vitesse/direction identifi\u00e9e.')+
+    ' Voir [BANDES RECUES] dans le journal. Aucun courant ni aucune unit\u00e9 n\u2019a \u00e9t\u00e9 invent\u00e9.');
+}
+function shopValue(raw,band,globalNoData=null){
+  const n=shopNumber(raw);if(n===null||Math.abs(n)>=1e20)return null;
+  const missing=[globalNoData,...(band.nodata||[])].map(shopNumber).filter(x=>x!==null);if(missing.some(v=>n===v))return null;
+  const scale=shopNumber(band.scale)??1,offset=shopNumber(band.offset)??0;const v=n*scale+offset;return Number.isFinite(v)?v:null;
+}
+function shopPair(a,b,plan){
+  if(a===null||b===null)return null;
+  if(plan.kind==='uv')return{u:a*plan.af,v:b*plan.bf};
+  if(a<0)return null;const angle=b*plan.bf+(plan.from?Math.PI:0),speed=a*plan.af;return{u:speed*Math.sin(angle),v:speed*Math.cos(angle)};
+}
+function shopDescribe(doc){
+  // WCS 2.0 SWE names and units; WCS 1.0 axis descriptions as fallback.
+  const records=shopNodes(doc,'DataRecord');let bands=[];
+  for(const record of records){const fields=Array.from(record.children).filter(x=>x.localName==='field');if(!fields.length)continue;
+    bands=fields.map(f=>{const q=shopNodes(f,'Quantity')[0],uom=shopNodes(f,'uom')[0];return{name:f.getAttribute('name')||'',label:shopNodes(f,'label')[0]?.textContent||'',definition:q?.getAttribute('definition')||'',description:shopNodes(f,'description')[0]?.textContent||'',units:uom?.getAttribute('code')||uom?.getAttribute('href')?.split('/').at(-1)||'',nodata:shopNodes(f,'nilValue').map(x=>x.textContent.trim())};});break;}
+  if(!bands.length){for(const axis of shopNodes(doc,'AxisDescription')){const n=shopText(axis,'name');if(!/band/i.test(n))continue;const u=shopText(axis,'units');bands=shopNodes(axis,'singleValue').map(v=>({name:v.textContent.trim(),units:u,nodata:[]}));if(bands.length)break;}}
+  return bands;
+}
+function shopWmsMeta(doc,layerName){
+  const layer=shopNodes(doc,'Layer').find(n=>shopText(n,'Name')===layerName||shopText(n,'Name')===layerName.split(':').at(-1));
+  if(!layer)throw new Error(`SHOP : couche ${layerName} non annonc\u00e9e par le serveur.`);
+  let current=layer,time='';
+  while(current&&current.nodeType===1&&!time){const dims=Array.from(current.children||[]).filter(n=>['Dimension','Extent'].includes(n.localName)&&n.getAttribute('name')?.toLowerCase()==='time');time=dims.map(n=>n.textContent.trim()).find(Boolean)||'';current=current.parentNode;}
+  const formats=shopNodes(doc,'GetFeatureInfo').flatMap(n=>shopNodes(n,'Format').map(v=>v.textContent.trim()));
+  return{times:shopTimes(time),queryable:layer.getAttribute('queryable')==='1',formats};
+}
+async function shopGeoSource(){
+  const base=SHOP_CONFIG.geoserver,wms=shopUrl(base+'/raster-harvester/wms',{service:'WMS',version:'1.3.0',request:'GetCapabilities'});
+  const wm=shopWmsMeta(shopXml(await shopFetch(wms,'Calendrier SHOP GeoServer')),SHOP_CONFIG.layer);
+  const source={kind:'wcs',key:base+'|'+SHOP_CONFIG.layer,label:'SHOP / GeoServer OGSL',base,times:wm.times,queryable:wm.queryable,infoFormats:wm.formats,bands:[],bandDescriptions:[],wcsVersion:null};
+  // Prefer WCS 1.0 for its explicit time and lon/lat BBOX syntax.
+  try{
+    const text=await shopFetch(shopUrl(base+'/ows',{service:'WCS',version:'1.0.0',request:'DescribeCoverage',coverage:SHOP_CONFIG.layer}),'Description SHOP WCS 1.0');
+    const doc=shopXml(text),offering=shopNodes(doc,'CoverageOffering')[0];if(!offering)throw new Error('CoverageOffering absent.');
+    const name=shopText(offering,'name');if(name&&name!==SHOP_CONFIG.layer&&name!==SHOP_CONFIG.layer.split(':').at(-1))throw new Error('Une autre couverture a \u00e9t\u00e9 retourn\u00e9e.');
+    source.coverage=name||SHOP_CONFIG.layer;source.bands=shopDescribe(doc);source.bandDescriptions.push({origin:'WCS 1.0',bands:source.bands});source.wcsVersion='1.0.0';
+    const formats=shopNodes(offering,'formats').map(n=>n.textContent.trim());source.format=formats.find(s=>/geotiff/i.test(s))||formats.find(s=>/tiff/i.test(s))||'GeoTIFF';
+    shopNote('[DESCRIPTION WCS 1.0] '+text.slice(0,20000));
+  }catch(e){shopNote('WCS 1.0 non retenu : '+e.message);}
+  // SWE rangeType commonly provides more complete band names/units in 2.0.
+  if(!source.wcsVersion||!source.bands.length||source.bands.some(b=>!b.units||shopIsWcsPlaceholder(b.units))){
+    try{
+      const caps=shopXml(await shopFetch(shopUrl(base+'/ows',{service:'WCS',acceptversions:'2.0.1',request:'GetCapabilities'}),'Catalogue SHOP WCS 2.0'));
+      const ids=shopNodes(caps,'CoverageId').map(x=>x.textContent.trim());const wanted=shopNorm(SHOP_CONFIG.layer);
+      const id=ids.find(x=>shopNorm(x)===wanted);if(!id)throw new Error('Identifiant SHOP absent du catalogue WCS 2.0.');
+      const text=await shopFetch(shopUrl(base+'/ows',{service:'WCS',version:'2.0.1',request:'DescribeCoverage',coverageId:id}),'Description SHOP WCS 2.0');
+      const doc=shopXml(text),bands=shopDescribe(doc);source.coverageId=id;source.bandDescriptions.push({origin:'WCS 2.0',bands});
+      if(bands.length&&(bands.length===source.bands.length||!source.bands.length))source.bands=bands;
+      const envelope=shopNodes(doc,'Envelope')[0];source.axisLabels=(envelope?.getAttribute('axisLabels')||'').split(/\s+/);source.nativeCrs=envelope?.getAttribute('srsName')||'';
+      const grids=shopNodes(doc,'RectifiedGrid');source.gridAxes=grids[0]?shopNodes(grids[0],'axisLabels')[0]?.textContent.trim().split(/\s+/):null;
+      if(!source.wcsVersion)source.wcsVersion='2.0.1';shopNote('[DESCRIPTION WCS 2.0] '+text.slice(0,20000));
+    }catch(e){shopNote('Description WCS 2.0 non disponible : '+e.message);}
+  }
+  if(!source.wcsVersion)throw new Error('SHOP : acc\u00e8s WCS non disponible; voir les r\u00e9ponses dans le journal.');
+  shopNote('[BANDES ANNONCEES] '+JSON.stringify(source.bands));return source;
+}
+function shopCoverageUrl(source,points,time,radius){
+  const b=ohpsBboxForPoints(points,radius),mid=(b.latMin+b.latMax)/2;
+  const w=Math.ceil((b.lonMax-b.lonMin)*111320*Math.cos(mid*Math.PI/180)/SHOP_CONFIG.targetMetres),h=Math.ceil((b.latMax-b.latMin)*111320/SHOP_CONFIG.targetMetres);
+  if(w*h>1200000||w>4096||h>4096)throw new Error('SHOP : zone demand\u00e9e trop grande.');
+  if(source.wcsVersion==='1.0.0')return shopUrl(source.base+'/ows',{service:'WCS',version:'1.0.0',request:'GetCoverage',coverage:source.coverage,crs:'EPSG:4326',response_crs:'EPSG:4326',bbox:[b.lonMin,b.latMin,b.lonMax,b.latMax].map(x=>x.toFixed(8)).join(','),width:Math.max(2,w),height:Math.max(2,h),time:fmtUtcIso(time),format:source.format,interpolation:'nearest neighbor'});
+  const lat=source.axisLabels.find(n=>/^lat/i.test(n)),lon=source.axisLabels.find(n=>/^lon/i.test(n));
+  if(!lat||!lon||!/4326/.test(source.nativeCrs))throw new Error('SHOP : axes WCS 2.0 non reconnus en WGS84.');
+  const url=new URL(shopUrl(source.base+'/ows',{service:'WCS',version:'2.0.1',request:'GetCoverage',coverageId:source.coverageId,format:'image/tiff',outputCrs:'http://www.opengis.net/def/crs/EPSG/0/4326',interpolation:'http://www.opengis.net/def/interpolation/OGC/1/nearest-neighbor'}));
+  url.searchParams.append('subset',`${lon}(${b.lonMin},${b.lonMax})`);url.searchParams.append('subset',`${lat}(${b.latMin},${b.latMax})`);url.searchParams.append('subset',`time("${fmtUtcIso(time)}")`);return url.href;
+}
+function shopTiffBands(tiff,source){
+  if(source.bands.length&&source.bands.length!==tiff.samples)throw shopMetadataError('SHOP : nombre de bandes diff\u00e9rent de la description WCS.');
+  return tiff.bandMeta.map((m,i)=>{
+    const base=source.bands[i]||{},description=m.description||m.long_name||m.standard_name||base.description||'';
+    const rasterKind=shopBandKind({name:description}),baseKind=shopBandKind(base);
+    if(rasterKind&&baseKind&&rasterKind!==baseKind)throw shopMetadataError('SHOP : noms de bandes TIFF/WCS contradictoires.');
+    const name=rasterKind?description:base.name||description;
+    const unitCandidates=[];
+    const add=(unit,origin)=>{if(String(unit??'').trim())unitCandidates.push({unit:String(unit).trim(),origin});};
+    add(m.unittype,'GeoTIFF bande');add(m.units,'GeoTIFF bande');add(m.unit,'GeoTIFF bande');add(m.uom,'GeoTIFF bande');
+    // A unit explicitly attached to the band's description is relevant to that band.
+    const embedded=description.match(/\(([^()]+)\)\s*$/)?.[1];if(embedded)add(embedded,'GeoTIFF description');
+    const versions=source.bandDescriptions?.length?source.bandDescriptions:[{origin:'WCS',bands:source.bands}];
+    for(const version of versions){
+      const matches=version.bands.filter(b=>shopNorm(b.name)===shopNorm(base.name));
+      if(matches.length===1)add(matches[0].units,version.origin);
+    }
+    // Global unit only applies when all bands have the same physical dimension.
+    const kinds=source.bands.map(shopBandKind);
+    if(kinds.length===tiff.samples&&kinds.every(k=>['u','v','speed'].includes(k))){
+      add(tiff.globalMeta.units,'GeoTIFF global');add(tiff.globalMeta.unittype,'GeoTIFF global');
+    }
+    return{...base,name,description,definition:m.standard_name||base.definition,units:unitCandidates[0]?.unit||'',unitCandidates,
+      scale:m.scale??1,offset:m.offset??0,nodata:[...(base.nodata||[]),m._fillvalue,m.missing_value].filter(x=>x!==undefined)};
+  });
+}
+function shopTiffSamples(tiff,source,points,time,radius){
+  const bands=shopTiffBands(tiff,source),out=new Map();
+  const mk=JSON.stringify(bands);if(!SHOP_STATE.metadataKey.has(mk)){SHOP_STATE.metadataKey.add(mk);
+    shopNote('[BANDES RECUES GEOTIFF] '+mk+'\n[METADONNEES TIFF GLOBALES] '+JSON.stringify(tiff.globalMeta));
+    shopNote('[ECHANTILLON TIFF BRUT - NON VALIDE] '+JSON.stringify(bands.map((b,i)=>({name:b.name,values:Array.from(tiff.arrays[i].slice(0,5)),nodata:tiff.nodata}))));
+  }
+  const plan=shopBandPlan(bands);shopNote('[UNITE RETENUE GEOTIFF] '+JSON.stringify(plan));
+  // When the server includes an explicit valid-time attribute, it must match.
+  for(const k of ['valid_time','validtime','time_coverage_start'])if(tiff.globalMeta[k]){const ms=shopUtc(tiff.globalMeta[k]);if(!Number.isFinite(ms)||Math.abs(ms-time)>1000)throw new Error('SHOP : heure du GeoTIFF diff\u00e9rente de la requ\u00eate.');}
+  for(let y=0;y<tiff.height;y++)for(let x=0;x<tiff.width;x++){
+    const i=y*tiff.width+x,a=shopValue(tiff.arrays[plan.a][i],bands[plan.a],tiff.nodata),b=shopValue(tiff.arrays[plan.b][i],bands[plan.b],tiff.nodata),vec=shopPair(a,b,plan);if(!vec)continue;
+    const [lon,lat]=tiff.xy(x,y);if(!(lat>=-90&&lat<=90&&lon>=-180&&lon<=180))throw new Error('SHOP : coordonn\u00e9es TIFF incoh\u00e9rentes.');
+    for(const p of points){const dist=ohpsDistanceKm(p.latitude,p.longitude,lat,lon),previous=out.get(p.index);if(dist<=radius&&(!previous||dist<previous.distanceToGridKm))out.set(p.index,{...vec,lat,lon,distanceToGridKm:dist,timeMs:time});}
+  }
+  return out;
+}
+function shopMerge(target,addition){for(const [i,v]of addition){const old=target.get(i);if(!old||v.distanceToGridKm<old.distanceToGridKm)target.set(i,v);}}
+async function shopWcsChunk(source,points,time,radius){
+  const url=shopCoverageUrl(source,points,time,radius),buf=await shopFetch(url,'Courants SHOP GeoTIFF',true),tiff=await shopReadTiff(buf);
+  // Check that the returned geographic raster actually encloses each requested point.
+  const corners=[tiff.xy(0,0),tiff.xy(tiff.width-1,0),tiff.xy(0,tiff.height-1),tiff.xy(tiff.width-1,tiff.height-1)];
+  if(points.some(p=>p.latitude<Math.min(...corners.map(c=>c[1]))-.005||p.latitude>Math.max(...corners.map(c=>c[1]))+.005||p.longitude<Math.min(...corners.map(c=>c[0]))-.005||p.longitude>Math.max(...corners.map(c=>c[0]))+.005))throw new Error('SHOP : l\u2019emprise TIFF ne couvre pas la zone demand\u00e9e.');
+  return shopTiffSamples(tiff,source,points,time,SHOP_CONFIG.radiusKm);
+}
+
+// Optional fallback to the original distribution, still SHOP and never STLE.
+function shopErddapMetadata(json){
+  const t=ohpsTable(json),col={};t.names.forEach((n,i)=>col[shopNorm(n)]=i);const vars=new Map(),dims=[],global={};
+  for(const key of ['rowtype','variablename','attributename','value'])if(col[key]===undefined)throw shopMetadataError('SHOP ERDDAP : colonnes de m\u00e9tadonn\u00e9es absentes.');
+  for(const r of t.rows){
+    const type=String(r[col.rowtype]||'').toLowerCase(),name=String(r[col.variablename]||''),key=shopNorm(r[col.attributename]),value=r[col.value];
+    if(name==='NC_GLOBAL'){if(type==='attribute')global[key]=value;continue;}if(!name)continue;
+    if(!vars.has(name))vars.set(name,{name,nodata:[],attrs:{}});const v=vars.get(name);
+    if(type==='dimension')dims.push(name);
+    if(type==='variable')v.dims=String(value||'').split(',').map(s=>s.trim()).filter(Boolean);
+    if(type==='attribute'){v.attrs[key]=value;if(['fillvalue','missingvalue'].includes(key))v.nodata.push(...String(value).split(/[, ]+/));}
+  }
+  const identity=shopNorm([global.title,global.summary].join(' '));
+  if(!/ohps|shop/.test(identity)||/stle200|stle500/.test(identity))throw shopMetadataError('SHOP : identit\u00e9 ERDDAP non confirm\u00e9e.');
+  const axis=(n,aliases)=>dims.find(k=>shopNorm(vars.get(k).attrs.standardname)===n||aliases.includes(shopNorm(k)));
+  const time=axis('time',['time']),lat=axis('latitude',['latitude','lat']),lon=axis('longitude',['longitude','lon']);
+  if(!time||!lat||!lon||dims.some(n=>![time,lat,lon].includes(n)))throw shopMetadataError('SHOP ERDDAP : axes non reconnus.');
+  const bands=[...vars.values()].filter(v=>!dims.includes(v.name))
+    .map(v=>({...v,definition:v.attrs.standardname,label:v.attrs.longname,units:v.attrs.units||v.attrs.unit||'',scale:v.attrs.scalefactor??1,offset:v.attrs.addoffset??0}))
+    .filter(v=>shopBandKind(v)!==null);
+  const kinds=bands.map(shopBandKind);
+  if(!(kinds.includes('u')&&kinds.includes('v')||kinds.includes('speed')&&kinds.includes('dir')))throw shopMetadataError('SHOP ERDDAP : aucune paire de courant identifiable.');
+  for(const band of bands){if(!band.dims?.length)band.dims=dims.slice();if(JSON.stringify(band.dims)!==JSON.stringify(bands[0].dims)||dims.some(d=>!band.dims.includes(d)))throw shopMetadataError('SHOP ERDDAP : grilles diff\u00e9rentes.');}
+  shopNote('[BANDES RECUES ERDDAP INFO] '+JSON.stringify(bands));
+  // Defer the unit check until the actual JSON response: columnUnits can carry
+  // units even when /info omitted them. Do not invent any missing unit.
+  return{time,lat,lon,dims:bands[0].dims,bands};
+}
+async function shopErddapSource(){
+  const base=SHOP_CONFIG.erddap,dataset=SHOP_CONFIG.dataset,meta=shopErddapMetadata(await shopJson(`${base}/info/${dataset}/index.json`));
+  const t=ohpsTable(await shopJson(`${base}/griddap/${dataset}.json?${encodeURIComponent(meta.time+'[0:1:last]')}`)),timeCol=t.names.indexOf(meta.time);if(timeCol<0)throw new Error('SHOP : axe temporel absent.');
+  const indexByMs=new Map();t.rows.forEach((r,i)=>{const ms=shopUtc(r[timeCol]);if(!Number.isFinite(ms)||indexByMs.has(ms))throw new Error('SHOP : heure ERDDAP invalide.');indexByMs.set(ms,i);});
+  const times=[...indexByMs.keys()].sort((a,b)=>a-b);if(times.length<2)throw new Error('SHOP : pr\u00e9visions ERDDAP incompl\u00e8tes.');return{kind:'erddap',key:base+'/'+dataset,label:'SHOP / ERDDAP OGSL',base,dataset,meta,times,indexByMs};
+}
+async function shopErddapChunk(source,points,time,radius){
+  const m=source.meta,b=ohpsBboxForPoints(points,radius),index=source.indexByMs.get(time);
+  if(!Number.isInteger(index))throw new Error('SHOP : heure ERDDAP non r\u00e9pertori\u00e9e.');
+  const dims=m.dims.map(n=>n===m.time?`[${index}]`:n===m.lat?`[(${b.latMin}):1:(${b.latMax})]`:`[(${b.lonMin}):1:(${b.lonMax})]`).join('');
+  const projection=m.bands.map(b=>b.name+dims).join(',');
+  const url=`${source.base}/griddap/${source.dataset}.json?${encodeURIComponent(projection)}`;
+  const t=ohpsTable(await shopJson(url)),c={};t.names.forEach((n,i)=>c[n]=i);
+  if([m.time,m.lat,m.lon,...m.bands.map(b=>b.name)].some(n=>c[n]===undefined))throw shopMetadataError('SHOP : colonnes ERDDAP absentes.');
+  const bands=m.bands.map(b=>({...b,unitCandidates:[{unit:t.units[c[b.name]],origin:'ERDDAP columnUnits'},{unit:b.units,origin:'ERDDAP info'}].filter(x=>String(x.unit??'').trim())}));
+  shopNote('[BANDES RECUES ERDDAP DONNEES] '+JSON.stringify(bands)+'\n[COLONNES] '+JSON.stringify(t.names)+'\n[UNITES COLONNES] '+JSON.stringify(t.units)+'\n[EXTRAIT BRUT NON VALIDE] '+JSON.stringify(t.rows.slice(0,3)));
+  const plan=shopBandPlan(bands),a=bands[plan.a],bb=bands[plan.b];shopNote('[UNITE RETENUE ERDDAP] '+JSON.stringify(plan));
+  const out=new Map();
+  for(const r of t.rows){
+    if(Math.abs(shopUtc(r[c[m.time]])-time)>1000||!Number.isFinite(shopUtc(r[c[m.time]])))throw new Error('SHOP : mauvaise heure ERDDAP.');
+    const lat=shopNumber(r[c[m.lat]]),lon=shopNumber(r[c[m.lon]]);
+    // ERDDAP applies scale_factor/add_offset on its server; only missing-value
+    // screening is applied here. Never double-unpack the numeric JSON output.
+    const pair=shopPair(shopValue(r[c[a.name]],{...a,scale:1,offset:0}),shopValue(r[c[bb.name]],{...bb,scale:1,offset:0}),plan);
+    if(lat===null||lon===null||!pair)continue;
+    for(const p of points){const distanceToGridKm=ohpsDistanceKm(p.latitude,p.longitude,lat,lon);if(distanceToGridKm<=SHOP_CONFIG.radiusKm&&(!out.has(p.index)||distanceToGridKm<out.get(p.index).distanceToGridKm))out.set(p.index,{...pair,lat,lon,distanceToGridKm,timeMs:time});}
+  }
+  return out;
+}
+async function shopChunk(source,points,time,radius){return source.kind==='wcs'?shopWcsChunk(source,points,time,radius):shopErddapChunk(source,points,time,radius);}
+async function shopPointAtHour(source,point,time){
+  const key=source.key+'|'+time;
+  let hour=SHOP_STATE.hours.get(key);if(!hour){hour={byPoint:new Map(),chunks:new Set(),retried:new Set(),errors:[]};SHOP_STATE.hours.set(key,hour);}
+  if(hour.byPoint.has(point.index)&&(hour.byPoint.get(point.index).distanceToGridKm<=SHOP_CONFIG.initialRadiusKm||hour.retried.has(point.index)))return hour.byPoint.get(point.index);
+  const chunkIndex=Math.floor(point.index/12),chunkKey=key+'|'+chunkIndex;
+  if(!hour.chunks.has(chunkIndex)){
+    let pending=SHOP_STATE.pending.get(chunkKey);
+    if(!pending){pending=(async()=>{const points=OHPS_ROUTE_POINTS.slice(chunkIndex*12,(chunkIndex+1)*12);try{shopMerge(hour.byPoint,await shopChunk(source,points,time,SHOP_CONFIG.initialRadiusKm));}catch(e){if(e.code==='SHOP_METADATA'){shopNote('[METADONNEES A VERIFIER] '+e.message);throw e;}hour.errors.push(e.message);}finally{hour.chunks.add(chunkIndex);}})();SHOP_STATE.pending.set(chunkKey,pending);}
+    try{await pending;}finally{SHOP_STATE.pending.delete(chunkKey);}
+  }
+  if((!hour.byPoint.has(point.index)||hour.byPoint.get(point.index).distanceToGridKm>SHOP_CONFIG.initialRadiusKm)&&!hour.retried.has(point.index)){
+    hour.retried.add(point.index);shopNote(`[RECHERCHE CIBLEE] ${shopPointLabel(point)}, ${fmtUtcIso(time)}, rayon ${SHOP_CONFIG.radiusKm} km.`);
+    try{shopMerge(hour.byPoint,await shopChunk(source,[point],time,SHOP_CONFIG.radiusKm));}catch(e){if(e.code==='SHOP_METADATA'){shopNote('[METADONNEES A VERIFIER] '+e.message);throw e;}hour.errors.push(e.message);}
+  }
+  const result=hour.byPoint.get(point.index);
+  if(!result){const message=`SHOP : pas de courant valide pour ${shopPointLabel(point)} (${point.latitude.toFixed(7)}, ${point.longitude.toFixed(7)}) \u00e0 ${fmtLocal(time,LOCAL_TZ)}, rayon ${SHOP_CONFIG.radiusKm} km. ${hour.errors.at(-1)||'Cellules absentes ou masqu\u00e9es.'}`;shopNote('[POINT NON COUVERT] '+message);throw new Error(message);}
+  return result;
+}
+function shopPointLabel(p){return displayName(p)||`Point interm\u00e9diaire ${p.index+1}/86 (${p.distanceFromStartNm.toFixed(1)} NM depuis Qu\u00e9bec)`;}
+async function shopPrepare(depMs,setProgress){
+  SHOP_STATE.source=null;SHOP_STATE.hours.clear();SHOP_STATE.pending.clear();SHOP_STATE.diagnostic=[];SHOP_STATE.metadataKey.clear();SHOP_STATE.fetchedAt=Date.now();
+  shopNote(`Version SHOP 2026-10-14 U2 (validation des unites) | requ\u00eates lanc\u00e9es ${fmtUtcIso(SHOP_STATE.fetchedAt)}\nSeul SHOP/OHPS est autoris\u00e9. Valeur manquante jamais remplac\u00e9e par z\u00e9ro.`);
+  const start=OHPS_ROUTE_POINTS[el('direction').value==='PORQ'?85:0],errors=[];
+  for(const make of [shopGeoSource,shopErddapSource]){
+    try{
+      setProgress?.(make===shopGeoSource?'Connexion au flux SHOP GeoServer...':'Essai de la distribution SHOP ERDDAP...',15);
+      const source=await make();shopNote(`${source.label} | ${fmtUtcIso(source.times[0])} \u00e0 ${fmtUtcIso(source.times.at(-1))}.`);
+      const br=shopBracket(source.times,depMs);
+      // Only the departure point at the departure time is required here.
+      // Down-route data will be checked at the actual computed passage times.
+      await shopPointAtHour(source,start,br.a);if(br.b!==br.a)await shopPointAtHour(source,start,br.b);
+      SHOP_STATE.source=source;shopNote('[SOURCE RETENUE] '+source.label);return;
+    }catch(e){errors.push(e.message);shopNote('[SOURCE NON RETENUE] '+e.message);}
+  }
+  throw new Error('Connexion SHOP non aboutie. '+errors.join(' | ')+'. Voir Journal (diagnostic).');
+}
+async function shopSample(point,target){
+  const source=SHOP_STATE.source;if(!source)throw new Error('SHOP : source non pr\u00e9par\u00e9e. Relancer Calculer.');
+  const br=shopBracket(source.times,target),a=await shopPointAtHour(source,point,br.a),b=br.b===br.a?a:await shopPointAtHour(source,point,br.b);
+  const u=a.u+(b.u-a.u)*br.f,v=a.v+(b.v-a.v)*br.f,speedKnots=Math.hypot(u,v)*1.9438444924406;
+  const logKey=source.key+'|'+point.index+'|'+br.a;
+  if(!SHOP_STATE.metadataKey.has(logKey)){SHOP_STATE.metadataKey.add(logKey);shopNote(`[POINT SHOP BRUT] ${shopPointLabel(point)} | ${fmtUtcIso(br.a)} | cellule ${a.lat.toFixed(7)}, ${a.lon.toFixed(7)} | distance ${a.distanceToGridKm.toFixed(3)} km | u=${a.u.toFixed(6)} m/s | v=${a.v.toFixed(6)} m/s | vitesse=${(Math.hypot(a.u,a.v)*1.9438444924406).toFixed(3)} kn. Avant les majorations du moteur.`);}
+  return{uEastMs:u,vNorthMs:v,speedKnots,directionTowardDeg:(Math.atan2(u,v)*180/Math.PI+360)%360,currentType:ohpsCurrentType(u,speedKnots),interpolated:br.a!==br.b,interpolationFraction:br.f,distanceToGridKm:Math.max(a.distanceToGridKm,b.distanceToGridKm),source:source.label};
+}
+function shopAppendDiagnostic(){
+  const marker='\n\n[ACQUISITION SHOP]',before=el('log').textContent.split(marker)[0];
+  el('log').textContent=before+marker+'\n'+SHOP_STATE.diagnostic.join('\n\n');lastText=el('log').textContent;
+}
+
+// END SHOP DATA ADAPTER
+
 function displayName(p){if(p.index===0)return 'Station Québec';if(p.index===85)return 'Station Pointe-des-Ormes';return p.name;}
 function namedPoints(direction){const pts=OHPS_ROUTE_POINTS.filter(p=>p.name||p.index===0||p.index===85);return direction==='QPOR'?pts:pts.slice().reverse();}
 function pathBetween(a,b){const step=b.index>a.index?1:-1,arr=[];for(let i=a.index;;i+=step){arr.push(OHPS_ROUTE_POINTS[i]);if(i===b.index)break;}return arr;}
@@ -1316,7 +1826,7 @@ function buildSegments(direction){const n=namedPoints(direction),out=[];for(let 
 function configForIndex(x){if(x<9)return{stationKey:'Neuville',cap:16,depth:15.0};let best=CONFIG_ANCHORS[0],d=Infinity;for(const c of CONFIG_ANCHORS){const dd=Math.abs(c.idx-x);if(dd<d){d=dd;best=c}}return best;}
 function geoDistanceNm(a,b){return ohpsDistanceKm(a.latitude,a.longitude,b.latitude,b.longitude)/1.852;}
 async function fetchStationSeries(stationId,fromIso,toIso){const url=`https://api-iwls.dfo-mpo.gc.ca/api/v1/stations/${stationId}/data?time-series-code=wlf-spine&from=${encodeURIComponent(fromIso)}&to=${encodeURIComponent(toIso)}`;const r=await fetch(url);if(!r.ok)throw new Error(`IWLS HTTP ${r.status}`);const d=await r.json();if(!Array.isArray(d))throw new Error('Réponse IWLS inattendue.');return d;}
-async function loadInputs(depMs,setProgress){const fromIso=fmtUtcIso(depMs-6*3600000),toIso=fmtUtcIso(depMs+60*3600000);const stationKeys=[...new Set(CONFIG_ANCHORS.map(c=>c.stationKey))];setProgress('Téléchargement des niveaux IWLS…',5);const seriesByStation={};await Promise.all(stationKeys.map(async k=>{const raw=await fetchStationSeries(STATIONS[k][0],fromIso,toIso);seriesByStation[k]=seriesToSorted(raw);}));setProgress('Préparation du modèle OHPS…',15);await ohpsLoadMetadata();return{seriesByStation,fromIso,toIso};}
+async function loadInputs(depMs,setProgress){const fromIso=fmtUtcIso(depMs-6*3600000),toIso=fmtUtcIso(depMs+60*3600000);const stationKeys=[...new Set(CONFIG_ANCHORS.map(c=>c.stationKey))];setProgress('Téléchargement des niveaux IWLS…',5);const seriesByStation={};await Promise.all(stationKeys.map(async k=>{const raw=await fetchStationSeries(STATIONS[k][0],fromIso,toIso);seriesByStation[k]=seriesToSorted(raw);}));setProgress('Préparation du modèle OHPS…',15);await shopPrepare(depMs,setProgress);return{seriesByStation,fromIso,toIso};}
 
 async function ohpsRouteSeriesForTime(targetMs){const aMs=Math.floor(targetMs/3600000)*3600000,bMs=Math.ceil(targetMs/3600000)*3600000,startIso=fmtUtcIso(aMs),endIso=fmtUtcIso(bMs),key=`route-${startIso}-${endIso}`;try{return await ohpsLoadPathSeries(key,OHPS_ROUTE_POINTS,startIso,endIso,1.5);}catch(e){await new Promise(r=>setTimeout(r,500));return await ohpsLoadPathSeries(key,OHPS_ROUTE_POINTS,startIso,endIso,1.5);}}
 
@@ -1325,8 +1835,7 @@ async function sampleCurrentForEta(point,targetMs,direction,inputData=null){
     const special=q73SpecialCurrentForEta(inputData,targetMs,direction);
     if(special)return special;
   }
-  const series=await ohpsRouteSeriesForTime(targetMs);
-  const c=ohpsSampleSeries(point,series,targetMs);
+  const c=await shopSample(point,targetMs);
   if(c.error) return c;
   const hydroSignedKn=ohpsHydroSignedKn(c,point);
   const effectKn=ohpsCurrentEffectKn(c,direction,point);
@@ -1874,6 +2383,7 @@ el('runBtn').addEventListener('click',async()=>{
     el('log').textContent='Erreur: '+String(e?.message??e);
     lastText=el('log').textContent;
   }finally{
+    shopAppendDiagnostic();
     el('runBtn').disabled=false;
   }
 });
@@ -1900,6 +2410,7 @@ el('recalcBtn').addEventListener('click',async()=>{
     renderRecalcResult({ok:false,dataError:true,error:String(e?.message??e)},ctx.res);
     setStatus(String(e?.message??e),'err');
   }finally{
+    shopAppendDiagnostic();
     btn.disabled=false;
   }
 });
