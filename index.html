@@ -2717,5 +2717,187 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
 
 </script>
 <!-- FAILURE-PRESENTATION-ONLY-END -->
+<!-- SHOP-UNIT-BRIDGE-U3-BEGIN -->
+<script id="shop-unit-bridge-u3">
+/* SHOP UNIT BRIDGE U3 - 2026-10-15
+ * Applies only to the named OGSL OHPS mosaic. No conversion of radiance to speed.
+ * All current values and validity times still come from WCS for the requested hour.
+ * A live, explicitly documented magnitude/direction pair in ecccShopNautilo is
+ * used as a candidate schema, not as proof that WCS uses that schema.
+ * Candidate WCS values are compared to live ERDDAP values at common past hours.
+ * At least 3 matches at 2 route locations and 2 hours are required before use.
+ * Comparisons establish a bounded consistency check, not operational validation.
+ * No calibration values are put in the transit cache or used as future currents.
+ * The original UI, transit, Q73, DSQ, speed and scheduling scripts are unchanged.
+ */
+(function shopUnitsCrosscheckU3(){
+  'use strict';
+  const originalWcsChunk = shopWcsChunk;
+  const originalTiffBands = shopTiffBands;
+  const bySource = new WeakMap();
+  const pending = new WeakMap();
+  const CFG = Object.freeze({
+    geoBase:'https://geoserver.prod.ogsl.ca/geoserver',
+    geoLayer:'raster-harvester:ohps_mosaic',
+    erddapBase:'https://erddap.ogsl.ca/erddap',
+    erddapDataset:'ecccShopNautilo',
+    pointIndices:[0,66,85],
+    radiusKm:0.6,
+    maxCellOffsetKm:0.35,
+    maxCellSeparationKm:0.25,
+    minSpeedMs:0.25,
+    speedAbsoluteToleranceMs:0.04,
+    speedRelativeTolerance:0.08,
+    directionToleranceDeg:8,
+    requiredMatches:3,
+    requiredLocations:2,
+    requiredHours:2,
+    maxAgeHours:24
+  });
+  const fail = text => shopMetadataError('SHOP U3 : '+text);
+  const finite = x => typeof x==='number' && Number.isFinite(x);
+  function namedBands(bands){
+    if(!Array.isArray(bands)||bands.length!==4)return null;
+    const byName=new Map();
+    for(const b of bands){
+      const name=shopNorm(b.name);
+      if(!['u','v','magnitude','direction'].includes(name)||byName.has(name))return null;
+      byName.set(name,b);
+    }
+    return byName.size===4?byName:null;
+  }
+  function isExpectedMosaic(source){
+    return source?.kind==='wcs' && source.base===CFG.geoBase &&
+      source.key===CFG.geoBase+'|'+CFG.geoLayer &&
+      [CFG.geoLayer,'ohps_mosaic'].includes(source.coverage) &&
+      !!namedBands(source.bands);
+  }
+  // This override merely provides evidence for two explicitly named fields;
+  // the original validator still rejects contradictory or unsupported units.
+  shopTiffBands = function shopTiffBandsU3(tiff,source){
+    const bands=originalTiffBands(tiff,source),entry=bySource.get(source);
+    if(!entry)return bands;
+    if(!isExpectedMosaic(source)||!namedBands(bands))throw fail('le sch\u00e9ma de la mosa\u00efque a chang\u00e9.');
+    for(const band of bands){
+      const name=shopNorm(band.name);
+      if(name!=='magnitude'&&name!=='direction')continue;
+      const unit=name==='magnitude'?entry.reference.speedUnit:entry.reference.directionUnit;
+      band.unitCandidates=[...(band.unitCandidates||[]),{
+        unit,
+        origin:(entry.verified?'U3 reference recoupee':'U3 CANDIDAT NON VALIDE')+
+          ' | '+entry.reference.url+' | '+name
+      }];
+      // ERDDAP explicitly declares a TOWARD bearing clockwise from North.
+      // It is not accepted for WCS until the vector comparisons pass.
+      if(name==='direction')band.definition='sea_water_velocity_to_direction';
+    }
+    return bands;
+  };
+  async function referenceSource(){
+    const s=await shopErddapSource();
+    if(s.kind!=='erddap'||s.base!==CFG.erddapBase||s.dataset!==CFG.erddapDataset)
+      throw fail('distribution SHOP de r\u00e9f\u00e9rence non reconnue.');
+    const speed=s.meta.bands.filter(b=>b.name==='magnitude'&&b.attrs?.standardname==='sea_water_speed');
+    const dir=s.meta.bands.filter(b=>b.name==='direction'&&b.attrs?.standardname==='sea_water_velocity_to_direction');
+    if(speed.length!==1||dir.length!==1)throw fail('magnitude/direction ou convention de direction non document\u00e9es.');
+    const su=shopBandUnit(speed[0],'speed'),du=shopBandUnit(dir[0],'dir');
+    // Ignore neither conflicting units nor packing metadata. ERDDAP's original
+    // chunk reader checks columnUnits and does not double-unpack server values.
+    s.meta={...s.meta,bands:[speed[0],dir[0]]};
+    return {source:s,reference:Object.freeze({
+      speedUnit:su.unit,directionUnit:du.unit,
+      speedFactor:su.factor,directionFactor:du.factor,
+      url:s.base+'/info/'+s.dataset+'/index.json',
+      checkedAt:Date.now()
+    })};
+  }
+  function assess(p,time,w,r){
+    const result={point:shopPointLabel(p),index:p.index,time:fmtUtcIso(time),ok:false};
+    if(!w||!r)return {...result,reason:'cellule valide absente dans une des deux distributions'};
+    const nums=[w.u,w.v,r.u,r.v,w.lat,w.lon,r.lat,r.lon,w.distanceToGridKm,r.distanceToGridKm];
+    if(nums.some(n=>!finite(n))||w.timeMs!==time||r.timeMs!==time)
+      return {...result,reason:'valeur ou horodatage non conforme'};
+    const ws=Math.hypot(w.u,w.v),rs=Math.hypot(r.u,r.v);
+    const separation=ohpsDistanceKm(w.lat,w.lon,r.lat,r.lon);
+    const wd=Math.atan2(w.u,w.v)*180/Math.PI,rd=Math.atan2(r.u,r.v)*180/Math.PI;
+    const angle=Math.abs(((wd-rd+540)%360)-180);
+    Object.assign(result,{geoSpeedMs:ws,erddapSpeedMs:rs,speedDifferenceMs:Math.abs(ws-rs),
+      directionDifferenceDeg:angle,cellSeparationKm:separation,
+      geoCell:[w.lat,w.lon],erddapCell:[r.lat,r.lon]});
+    if(w.distanceToGridKm>CFG.maxCellOffsetKm||r.distanceToGridKm>CFG.maxCellOffsetKm||separation>CFG.maxCellSeparationKm)
+      return {...result,reason:'cellules trop \u00e9loign\u00e9es pour comparer'};
+    if(ws<CFG.minSpeedMs||rs<CFG.minSpeedMs)return {...result,reason:'courant trop faible pour v\u00e9rifier les unit\u00e9s et la direction'};
+    const tolerance=Math.max(CFG.speedAbsoluteToleranceMs,CFG.speedRelativeTolerance*rs);
+    if(Math.abs(ws-rs)>tolerance||angle>CFG.directionToleranceDeg)
+      return {...result,contradiction:true,reason:'vitesses ou directions incompatibles (cycles ou produits possiblement diff\u00e9rents)'};
+    return {...result,ok:true,reason:'comparaison conforme',speedToleranceMs:tolerance};
+  }
+  function sufficient(matches){
+    return matches.length>=CFG.requiredMatches &&
+      new Set(matches.map(x=>x.index)).size>=CFG.requiredLocations &&
+      new Set(matches.map(x=>x.time)).size>=CFG.requiredHours;
+  }
+  async function establish(source,targetTime){
+    if(!isExpectedMosaic(source))throw fail('cette proc\u00e9dure est limit\u00e9e \u00e0 ohps_mosaic de l\u2019OGSL.');
+    shopNote('[U3 CONTROLE CROISE] GeoTIFF sans unite exploitable. Essai du schema magnitude/direction documente par ERDDAP. Les donnees de comparaison ne seront PAS utilisees pour le transit.');
+    shopNote('[U3 CRITERES DE COMPARAISON] '+JSON.stringify(CFG));
+    const {source:ref,reference}=await referenceSource();
+    const available=new Set(ref.times);
+    const times=source.times.filter(t=>available.has(t)&&t<=targetTime&&targetTime-t<=CFG.maxAgeHours*3600000).sort((a,b)=>b-a).slice(0,2);
+    if(times.length<CFG.requiredHours)throw fail('pas assez d\u2019heures communes pour recouper les deux distributions.');
+    const candidate={...source};
+    bySource.set(candidate,{reference,verified:false});
+    const matches=[],attempts=[];
+    try{
+      for(const time of times){
+        for(const index of CFG.pointIndices){
+          const point=OHPS_ROUTE_POINTS.find(p=>p.index===index);
+          if(!point)throw fail('point de comparaison absent de la route.');
+          let comparison;
+          try{
+            const [wm,rm]=await Promise.all([
+              originalWcsChunk(candidate,[point],time,CFG.radiusKm),
+              shopErddapChunk(ref,[point],time,CFG.radiusKm)
+            ]);
+            comparison=assess(point,time,wm.get(index),rm.get(index));
+          }catch(e){comparison={ok:false,index,point:shopPointLabel(point),time:fmtUtcIso(time),reason:String(e.message||e)};}
+          attempts.push(comparison);shopNote('[U3 COMPARAISON] '+JSON.stringify(comparison));
+          if(comparison.contradiction)throw fail('comparaison contradictoire avec ERDDAP; aucune unite externe appliquee. Voir [U3 COMPARAISON].');
+          if(comparison.ok)matches.push(comparison);
+          if(sufficient(matches)){
+            const entry={reference,verified:true,comparisons:matches.slice()};
+            bySource.set(source,entry);
+            shopNote('[U3 REFERENCE RETENUE] '+JSON.stringify({
+              source:reference.url,speedUnit:reference.speedUnit,directionUnit:reference.directionUnit,
+              matches:matches.length,locations:new Set(matches.map(x=>x.index)).size,
+              hours:[...new Set(matches.map(x=>x.time))]
+            })+'\nControle de coherence reussi, pas une validation operationnelle du modele. Pour le transit: valeurs WCS aux heures demandees, aucune extrapolation des valeurs ERDDAP.');
+            return entry;
+          }
+        }
+      }
+    }finally{bySource.delete(candidate);}
+    throw fail(`unit\u00e9s GeoServer non recoup\u00e9es : ${matches.length} comparaisons conformes sur ${attempts.length}; 3, sur 2 lieux et 2 heures, sont requises. Voir [U3 COMPARAISON]. Aucun courant calcul\u00e9 avec des unit\u00e9s suppos\u00e9es.`);
+  }
+  shopWcsChunk = async function shopWcsChunkU3(source,points,time,radius){
+    if(bySource.get(source)?.verified)return originalWcsChunk(source,points,time,radius);
+    try{return await originalWcsChunk(source,points,time,radius);}
+    catch(e){
+      if(e.code!=='SHOP_METADATA'||!isExpectedMosaic(source))throw e;
+      // Only the observed missing-unit error is eligible. Raster decoding,
+      // name, count, projection, time and contradictory-unit errors are not.
+      if(!/unit\\u00e9|unit\u00e9/i.test(e.message)||!/non confirm|non exploitable/.test(e.message))throw e;
+      if(/contradictoire|ambigu|nombre de bandes|noms de bandes/.test(e.message))throw e;
+      if(!source.bands.every(b=>!String(b.units||'').trim()||shopIsWcsPlaceholder(b.units)))throw e;
+      let task=pending.get(source);
+      if(!task){task=establish(source,time);pending.set(source,task);}
+      try{await task;}catch(error){if(error.code==='SHOP_METADATA')throw error;throw fail(String(error.message||error));}
+      return originalWcsChunk(source,points,time,radius);
+    }
+  };
+})();
+
+</script>
+<!-- SHOP-UNIT-BRIDGE-U3-END -->
 </body>
 </html>
