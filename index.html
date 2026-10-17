@@ -149,6 +149,10 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
         text-transform: uppercase;
         color: #8eabc5;
       }
+      .results-table .result-row td[data-label="SOW max au point (kn)"]::before {
+        white-space: nowrap;
+        letter-spacing: .02em;
+      }
       .results-table .result-row td:first-child {
         grid-column: 1 / -1;
         font-size: 1rem;
@@ -248,7 +252,6 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
     <section class="bg-white rounded-2xl shadow-sm border p-4">
-      <h2 class="text-lg font-semibold mb-3">Paramètres</h2>
       <div class="grid grid-cols-1 gap-3">
         <label class="text-sm">
           <span class="block text-slate-700 mb-1">Direction</span>
@@ -292,7 +295,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
             <th class="text-left p-2">ETA (local)</th>
             <th class="text-left p-2">Niveau (m)</th>
             <th class="text-left p-2">DSQ (m)</th>
-            <th class="text-left p-2">SOW max permise au point (kn)</th>
+            <th class="text-left p-2 whitespace-nowrap">SOW max au point (kn)</th>
             <th class="text-left p-2">Courant au point (kn)</th>
             <th class="text-left p-2">SOG au point (kn)</th>
           </tr></thead>
@@ -336,7 +339,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
               <th class="text-left p-2">ETA (local)</th>
               <th class="text-left p-2">Niveau (m)</th>
               <th class="text-left p-2">DSQ (m)</th>
-              <th class="text-left p-2">SOW max permise au point (kn)</th>
+              <th class="text-left p-2 whitespace-nowrap">SOW max au point (kn)</th>
               <th class="text-left p-2">Courant au point (kn)</th>
               <th class="text-left p-2">SOG au point (kn)</th>
             </tr></thead>
@@ -387,7 +390,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
           <li>Navires de largeur réelle ≥ 30 m, dans les deux directions : maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes. Toute limite locale plus basse demeure prioritaire.</li>
           <li>Table SQ porte-conteneurs complète utilisée de 7 à 15 kn pour toutes les largeurs 24 à 44 m; au-dessus de 15 kn, l'exigence augmente de 0,60 m par nœud supplémentaire, avec interpolation.</li>
           <li>La SOW utilisée reste la plus élevée permise par le DSQ, la vitesse maximale saisie et les limites locales applicables; le plancher de 7 kn n'est pas un plafond.</li>
-          <li>Tableau principal : seuls les points de rapport Station Québec, CIP Saint-Nicolas, CIP Sainte-Croix, CIP Grondines, CIP Batiscan et Pointe-des-Ormes sont affichés. Pour chaque point, le tableau donne le niveau, le DSQ, la SOW maximale permise au point, le courant instantané au point et la SOG au point (SOW maximale permise + effet signé du courant). Le tableau complet repliable demeure inchangé avec tous les waypoints, le courant moyen par secteur, la SOW permise minimale et la SOW utilisée moyenne.</li>
+          <li>Tableau principal : seuls les points de rapport Station Québec, CIP Saint-Nicolas, CIP Sainte-Croix, CIP Grondines, CIP Batiscan et Pointe-des-Ormes sont affichés. La colonne « SOW max au point » indique uniquement le maximum permis par le DSQ et la table SQ, jusqu’à 15 kn, sans appliquer la vitesse maximale saisie ni les limites locales de transit. La SOG au point demeure calculée avec la vitesse réellement permise par l’ensemble des règles applicables. Le tableau complet repliable demeure inchangé.</li>
           <li>Le bouton Calculer affiche toujours d'abord le plan initial demandé. Si le transit est interrompu, le tableau initial demeure visible avec la raison du bris.</li>
           <li>Le bouton « Recalculer le prochain passage » essaie d'abord de conserver exactement l'heure de départ demandée. Pour un bris lié à Q73 en direction Québec → Pointe-des-Ormes, il réduit au besoin la SOW avant Q73 seulement, en recherchant le plafond pré-Q73 le plus élevé qui permet le passage.</li>
           <li>Dès Q73, le ralentissement de synchronisation cesse : la SOW revient à la vitesse maximale permise par le DSQ, la vitesse maximale saisie et les restrictions locales. Si aucun profil ne fonctionne à l'heure demandée, le logiciel cherche ensuite le prochain départ possible sur 30 h, par pas de 5 min puis avec raffinement à 1 min, en appliquant la même stratégie.</li>
@@ -1953,7 +1956,7 @@ async function calcTrip(params,inputData,trip,setProgress){
 
   for(const seg of trip.segments){
     let segHours=0,segDist=0,wCur=0,wSow=0,minDsq=Infinity,minSowPerm=Infinity,lastLevel=null,lastStation='',currentMin=Infinity,currentMax=-Infinity;
-    let lastPointCurrentKn=null,lastPointCurrentType=null,lastPointLevel=null,lastPointDsq=null,lastPointSowPerm=null,lastPointSog=null;
+    let lastPointCurrentKn=null,lastPointCurrentType=null,lastPointLevel=null,lastPointDsq=null,lastPointSowPerm=null,lastPointDsqSowMax=null,lastPointSog=null;
     let montantCount=0,descendantCount=0,slackCount=0;
 
     for(let i=0;i<seg.path.length-1;i++){
@@ -1997,11 +2000,15 @@ async function calcTrip(params,inputData,trip,setProgress){
       if(startRow.pointCurrentKn==null && totalDist<=EPS && p.index===trip.named[0].index){
         const pPointMaxSow=localMaxSowKnForDistance(Number(p.distanceFromStartNm),planningMaxSowKn,beamM,direction);
         const pPointSowPerm=allowedSow(dsqTable,dsq,pPointMaxSow);
+        // Colonne de rapport: maximum dicté par le DSQ / la table SQ seulement.
+        // On ne lui applique ni la vitesse maximale saisie ni les limites locales de transit.
+        const pPointDsqSowMax=allowedSow(dsqTable,dsq,15.0);
         startRow.pointCurrentKn=cP.effectKn;
         startRow.pointCurrentType=cP.currentType;
         startRow.pointLevel=level;
         startRow.pointDsq=dsq;
         startRow.pointSowPerm=pPointSowPerm;
+        startRow.pointDsqSowMax=pPointDsqSowMax;
         startRow.pointSog=(pPointSowPerm>0&&Number.isFinite(cP.effectKn))?pPointSowPerm+cP.effectKn:null;
       }
 
@@ -2104,9 +2111,11 @@ async function calcTrip(params,inputData,trip,setProgress){
       const qPlanningMaxSowKn=(qBeforeQ73&&Number.isFinite(preQ73SowCapKn))?Math.max(7,Math.min(maxSowKn,preQ73SowCapKn)):maxSowKn;
       const qPointMaxSow=localMaxSowKnForDistance(Number(q.distanceFromStartNm),qPlanningMaxSowKn,beamM,direction);
       const qPointSowPerm=qDsq==null?null:allowedSow(dsqTable,qDsq,qPointMaxSow);
+      const qPointDsqSowMax=qDsq==null?null:allowedSow(dsqTable,qDsq,15.0);
       lastPointLevel=qLevel;
       lastPointDsq=qDsq;
       lastPointSowPerm=qPointSowPerm;
+      lastPointDsqSowMax=qPointDsqSowMax;
       lastPointSog=(Number.isFinite(qPointSowPerm)&&qPointSowPerm>0&&Number.isFinite(cQ.effectKn))?qPointSowPerm+cQ.effectKn:null;
       if(q73RuleAtEntry) q73Plan={...q73RuleAtEntry,exitEtaMs:eta,dsq};
       segHours+=h; segDist+=dist; totalDist+=dist;
@@ -2122,7 +2131,7 @@ async function calcTrip(params,inputData,trip,setProgress){
     }
 
     const avgCur=wCur/segDist,avgSow=wSow/segDist,effectiveSog=segDist/segHours;
-    rows.push({name:displayName(seg.end),etaMs:eta,status:'OK',level:lastLevel,station:lastStation,dsqMin:minDsq,currentKn:avgCur,pointCurrentKn:lastPointCurrentKn,pointCurrentType:lastPointCurrentType,pointLevel:lastPointLevel,pointDsq:lastPointDsq,pointSowPerm:lastPointSowPerm,pointSog:lastPointSog,sowPermise:minSowPerm,sowUsed:avgSow,sog:effectiveSog,detail:{distanceNm:segDist,pointCount:seg.path.length,currentMin,currentMax,montantCount,descendantCount,slackCount}});
+    rows.push({name:displayName(seg.end),etaMs:eta,status:'OK',level:lastLevel,station:lastStation,dsqMin:minDsq,currentKn:avgCur,pointCurrentKn:lastPointCurrentKn,pointCurrentType:lastPointCurrentType,pointLevel:lastPointLevel,pointDsq:lastPointDsq,pointSowPerm:lastPointSowPerm,pointDsqSowMax:lastPointDsqSowMax,pointSog:lastPointSog,sowPermise:minSowPerm,sowUsed:avgSow,sog:effectiveSog,detail:{distanceNm:segDist,pointCount:seg.path.length,currentMin,currentMax,montantCount,descendantCount,slackCount}});
     logs.push(`[${displayName(seg.end)}] ETA ${fmtLocal(eta,tzName)} | ${segDist.toFixed(2)} NM | courant moyen P-Q ${(avgCur>=0?'+':'')}${avgCur.toFixed(2)} kn | SOW ${avgSow.toFixed(1)} | SOG ${effectiveSog.toFixed(1)} | DSQ min ${minDsq.toFixed(2)} m`);
     doneSegments++;
     setProgress?.(`Calcul OHPS point par point… ${doneSegments}/${trip.segments.length} secteurs`,20+Math.round(doneSegments/trip.segments.length*75));
@@ -2321,9 +2330,10 @@ function renderReportRowsInto(tbodyId,res){
     const pointLevel=r.pointLevel??r.level;
     const pointDsq=r.pointDsq??r.dsqMin;
     const pointSowPerm=r.pointSowPerm;
+    const pointDsqSowMax=r.pointDsqSowMax;
     const pointCurrent=r.pointCurrentKn;
     const pointSog=r.pointSog;
-    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA" class="p-2 whitespace-nowrap">${escapeHtml(fmtLocal(r.etaMs,LOCAL_TZ))}</td><td data-label="Niveau (m)" class="p-2">${pointLevel==null?'—':pointLevel.toFixed(2)}</td><td data-label="DSQ (m)" class="p-2">${pointDsq==null?'—':pointDsq.toFixed(2)}</td><td data-label="SOW max permise au point (kn)" class="p-2">${pointSowPerm==null?'—':pointSowPerm.toFixed(1)}</td><td data-label="Courant au point (kn)" class="p-2">${pointCurrent==null?'—':`${pointCurrent>=0?'+':''}${pointCurrent.toFixed(2)}`}</td><td data-label="SOG au point (kn)" class="p-2 font-semibold">${pointSog==null?'—':pointSog.toFixed(1)}</td>`;
+    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA" class="p-2 whitespace-nowrap">${escapeHtml(fmtLocal(r.etaMs,LOCAL_TZ))}</td><td data-label="Niveau (m)" class="p-2">${pointLevel==null?'—':pointLevel.toFixed(2)}</td><td data-label="DSQ (m)" class="p-2">${pointDsq==null?'—':pointDsq.toFixed(2)}</td><td data-label="SOW max au point (kn)" class="p-2">${pointDsqSowMax==null?'—':pointDsqSowMax.toFixed(1)}</td><td data-label="Courant au point (kn)" class="p-2">${pointCurrent==null?'—':`${pointCurrent>=0?'+':''}${pointCurrent.toFixed(2)}`}</td><td data-label="SOG au point (kn)" class="p-2 font-semibold">${pointSog==null?'—':pointSog.toFixed(1)}</td>`;
     tbody.appendChild(tr);
   }
 }
@@ -3036,6 +3046,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     if(!tr||tr.dataset.routeUpdateHeader==='yes')return;
     const ths=Array.from(tr.children);
     if(ths[1])ths[1].textContent='ETA / heure de passage';
+    if(ths[4]){ths[4].textContent='SOW max au point (kn)';ths[4].classList.add('whitespace-nowrap');}
     const speedTh=document.createElement('th');
     speedTh.className='text-left p-2';
     speedTh.textContent='SOW à partir d’ici (kn)';
@@ -3072,7 +3083,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
       const etaCell=cells[1];
       const sowPermCell=cells[4];
       const lp=localParts(data.etaMs);
-      const editable=pointIndex!==startIdx&&pointIndex!==endIdx;
+      const editable=pointIndex!==endIdx;
 
       etaCell.innerHTML='';
       const time=document.createElement('input');
@@ -3087,19 +3098,21 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
       speedCell.dataset.label='SOW à partir d’ici (kn)';
       const speed=document.createElement('input');
       speed.type='number';speed.min='7';speed.max=String(state.rootMaxSowKn);speed.step='0.1';
-      // Valeur proposée : vitesse réellement permise à ce point par le calcul courant
-      // (DSQ / table SQ, limite navire et toute limite locale plus basse déjà applicable).
-      const pointPermitted=Number(data.pointSowPerm);
-      const proposedSpeed=(Number.isFinite(pointPermitted)&&pointPermitted>0)
-        ?Math.min(state.rootMaxSowKn,pointPermitted)
-        :(caps.get(pointIndex)??state.rootMaxSowKn);
+      // Valeur proposée : plafond volontaire déjà en vigueur, limité au besoin
+      // par le maximum DSQ / table SQ au point. Les limites locales sont appliquées
+      // séparément par le moteur et ne réduisent pas la valeur présaisie ici.
+      const pointDsqMax=Number(data.pointDsqSowMax);
+      const voluntaryCap=caps.get(pointIndex)??state.rootMaxSowKn;
+      const proposedSpeed=(Number.isFinite(pointDsqMax)&&pointDsqMax>0)
+        ?Math.min(voluntaryCap,pointDsqMax)
+        :voluntaryCap;
       speed.value=proposedSpeed.toFixed(1);
       speed.dataset.routeUpdateBaseline=speed.value;
       speed.className='route-update-speed';
       speed.setAttribute('aria-label','SOW maximale planifiée à partir de '+(REPORT_POINT_LABELS.get(data.name)||data.name));
       speed.disabled=!editable;
       speedCell.append(speed);
-      const hint=document.createElement('span');hint.className='route-update-note';hint.textContent='Plafond volontaire; DSQ et limites locales restent prioritaires.';speedCell.append(hint);
+      const hint=document.createElement('span');hint.className='route-update-note';hint.textContent='Plafond volontaire';speedCell.append(hint);
       sowPermCell.after(speedCell);
 
       const action=document.createElement('td');
@@ -3115,7 +3128,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
         note.textContent='Recalcul requis : la grille n’intègre pas encore cette modification.';
         action.append(note);
       }else{
-        const note=document.createElement('span');note.className='route-update-note';note.textContent=pointIndex===startIdx?'Départ réglé dans les paramètres.':'Destination.';action.append(note);
+        const note=document.createElement('span');note.className='route-update-note';note.textContent='Destination.';action.append(note);
       }
       tr.append(action);
       tr.dataset.routeUpdateEnhanced='yes';
@@ -3303,7 +3316,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
   const list=get('directivesSummary')?.querySelector('ul');
   if(list&&!get('routeUpdateDirective')){
     const li=document.createElement('li');li.id='routeUpdateDirective';
-    li.textContent='Mise à jour en route : aux points de rapport intermédiaires, l’heure de passage et un plafond SOW peuvent être saisis. La vitesse proposée dans la case correspond à la SOW maximale permise au point par le calcul courant; elle peut donc être inférieure à la vitesse maximale du navire lorsque le DSQ ou une limite locale l’impose. Après toute modification, l’avis « Recalcul requis » et le bouton « Actualiser la suite » apparaissent; ils restent cachés lorsque les cases n’ont pas été modifiées. La SOW saisie devient le plafond volontaire jusqu’à la prochaine mise à jour; le DSQ et les limites locales plus basses demeurent prioritaires.';
+    li.textContent='Mise à jour en route : à partir du point de départ et aux points de rapport intermédiaires, l’heure de passage et un plafond SOW peuvent être saisis. La vitesse proposée dans la case est le plafond volontaire en vigueur, limité si nécessaire par le maximum DSQ / table SQ au point; les limites locales de transit restent appliquées séparément par le moteur. Après toute modification, l’avis « Recalcul requis » et le bouton « Actualiser la suite » apparaissent; ils restent cachés lorsque les cases n’ont pas été modifiées.';
     list.append(li);
   }
 })();
