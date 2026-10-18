@@ -304,7 +304,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
             <th class="text-left p-2">Niveau (m)</th>
             <th class="text-left p-2">DSQ (m)</th>
             <th class="text-left p-2 whitespace-nowrap">SOW max au point (kn)</th>
-            <th class="text-left p-2 whitespace-nowrap">Courant → SOG</th>
+            <th class="text-left p-2 whitespace-nowrap">Courant</th>
           </tr></thead>
           <tbody id="reportTbody"></tbody>
         </table>
@@ -347,7 +347,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
               <th class="text-left p-2">Niveau (m)</th>
               <th class="text-left p-2">DSQ (m)</th>
               <th class="text-left p-2 whitespace-nowrap">SOW max au point (kn)</th>
-              <th class="text-left p-2 whitespace-nowrap">Courant → SOG</th>
+              <th class="text-left p-2 whitespace-nowrap">Courant</th>
             </tr></thead>
             <tbody id="recalcReportTbody"></tbody>
           </table>
@@ -2338,10 +2338,12 @@ function renderReportRowsInto(tbodyId,res){
     const pointSowPerm=r.pointSowPerm;
     const pointDsqSowMax=r.pointDsqSowMax;
     const pointCurrent=r.pointCurrentKn;
-    const pointSog=r.pointSog;
-    const currentText=pointCurrent==null?'—':`${pointCurrent>=0?'+':''}${pointCurrent.toFixed(2)}`;
-    const sogText=pointSog==null?'—':pointSog.toFixed(1);
-    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA" class="p-2 whitespace-nowrap">${escapeHtml(fmtLocal(r.etaMs,LOCAL_TZ))}</td><td data-label="Niveau (m)" class="p-2">${pointLevel==null?'—':pointLevel.toFixed(2)}</td><td data-label="DSQ (m)" class="p-2">${pointDsq==null?'—':pointDsq.toFixed(2)}</td><td data-label="SOW max au point (kn)" class="p-2">${pointDsqSowMax==null?'—':pointDsqSowMax.toFixed(1)}</td><td data-label="Courant → SOG" class="p-2 whitespace-nowrap">${currentText==='—'?'—':currentText+' kn'} <span aria-hidden="true">→</span> <span class="font-semibold">${sogText==='—'?'SOG —':'SOG '+sogText+' kn'}</span></td>`;
+    const pointCurrentType=r.pointCurrentType;
+    const currentText=pointCurrent==null?'—':Math.abs(pointCurrent).toFixed(2);
+    const currentArrow=pointCurrentType==='MONTANT'?'↑':pointCurrentType==='DESCENDANT'?'↓':'';
+    const currentLabel=pointCurrentType==='MONTANT'?'courant montant':pointCurrentType==='DESCENDANT'?'courant baissant':'courant nul';
+    const currentClass=pointCurrentType==='MONTANT'?'current-up':pointCurrentType==='DESCENDANT'?'current-down':'current-slack';
+    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA" class="p-2 whitespace-nowrap">${escapeHtml(fmtLocal(r.etaMs,LOCAL_TZ))}</td><td data-label="Niveau (m)" class="p-2">${pointLevel==null?'—':pointLevel.toFixed(2)}</td><td data-label="DSQ (m)" class="p-2">${pointDsq==null?'—':pointDsq.toFixed(2)}</td><td data-label="SOW max au point (kn)" class="p-2">${pointDsqSowMax==null?'—':pointDsqSowMax.toFixed(1)}</td><td data-label="Courant" class="p-2 whitespace-nowrap">${currentText==='—'?'—':`<span class="report-current-value ${currentClass}" title="${escapeHtml(currentLabel)}">${currentText} kn <span class="report-current-arrow" aria-hidden="true">${currentArrow}</span></span>`}</td>`;
     tbody.appendChild(tr);
   }
 }
@@ -2948,7 +2950,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     background: #0b1a2b;
     color: #eef6ff;
   }
-  .route-update-speed { width: 5.8rem; min-width: 5.3rem; }
+  .route-update-speed { width: 5.3rem; min-width: 4.8rem; }
   .route-update-date,
   .route-update-note {
     display: block;
@@ -2976,11 +2978,55 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
   .route-update-pending { color: #fbbf24; font-weight: 600; }
   .route-update-pending.hidden { display: none !important; }
   .route-update-btn.route-update-dirty { box-shadow: 0 0 0 2px rgba(251,191,36,.35); }
+  .report-current-value { font-weight: 750; }
+  .report-current-value.current-up { color: #2563eb; }
+  .report-current-value.current-down { color: #dc2626; }
+  .report-current-value.current-slack { color: #64748b; }
+  body.app-night .report-current-value.current-up { color: #7dd3fc; }
+  body.app-night .report-current-value.current-down { color: #fb7185; }
+  body.app-night .report-current-value.current-slack { color: #94a3b8; }
+  .report-current-arrow {
+    display: inline-block;
+    margin-left: .2rem;
+    font-size: 1.55em;
+    line-height: .72;
+    font-weight: 950;
+    -webkit-text-stroke: .7px currentColor;
+    text-shadow: 0 0 .01px currentColor;
+    vertical-align: -.1em;
+  }
   @media (max-width: 767px) {
-    .route-update-time,
-    .route-update-speed { width: 100%; min-width: 0; }
+    .route-update-time { width: 100%; min-width: 0; }
+    .route-update-speed { width: 5.3rem; min-width: 0; max-width: calc(100% - .5rem); }
     .route-update-btn { width: 100%; min-height: 44px; }
     .route-update-cell { min-width: 0; }
+
+    /* Cartes de points de rapport : un peu de relief, sans ajouter de contenu. */
+    #reportTbody .result-row,
+    #recalcReportTbody .result-row {
+      margin: .48rem .42rem;
+      padding: .48rem .58rem .4rem;
+      border: 1px solid #355473;
+      border-radius: .9rem;
+      background: rgba(16,36,58,.82);
+      box-shadow: 0 2px 7px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.035);
+    }
+    #reportTbody .result-row:first-child,
+    #recalcReportTbody .result-row:first-child { border-top: 1px solid #355473; }
+    #reportTbody .result-row > td:first-child,
+    #recalcReportTbody .result-row > td:first-child {
+      margin: -.48rem -.58rem .16rem;
+      padding: .46rem .58rem !important;
+      border-bottom: 1px solid rgba(112,168,209,.22);
+      border-radius: .86rem .86rem 0 0;
+      background: rgba(28,58,90,.42);
+      letter-spacing: .01em;
+    }
+    #reportTbody .result-row.bg-red-50,
+    #recalcReportTbody .result-row.bg-red-50 {
+      background: rgba(64,33,41,.9) !important;
+      border-color: #7f4a55 !important;
+    }
   }
 </style>
 <script id="route-update-stage1">
@@ -3055,7 +3101,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     const ths=Array.from(tr.children);
     if(ths[1])ths[1].textContent='ETA / heure de passage';
     if(ths[4]){ths[4].textContent='SOW max au point (kn)';ths[4].classList.add('whitespace-nowrap');}
-    if(ths[5]){ths[5].textContent='Courant → SOG';ths[5].classList.add('whitespace-nowrap');}
+    if(ths[5]){ths[5].textContent='Courant';ths[5].classList.add('whitespace-nowrap');}
     if(ths[6])ths[6].remove();
     const speedTh=document.createElement('th');
     speedTh.className='text-left p-2';
