@@ -200,6 +200,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
 <!-- Favicon externe prioritaire pour favoris locaux Edge/Chrome; garder les fichiers avec le HTML. -->
 <link rel="icon" href="Transit_Quebec_Trois_Rivieres.ico" type="image/x-icon" sizes="any">
 <link rel="shortcut icon" href="Transit_Quebec_Trois_Rivieres.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
 <meta name="msapplication-TileImage" content="favicon-256.png">
 <!-- Secours autonome si l'ICO externe n'est pas trouvé. -->
@@ -251,6 +252,29 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
   #initialPlanFeedback #recalcBtn { width: 100%; }
 }
 </style>
+
+<style id="mobile-compact-safe-20261018">
+/* Presentation only. No calculation/current/DSQ rule is changed. */
+#status:empty { display:none; }
+@media (max-width: 767px) {
+  #inputPanel .grid.gap-3 { gap:.52rem !important; }
+  #inputPanel label > span { margin-bottom:.18rem !important; line-height:1rem; }
+  #inputPanel input, #inputPanel select { padding-top:.42rem !important; padding-bottom:.42rem !important; }
+  #inputPanel #runBtn { min-height:42px; padding-top:.55rem !important; padding-bottom:.55rem !important; }
+  #inputPanel .departure-datetime {
+    display:grid !important;
+    grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr) !important;
+    gap:.45rem !important;
+  }
+  #inputPanel .departure-datetime label { min-width:0; }
+  #inputPanel .departure-datetime input { width:100%; min-width:0; padding-left:.55rem !important; padding-right:.45rem !important; }
+  #summary > .bg-emerald-50 { padding:.55rem .7rem !important; }
+  .report-table-wrap { margin-top:.65rem !important; }
+  #reportTbody .result-row, #recalcReportTbody .result-row { margin-top:.36rem; margin-bottom:.36rem; }
+  #reportTbody .result-row td, #recalcReportTbody .result-row td { padding-top:.25rem !important; padding-bottom:.25rem !important; }
+  .route-update-date { margin-top:.12rem !important; line-height:.78rem !important; }
+}
+</style>
 </head>
 <body class="app-night bg-slate-50 text-slate-900">
 <div class="max-w-7xl mx-auto p-4 md:p-6">
@@ -259,7 +283,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
   </header>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <section class="bg-white rounded-2xl shadow-sm border p-4">
+    <section id="inputPanel" class="bg-white rounded-2xl shadow-sm border p-4">
       <div class="grid grid-cols-1 gap-3">
         <label class="text-sm">
           <span class="block text-slate-700 mb-1">Direction</span>
@@ -280,8 +304,8 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
           <span class="block text-slate-700 mb-1">Vitesse sur l'eau maximum (kn)</span>
           <input id="maxSowKn" type="number" min="7" max="20" step="0.1" value="12.0" class="w-full border rounded-xl px-3 py-2" />
         </label>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <label class="text-sm"><span class="block text-slate-700 mb-1">Date départ (local)</span><input id="depDate" type="date" class="w-full border rounded-xl px-3 py-2" /></label>
+        <div class="departure-datetime grid grid-cols-2 gap-2">
+          <label class="text-sm"><span class="block text-slate-700 mb-1">Date départ</span><input id="depDate" type="date" class="w-full border rounded-xl px-3 py-2" /></label>
           <label class="text-sm"><span class="block text-slate-700 mb-1">Heure départ</span><input id="depTime" type="time" step="60" class="w-full border rounded-xl px-3 py-2" /></label>
         </div>
         <button id="runBtn" class="w-full bg-slate-900 text-white rounded-2xl py-3 font-semibold hover:bg-slate-800">Calculer</button>
@@ -391,7 +415,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
           <li>DSQ : aucune marge additionnelle n'est ajoutée au calcul. Le dégagement disponible est calculé à partir du niveau, de la profondeur de référence et du tirant d'eau saisi.</li>
           <li>Profondeur de référence spéciale : 10,8 m de Pointe Deschambeault jusqu'au point intermédiaire non nommé (11,5 NM), puis 10,7 m de ce point jusqu'à Bouée Q19, dans les deux directions.</li>
           <li>Plancher SOW général : 7,0 kn partout. À Q73 en direction Québec → Trois-Rivières, le critère additionnel est une SOG minimale, et non un plancher SOW spécial.</li>
-          <li>Limites locales de SOW selon la direction : Québec → Pointe-des-Ormes, maximum 10,0 kn sur le premier 1,0 NM depuis Station Québec, puis 11,0 kn jusqu’à 2,0 NM, puis retour à la vitesse maximale normale; Pointe-des-Ormes → Québec, maximum 10,0 kn de Station Pointe-des-Ormes à Wayagamak. Toute limite DSQ, navire ou autre limite locale plus basse demeure prioritaire.</li>
+          <li>Limites locales de SOW selon la direction : Québec → Pointe-des-Ormes, maximum 9,0 kn sur le premier 1,0 NM depuis Station Québec, puis 11,0 kn jusqu’à 2,0 NM, puis retour à la vitesse maximale normale; Pointe-des-Ormes → Québec, maximum 9,0 kn sur le premier 1,0 NM depuis Station Pointe-des-Ormes, puis 11,0 kn jusqu’à Wayagamak, puis retour à la vitesse maximale normale. Toute limite DSQ, navire ou autre limite locale plus basse demeure prioritaire.</li>
           <li>Navires de largeur réelle &lt; 30 m : la vitesse maximale saisie peut aller jusqu’à 20,0 kn. Jusqu’à 15,0 kn inclusivement, la table SQ initiale demeure inchangée. Au-dessus de 15,0 kn, le dégagement requis est égal à la valeur requise à 15,0 kn + 0,60 m par nœud supplémentaire; interpolation linéaire entre les dixièmes de nœud.</li>
           <li>Navires de largeur réelle ≥ 30 m, dans les deux directions : maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes. Toute limite locale plus basse demeure prioritaire.</li>
           <li>Table SQ porte-conteneurs complète utilisée de 7 à 15 kn pour toutes les largeurs 24 à 44 m; au-dessus de 15 kn, l'exigence augmente de 0,60 m par nœud supplémentaire, avec interpolation.</li>
@@ -1397,16 +1421,17 @@ function ohpsCurrentEffectKn(c,direction,point){
 }
 function localMaxSowKnForDistance(distanceFromQuebecNm,userMaxSowKn,beamM,direction){
   let localMax=userMaxSowKn;
-  // Québec -> Pointe-des-Ormes (voyage montant): 10 kn sur le premier NM,
+  // Québec -> Pointe-des-Ormes (voyage montant): 9 kn sur le premier NM,
   // 11 kn du premier au deuxième NM, puis retour à la limite normale.
   if(direction==='QPOR'){
-    if(distanceFromQuebecNm<=1.0+EPS) localMax=Math.min(localMax,10.0);
+    if(distanceFromQuebecNm<=1.0+EPS) localMax=Math.min(localMax,9.0);
     else if(distanceFromQuebecNm<=2.0+EPS) localMax=Math.min(localMax,11.0);
   }
-  // Pointe-des-Ormes -> Québec (voyage descendant): 10 kn entre la station
-  // Pointe-des-Ormes et Wayagamak; aucune limite 10/11 kn près de Québec.
-  if(direction==='PORQ' && distanceFromQuebecNm>=66.6-EPS && distanceFromQuebecNm<=70.9+EPS){
-    localMax=Math.min(localMax,10.0);
+  // Pointe-des-Ormes -> Québec (voyage descendant): 9 kn sur le premier NM
+  // depuis la station (70,9 -> 69,9 NM depuis Québec), puis 11 kn jusqu'à Wayagamak.
+  if(direction==='PORQ'){
+    if(distanceFromQuebecNm>=69.9-EPS && distanceFromQuebecNm<=70.9+EPS) localMax=Math.min(localMax,9.0);
+    else if(distanceFromQuebecNm>=66.6-EPS && distanceFromQuebecNm<69.9-EPS) localMax=Math.min(localMax,11.0);
   }
   if(Number.isFinite(beamM) && beamM>=30.0-EPS){
     if(distanceFromQuebecNm<=41.4+EPS) localMax=Math.min(localMax,15.0);
@@ -1420,10 +1445,10 @@ function localSpeedPieces(p,q,userMaxSowKn,beamM,direction){
   if(!(total>0)) return [{distanceNm:0,maxSowKn:localMaxSowKnForDistance((a+b)/2,userMaxSowKn,beamM,direction)}];
   const lo=Math.min(a,b),hi=Math.max(a,b);
   const cuts=[lo,hi];
-  // 1/2 NM: nouvelles limites au départ de Québec en QPOR.
+  // 1/2 NM: limites au départ de Québec en QPOR.
   // 41.4 NM: changement de plafond des navires >=30 m.
-  // 66.6 NM: Wayagamak, début/fin de la zone 10 kn en PORQ.
-  for(const boundary of [1.0,2.0,41.4,66.6]){
+  // 66.6 NM: Wayagamak; 69.9 NM: fin du premier NM depuis Pointe-des-Ormes en PORQ.
+  for(const boundary of [1.0,2.0,41.4,66.6,69.9]){
     if(boundary>lo+EPS && boundary<hi-EPS) cuts.push(boundary);
   }
   cuts.sort((x,y)=>x-y);
@@ -1950,7 +1975,7 @@ async function calcTrip(params,inputData,trip,setProgress){
   logs.push(`Direction: ${displayName(trip.named[0])} → ${displayName(trip.named.at(-1))}`);
   logs.push(`Départ: ${fmtLocal(depMs,tzName)} | SOW max utilisateur: ${maxSowKn.toFixed(1)} kn`);
   logs.push(direction==='QPOR'?'Règle courant Québec → Pointe-des-Ormes: MONTANT = ajouté | DESCENDANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.':'Règle courant Pointe-des-Ormes → Québec: DESCENDANT = ajouté | MONTANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.');
-  logs.push(direction==='QPOR'?"SOW locale (Québec → Pointe-des-Ormes): maximum 10,0 kn sur le premier 1,0 NM depuis Station Québec; puis 11,0 kn jusqu’à 2,0 NM; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.":"SOW locale (Pointe-des-Ormes → Québec): maximum 10,0 kn de Station Pointe-des-Ormes à Wayagamak; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.");
+  logs.push(direction==='QPOR'?"SOW locale (Québec → Pointe-des-Ormes): maximum 9,0 kn sur le premier 1,0 NM depuis Station Québec; puis 11,0 kn jusqu’à 2,0 NM; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.":"SOW locale (Pointe-des-Ormes → Québec): maximum 9,0 kn sur le premier 1,0 NM depuis Station Pointe-des-Ormes; puis 11,0 kn jusqu’à Wayagamak; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.");
   if(beamM>=30-EPS) logs.push('Navire de largeur réelle >= 30 m: maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes, dans les deux directions; toute limite locale plus basse demeure prioritaire.');
   else logs.push('Navire de largeur réelle < 30 m: vitesse maximale saisie jusqu’à 20,0 kn. Jusqu’à 15,0 kn, table SQ initiale inchangée; au-dessus de 15,0 kn, dégagement requis = exigence à 15,0 kn + 0,60 m par nœud supplémentaire, avec interpolation linéaire.');
   logs.push('Majoration du courant DESCENDANT OHPS: +14 % par défaut; +20 % entre Pont de Québec et CIP St-Nicolas (incluant Bouée Q19); +30 % entre Phare Richelieu et Barre Boulard; +13 % supplémentaires sur le courant DESCENDANT calculé entre CIP Grondines et Cap à la roche inclusivement. Le courant MONTANT n’est pas modifié par cette correction. Exception: au point Q73 en direction Québec → Trois-Rivières, le courant OHPS est remplacé par la table Portneuf − Deschaillons.');
@@ -2343,7 +2368,11 @@ function renderReportRowsInto(tbodyId,res){
     const currentArrow=pointCurrentType==='MONTANT'?'↑':pointCurrentType==='DESCENDANT'?'↓':'';
     const currentLabel=pointCurrentType==='MONTANT'?'courant montant':pointCurrentType==='DESCENDANT'?'courant baissant':'courant nul';
     const currentClass=pointCurrentType==='MONTANT'?'current-up':pointCurrentType==='DESCENDANT'?'current-down':'current-slack';
-    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA" class="p-2 whitespace-nowrap">${escapeHtml(fmtLocal(r.etaMs,LOCAL_TZ))}</td><td data-label="Niveau (m)" class="p-2">${pointLevel==null?'—':pointLevel.toFixed(2)}</td><td data-label="DSQ (m)" class="p-2">${pointDsq==null?'—':pointDsq.toFixed(2)}</td><td data-label="SOW max au point (kn)" class="p-2">${pointDsqSowMax==null?'—':pointDsqSowMax.toFixed(1)}</td><td data-label="Courant" class="p-2 whitespace-nowrap">${currentText==='—'?'—':`<span class="report-current-value ${currentClass}" title="${escapeHtml(currentLabel)}">${currentText} kn <span class="report-current-arrow" aria-hidden="true">${currentArrow}</span></span>`}</td>`;
+    const etaParts=_dtParts(new Date(r.etaMs),LOCAL_TZ,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false,timeZoneName:'short'});
+    const etaZone=etaParts.get('timeZoneName')||'';
+    let etaHour=etaParts.get('hour'); if(etaHour==='24')etaHour='00';
+    const etaCompact=`${etaParts.get('year')}-${etaParts.get('month')}-${etaParts.get('day')} ${etaHour}:${etaParts.get('minute')}`;
+    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA${etaZone?` (${escapeHtml(etaZone)})`:''}" class="p-2 whitespace-nowrap">${escapeHtml(etaCompact)}</td><td data-label="Niveau (m)" class="p-2">${pointLevel==null?'—':pointLevel.toFixed(2)}</td><td data-label="DSQ (m)" class="p-2">${pointDsq==null?'—':pointDsq.toFixed(2)}</td><td data-label="SOW max au point (kn)" class="p-2">${pointDsqSowMax==null?'—':pointDsqSowMax.toFixed(1)}</td><td data-label="Courant" class="p-2 whitespace-nowrap">${currentText==='—'?'—':`<span class="report-current-value ${currentClass}" title="${escapeHtml(currentLabel)}">${currentText} kn <span class="report-current-arrow" aria-hidden="true">${currentArrow}</span></span>`}</td>`;
     tbody.appendChild(tr);
   }
 }
@@ -2410,7 +2439,7 @@ function renderInitialResult(res){
   el('recalcReason').innerHTML='';
 
   if(res.ok){
-    el('summary').innerHTML=`<div class="rounded-2xl border bg-emerald-50 border-emerald-200 p-3"><div class="font-semibold">Plan initial réalisable</div><div class="mt-1">ETA destination : <b>${escapeHtml(fmtLocal(res.etaMs,LOCAL_TZ))}</b></div><div class="mt-1">Temps de transit : <b>${escapeHtml(fmtDuration(res.etaMs-res.depMs))}</b> — Distance calculée : ${res.distanceNm.toFixed(1)} NM</div></div>${q73ControlHtml(res)}`;
+    el('summary').innerHTML=`<div class="rounded-2xl border bg-emerald-50 border-emerald-200 p-3"><div>ETA destination : <b>${escapeHtml(fmtLocal(res.etaMs,LOCAL_TZ))}</b></div><div class="mt-1">Temps de transit : <b>${escapeHtml(fmtDuration(res.etaMs-res.depMs))}</b> — Distance calculée : ${res.distanceNm.toFixed(1)} NM</div></div>${q73ControlHtml(res)}`;
   }else{
     const explanation=failureExplanation(res);
     el('summary').innerHTML=`<div class="rounded-2xl border bg-red-50 border-red-200 p-3"><div class="font-semibold">Plan initial interrompu</div><div class="mt-1">${explanation}</div></div>${q73ControlHtml(res)}`;
@@ -2482,7 +2511,7 @@ el('runBtn').addEventListener('click',async()=>{
     const canRecalc=!res.ok&&(res.failureKind==='DSQ'||res.failureKind==='Q73_SOG'||String(res.error||'').startsWith('DSQ insuffisant'));
     if(canRecalc) pendingRecalcContext={baseParams,inputs,trip,res};
     setProgress(res.ok?'Plan initial calculé.':'Plan initial interrompu — voir la raison et le bouton Recalculer.',100);
-    setStatus(res.ok?'Plan initial réalisable.':'Plan initial interrompu — tableau conservé pour diagnostic.',res.ok?'ok':'err');
+    if(res.ok)setStatus('', 'ok');else setStatus('Plan initial interrompu — tableau conservé pour diagnostic.','err');
   }catch(e){
     console.error(e);
     setStatus(String(e?.message??e),'err');
@@ -3065,10 +3094,10 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     return (state.trip?.segments||[]).reduce((a,s)=>a+(Number(s.distanceNm)||0),0);
   }
   function localParts(ms){
-    const p=_dtParts(new Date(ms),LOCAL_TZ,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+    const p=_dtParts(new Date(ms),LOCAL_TZ,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZoneName:'short'});
     let h=p.get('hour');
     if(h==='24')h='00';
-    return{date:`${p.get('year')}-${p.get('month')}-${p.get('day')}`,time:`${h}:${p.get('minute')}`};
+    return{date:`${p.get('year')}-${p.get('month')}-${p.get('day')}`,time:`${h}:${p.get('minute')}`,zone:p.get('timeZoneName')||''};
   }
   function resolveEditedTime(timeStr,referenceMs){
     if(!/^\d{2}:\d{2}$/.test(String(timeStr||'')))throw new Error('Heure de passage invalide.');
@@ -3095,11 +3124,11 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     }
     return caps;
   }
-  function setupHeader(tbodyId){
+  function setupHeader(tbodyId,etaZone=''){
     const tbody=get(tbodyId),table=tbody?.closest('table'),tr=table?.querySelector('thead tr');
     if(!tr||tr.dataset.routeUpdateHeader==='yes')return;
     const ths=Array.from(tr.children);
-    if(ths[1])ths[1].textContent='ETA / heure de passage';
+    if(ths[1])ths[1].textContent=`ETA${etaZone?` (${etaZone})`:''} / heure de passage`;
     if(ths[4]){ths[4].textContent='SOW max au point (kn)';ths[4].classList.add('whitespace-nowrap');}
     if(ths[5]){ths[5].textContent='Courant';ths[5].classList.add('whitespace-nowrap');}
     if(ths[6])ths[6].remove();
@@ -3122,9 +3151,10 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
   function enhanceRows(tbodyId){
     const tbody=get(tbodyId);
     if(!tbody||tbodyId!==state.activeTableId||!state.currentResult||!state.trip)return;
-    setupHeader(tbodyId);
     const renderedRows=Array.from(tbody.querySelectorAll('tr.result-row'));
     const reportRows=(state.currentResult.rows||[]).filter(x=>REPORT_POINT_LABELS.has(x.name));
+    const firstZone=reportRows.length?localParts(reportRows[0].etaMs).zone:'';
+    setupHeader(tbodyId,firstZone);
     const caps=effectiveCapsForRenderedRows(reportRows);
     const startIdx=state.trip.named[0]?.index,endIdx=state.trip.named.at(-1)?.index;
 
@@ -3141,6 +3171,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
       const lp=localParts(data.etaMs);
       const isStart=pointIndex===startIdx;
       const editable=pointIndex!==endIdx;
+      etaCell.dataset.label=`ETA${lp.zone?` (${lp.zone})`:''}`;
 
       if(!isStart){
         etaCell.innerHTML='';
@@ -3149,7 +3180,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
         time.setAttribute('aria-label','Heure de passage à '+(REPORT_POINT_LABELS.get(data.name)||data.name));
         time.disabled=!editable;
         etaCell.append(time);
-        const date=document.createElement('span');date.className='route-update-date';date.textContent=lp.date+' — heure locale';etaCell.append(date);
+        const date=document.createElement('span');date.className='route-update-date';date.textContent=lp.date;etaCell.append(date);
       }
 
       const speedCell=document.createElement('td');
