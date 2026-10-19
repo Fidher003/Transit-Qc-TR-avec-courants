@@ -262,11 +262,20 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
   #inputPanel #runBtn { min-height:42px; padding-top:.55rem !important; padding-bottom:.55rem !important; }
   #inputPanel .departure-datetime {
     display:grid !important;
-    grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr) !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
     gap:.45rem !important;
   }
   #inputPanel .departure-datetime label { min-width:0; }
-  #inputPanel .departure-datetime input { width:100%; min-width:0; padding-left:.55rem !important; padding-right:.45rem !important; }
+  #inputPanel .departure-datetime input {
+    width:calc(100% - 19px) !important;
+    max-width:calc(100% - 19px) !important;
+    min-width:0;
+    box-sizing:border-box;
+    padding-left:.55rem !important;
+    padding-right:.45rem !important;
+  }
+  #inputPanel .departure-datetime label:first-child input { margin-right:auto; }
+  #inputPanel .departure-datetime label:last-child input { margin-left:auto; }
   #summary > .bg-emerald-50 { padding:.55rem .7rem !important; }
   .report-table-wrap { margin-top:.65rem !important; }
   #reportTbody .result-row, #recalcReportTbody .result-row { margin-top:.36rem; margin-bottom:.36rem; }
