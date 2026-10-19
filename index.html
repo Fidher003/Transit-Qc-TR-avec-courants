@@ -200,7 +200,6 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
 <!-- Favicon externe prioritaire pour favoris locaux Edge/Chrome; garder les fichiers avec le HTML. -->
 <link rel="icon" href="Transit_Quebec_Trois_Rivieres.ico" type="image/x-icon" sizes="any">
 <link rel="shortcut icon" href="Transit_Quebec_Trois_Rivieres.ico" type="image/x-icon">
-  <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
 <meta name="msapplication-TileImage" content="favicon-256.png">
 <!-- Secours autonome si l'ICO externe n'est pas trouvé. -->
@@ -408,7 +407,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
           <ul class="mt-2 list-disc pl-5 space-y-1 text-slate-700">
           <li>Courants OHPS échantillonnés sur la route et interpolés dans le temps; courant du sous-segment = moyenne P–Q, sans projection sur le cap.</li>
           <li>Québec → Pointe-des-Ormes : MONTANT ajouté, DESCENDANT soustrait. Pointe-des-Ormes → Québec : DESCENDANT ajouté, MONTANT soustrait. Le courant est appliqué directement à la SOW pour calculer la SOG; SLACK &lt; 0,10 kn = 0.</li>
-          <li>Majoration du courant DESCENDANT OHPS : +14 % par défaut; +20 % de Pont de Québec à CIP St-Nicolas; +30 % de Phare Richelieu à Barre Boulard. Entre CIP Grondines et Cap à la roche inclusivement, le courant DESCENDANT calculé reçoit ensuite +13 % supplémentaires; le courant MONTANT n'est pas modifié par cette correction. Exception : au point Q73 en direction Québec → Trois-Rivières, le courant est remplacé par la règle Portneuf − Deschaillons ci-dessous.</li>
+          <li>Majoration du courant DESCENDANT OHPS : +14 % par défaut; +20 % de Station Québec à CIP St-Nicolas inclusivement; +30 % de Phare Richelieu à Barre Boulard. Entre CIP Grondines et Cap à la roche inclusivement, le courant DESCENDANT calculé reçoit ensuite +13 % supplémentaires; le courant MONTANT n'est pas modifié par cette correction. Exception : au point Q73 en direction Québec → Trois-Rivières, le courant est remplacé par la règle Portneuf − Deschaillons ci-dessous.</li>
           <li>Courant spécial Q73, Québec → Trois-Rivières : Δ niveau = Portneuf − Deschaillons à l'heure réelle de passage. Table Δ→courant : −0,75→10 kn baissant; −0,50→9; −0,25→8; 0,00→7; +0,25→6; +0,50→5; +0,75→4; +1,00→3; +1,25→2; +1,50→1 kn baissant; +1,80→0 kn; +2,05→1 kn montant. Interpolation linéaire entre les valeurs. Sous −0,75 m, la valeur reste 10 kn baissant; à +2,05 m et plus, elle reste 1 kn montant.</li>
           <li>À Q73 en direction Québec → Trois-Rivières, critère de passage basé sur la SOG avec ce courant spécial : si le tirant d’eau est supérieur à 9,0 m ou si la largeur réelle est ≥ 30 m → SOG minimale 3,5 kn; sinon, largeur réelle &lt; 24 m → 2,5 kn; largeur réelle de 24 m à moins de 30 m → 3,0 kn.</li>
           <li>Heures : toutes les heures sont affichées en heure locale du Saint-Laurent (America/Montreal); aucun choix de fuseau n'est demandé.</li>
@@ -1393,12 +1392,12 @@ function ohpsSampleAtHour(point,rows,series){if(!rows||!rows.length)return{error
 function ohpsCurrentType(uEastMs,speedKnots){if(speedKnots<0.1)return 'SLACK';if(uEastMs<0)return 'MONTANT';if(uEastMs>0)return 'DESCENDANT';return 'INDÉTERMINÉ';}
 function descendingCurrentMultiplier(point){
   const idx=Number(point?.index);
-  const zonePontQuebecStNicolas=Number.isFinite(idx) && idx>=5 && idx<=12;
+  const zoneQuebecStNicolas=Number.isFinite(idx) && idx>=0 && idx<=12;
   const zonePhareRichelieuBarreBoulard=Number.isFinite(idx) && idx>=36 && idx<=39;
   const zoneGrondinesCapRoche=Number.isFinite(idx) && idx>=42 && idx<=49;
   let multiplier=1.14;
   if(zonePhareRichelieuBarreBoulard) multiplier=1.30;
-  else if(zonePontQuebecStNicolas) multiplier=1.20;
+  else if(zoneQuebecStNicolas) multiplier=1.20;
   // Correction supplémentaire uniquement sur le courant DESCENDANT entre CIP Grondines et Cap à la roche inclusivement.
   if(zoneGrondinesCapRoche) multiplier*=1.13;
   return multiplier;
@@ -1978,7 +1977,7 @@ async function calcTrip(params,inputData,trip,setProgress){
   logs.push(direction==='QPOR'?"SOW locale (Québec → Pointe-des-Ormes): maximum 9,0 kn sur le premier 1,0 NM depuis Station Québec; puis 11,0 kn jusqu’à 2,0 NM; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.":"SOW locale (Pointe-des-Ormes → Québec): maximum 9,0 kn sur le premier 1,0 NM depuis Station Pointe-des-Ormes; puis 11,0 kn jusqu’à Wayagamak; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.");
   if(beamM>=30-EPS) logs.push('Navire de largeur réelle >= 30 m: maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes, dans les deux directions; toute limite locale plus basse demeure prioritaire.');
   else logs.push('Navire de largeur réelle < 30 m: vitesse maximale saisie jusqu’à 20,0 kn. Jusqu’à 15,0 kn, table SQ initiale inchangée; au-dessus de 15,0 kn, dégagement requis = exigence à 15,0 kn + 0,60 m par nœud supplémentaire, avec interpolation linéaire.');
-  logs.push('Majoration du courant DESCENDANT OHPS: +14 % par défaut; +20 % entre Pont de Québec et CIP St-Nicolas (incluant Bouée Q19); +30 % entre Phare Richelieu et Barre Boulard; +13 % supplémentaires sur le courant DESCENDANT calculé entre CIP Grondines et Cap à la roche inclusivement. Le courant MONTANT n’est pas modifié par cette correction. Exception: au point Q73 en direction Québec → Trois-Rivières, le courant OHPS est remplacé par la table Portneuf − Deschaillons.');
+  logs.push('Majoration du courant DESCENDANT OHPS: +14 % par défaut; +20 % entre Station Québec et CIP St-Nicolas inclusivement (incluant Pont de Québec et Bouée Q19); +30 % entre Phare Richelieu et Barre Boulard; +13 % supplémentaires sur le courant DESCENDANT calculé entre CIP Grondines et Cap à la roche inclusivement. Le courant MONTANT n’est pas modifié par cette correction. Exception: au point Q73 en direction Québec → Trois-Rivières, le courant OHPS est remplacé par la table Portneuf − Deschaillons.');
   logs.push('Les anciennes corrections locales fixes de +0,5 kn / +1,0 kn ont été retirées.');
   logs.push('Plancher SOW: 7,0 kn partout. À Q73 en direction Québec → Trois-Rivières, le passage dépend de la SOG: minimum 3,5 kn si tirant d’eau > 9,0 m ou largeur >= 30 m; sinon 2,5 kn si largeur < 24 m, et 3,0 kn si largeur de 24 m à moins de 30 m.');
   if(direction==='QPOR'&&Number.isFinite(preQ73SowCapKn)) logs.push(`Synchronisation Q73: départ conservé lorsque possible; plafond volontaire de ${preQ73SowCapKn.toFixed(1)} kn avant Q73 seulement. À Q73 et après, retour à la SOW maximale permise par le DSQ, la vitesse saisie et les limites locales.`);
@@ -3025,7 +3024,8 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     vertical-align: -.1em;
   }
   @media (max-width: 767px) {
-    .route-update-time { width: 100%; min-width: 0; }
+    /* Ergonomie iPhone : la case ETA/heure est volontairement ~5 mm plus étroite. */
+    .route-update-time { width: calc(100% - 19px); min-width: 0; max-width: calc(100% - 19px); }
     .route-update-speed { width: 5.3rem; min-width: 0; max-width: calc(100% - .5rem); }
     .route-update-btn { width: 100%; min-height: 44px; }
     .route-update-cell { min-width: 0; }
@@ -3414,6 +3414,54 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
 })();
 </script>
 <!-- ROUTE-UPDATE-STAGE2-END -->
+
+
+<!-- VESSEL-MEMORY-BEGIN -->
+<script id="vessel-memory">
+(function(){
+  'use strict';
+  const KEY='transit-qc-tr-vessel-v1';
+  const IDS=['vesselType','draftM','beamM','maxSowKn'];
+
+  function readStored(){
+    try{
+      const raw=localStorage.getItem(KEY);
+      if(!raw)return null;
+      const data=JSON.parse(raw);
+      return data&&typeof data==='object'?data:null;
+    }catch(_){return null;}
+  }
+
+  function save(){
+    try{
+      const data={};
+      for(const id of IDS){
+        const node=document.getElementById(id);
+        if(node)data[id]=node.value;
+      }
+      localStorage.setItem(KEY,JSON.stringify(data));
+    }catch(_){/* stockage indisponible : aucun effet sur le calcul */}
+  }
+
+  function restore(){
+    const data=readStored();
+    if(!data)return;
+    for(const id of IDS){
+      const node=document.getElementById(id);
+      if(node&&Object.prototype.hasOwnProperty.call(data,id))node.value=String(data[id]);
+    }
+  }
+
+  restore();
+  for(const id of IDS){
+    const node=document.getElementById(id);
+    if(!node)continue;
+    node.addEventListener('input',save);
+    node.addEventListener('change',save);
+  }
+})();
+</script>
+<!-- VESSEL-MEMORY-END -->
 
 </body>
 </html>
