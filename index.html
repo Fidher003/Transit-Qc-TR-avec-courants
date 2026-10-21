@@ -62,7 +62,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
     body.app-night .bg-slate-50 { background-color: #142a43 !important; }
     body.app-night .bg-slate-100 { background-color: #1b3552 !important; }
     body.app-night .bg-slate-900 { background-color: #06111f !important; }
-    body.app-night .bg-blue-50 { background-color: #102f4e !important; }
+    body.app-night .bg-blue-50 { background-color: #0e2944 !important; }
     body.app-night .bg-emerald-50 { background-color: #103a35 !important; }
     body.app-night .bg-amber-50 { background-color: #403316 !important; }
     body.app-night .bg-red-50 { background-color: #402129 !important; }
@@ -88,7 +88,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
     body.app-night button.border { background-color: #132a43; color: #e7f1fb; }
     body.app-night button.border:hover { background-color: #1c3a5a; }
     body.app-night #runBtn { background-color: #1c4d73 !important; }
-    body.app-night #progressBar { background-color: #70a8d1 !important; }
+    body.app-night #progressBar { background-color: #5f96bf !important; }
 
 
     .full-table-details { margin-top: 1rem; }
@@ -147,7 +147,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
         font-weight: 700;
         letter-spacing: .035em;
         text-transform: uppercase;
-        color: #8eabc5;
+        color: #7899b8;
       }
       .results-table .result-row td[data-label="SOW max au point (kn)"]::before {
         white-space: nowrap;
@@ -280,9 +280,12 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
   .report-table-wrap { margin-top:.65rem !important; }
   #reportTbody .result-row, #recalcReportTbody .result-row { margin-top:.36rem; margin-bottom:.36rem; }
   #reportTbody .result-row td, #recalcReportTbody .result-row td { padding-top:.25rem !important; padding-bottom:.25rem !important; }
-  .route-update-date { margin-top:.12rem !important; line-height:.78rem !important; }
+  .route-update-date { margin-top:0 !important; margin-bottom:.12rem !important; line-height:.82rem !important; font-size:.68rem !important; color:#7899b8 !important; font-weight:700; }
+  #reportTbody .report-eta-meta, #recalcReportTbody .report-eta-meta { display:block; margin-bottom:.12rem; font-size:.68rem; line-height:.82rem; color:#7899b8; font-weight:700; }
+  #reportTbody .report-number, #recalcReportTbody .report-number { font-size:1.08rem; line-height:1.22rem; font-weight:700; }
 }
 </style>
+<!-- ETAPE 2.8.17: contraste bleu ajuste; messages visibles simplifies, calculs inchanges. -->
 </head>
 <body class="app-night bg-slate-50 text-slate-900">
 <div class="max-w-7xl mx-auto p-4 md:p-6">
@@ -296,8 +299,8 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
         <label class="text-sm">
           <span class="block text-slate-700 mb-1">Direction</span>
           <select id="direction" class="w-full border rounded-xl px-3 py-2">
-            <option value="QPOR">Station Québec → Station Pointe-des-Ormes</option>
-            <option value="PORQ">Station Pointe-des-Ormes → Station Québec</option>
+            <option value="QPOR">Station Québec → Station POR</option>
+            <option value="PORQ">Station POR → Station Québec</option>
           </select>
         </label>
         <label class="text-sm">
@@ -420,19 +423,19 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
           <li>Courant spécial Q73, Québec → Trois-Rivières : Δ niveau = Portneuf − Deschaillons à l'heure réelle de passage. Table Δ→courant : −0,75→10 kn baissant; −0,50→9; −0,25→8; 0,00→7; +0,25→6; +0,50→5; +0,75→4; +1,00→3; +1,25→2; +1,50→1 kn baissant; +1,80→0 kn; +2,05→1 kn montant. Interpolation linéaire entre les valeurs. Sous −0,75 m, la valeur reste 10 kn baissant; à +2,05 m et plus, elle reste 1 kn montant.</li>
           <li>À Q73 en direction Québec → Trois-Rivières, critère de passage basé sur la SOG avec ce courant spécial : si le tirant d’eau est supérieur à 9,0 m ou si la largeur réelle est ≥ 30 m → SOG minimale 3,5 kn; sinon, largeur réelle &lt; 24 m → 2,5 kn; largeur réelle de 24 m à moins de 30 m → 3,0 kn.</li>
           <li>Heures : toutes les heures sont affichées en heure locale du Saint-Laurent (America/Montreal); aucun choix de fuseau n'est demandé.</li>
-          <li>DSQ : aucune marge additionnelle n'est ajoutée au calcul. Le dégagement disponible est calculé à partir du niveau, de la profondeur de référence et du tirant d'eau saisi.</li>
+          <li>DSQ : la faisabilité reste évaluée sur le plafond brut de la table SQ avec un minimum de 7,0 kn. La marge de 2 % s’applique seulement lorsque le DSQ est réellement la contrainte qui fixe la vitesse utilisée et que ce plafond DSQ est de 15,0 kn ou moins. Si une vitesse volontaire, une limite locale ou la vitesse maximale du navire est plus basse que le plafond DSQ, aucune marge DSQ n’est retranchée. La colonne « SOW max au point » continue d’afficher le plafond brut de la table SQ.</li>
           <li>Profondeur de référence spéciale : 10,8 m de Pointe Deschambeault jusqu'au point intermédiaire non nommé (11,5 NM), puis 10,7 m de ce point jusqu'à Bouée Q19, dans les deux directions.</li>
           <li>Plancher SOW général : 7,0 kn partout. À Q73 en direction Québec → Trois-Rivières, le critère additionnel est une SOG minimale, et non un plancher SOW spécial.</li>
           <li>Limites locales de SOW selon la direction : Québec → Pointe-des-Ormes, maximum 9,0 kn sur le premier 1,0 NM depuis Station Québec, puis 11,0 kn jusqu’à 2,0 NM, puis retour à la vitesse maximale normale; Pointe-des-Ormes → Québec, maximum 9,0 kn sur le premier 1,0 NM depuis Station Pointe-des-Ormes, puis 11,0 kn jusqu’à Wayagamak, puis retour à la vitesse maximale normale. Toute limite DSQ, navire ou autre limite locale plus basse demeure prioritaire.</li>
           <li>Navires de largeur réelle &lt; 30 m : la vitesse maximale saisie peut aller jusqu’à 20,0 kn. Jusqu’à 15,0 kn inclusivement, la table SQ initiale demeure inchangée. Au-dessus de 15,0 kn, le dégagement requis est égal à la valeur requise à 15,0 kn + 0,60 m par nœud supplémentaire; interpolation linéaire entre les dixièmes de nœud.</li>
           <li>Navires de largeur réelle ≥ 30 m, dans les deux directions : maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes. Toute limite locale plus basse demeure prioritaire.</li>
           <li>Table SQ porte-conteneurs complète utilisée de 7 à 15 kn pour toutes les largeurs 24 à 44 m; au-dessus de 15 kn, l'exigence augmente de 0,60 m par nœud supplémentaire, avec interpolation.</li>
-          <li>La SOW utilisée reste la plus élevée permise par le DSQ, la vitesse maximale saisie et les limites locales applicables; le plancher de 7 kn n'est pas un plafond.</li>
+          <li>Le seuil de faisabilité DSQ demeure 7,0 kn sur la valeur brute de la table SQ. Après validation de ce seuil, la marge opérationnelle de 2 % peut donc produire une SOW utilisée inférieure à 7,0 kn (6,86 kn lorsque le plafond brut est exactement 7,0 kn).</li>
           <li>Tableau principal : seuls les points de rapport Station Québec, CIP Saint-Nicolas, CIP Sainte-Croix, CIP Grondines, CIP Batiscan et Pointe-des-Ormes sont affichés. La colonne « SOW max au point » indique uniquement le maximum permis par le DSQ et la table SQ, jusqu’à 15 kn, sans appliquer la vitesse maximale saisie ni les limites locales de transit. La SOG au point demeure calculée avec la vitesse réellement permise par l’ensemble des règles applicables. Le tableau complet repliable demeure inchangé.</li>
           <li>Le bouton Calculer affiche toujours d'abord le plan initial demandé. Si le transit est interrompu, le tableau initial demeure visible avec la raison du bris.</li>
-          <li>Le bouton « Recalculer le prochain passage » essaie d'abord de conserver exactement l'heure de départ demandée. Pour un bris lié à Q73 en direction Québec → Pointe-des-Ormes, il réduit au besoin la SOW avant Q73 seulement, en recherchant le plafond pré-Q73 le plus élevé qui permet le passage.</li>
-          <li>Dès Q73, le ralentissement de synchronisation cesse : la SOW revient à la vitesse maximale permise par le DSQ, la vitesse maximale saisie et les restrictions locales. Si aucun profil ne fonctionne à l'heure demandée, le logiciel cherche ensuite le prochain départ possible sur 30 h, par pas de 5 min puis avec raffinement à 1 min, en appliquant la même stratégie.</li>
-          <li>Le plancher de 7 kn demeure uniquement le minimum absolu; il n'est jamais utilisé comme plafond général de planification.</li>
+          <li>Le bouton « Recalculer le prochain passage » traite la cause du bris initial. Pour un échec DSQ, il cherche d’abord le premier départ où le transit complet demeure faisable avec le plancher brut de 7,0 kn, puis synchronise la vitesse seulement jusqu’à la restriction qui a causé le bris. Pour un échec Q73, il conserve la logique dédiée de synchronisation avant Q73. La recherche se fait sur 30 h, par pas de 5 min puis avec raffinement à 1 min.</li>
+          <li>Après avoir trouvé ce départ, le logiciel synchronise la SOW seulement jusqu’au point qui a causé l’échec initial : il évite d’arriver trop tôt à cette première restriction, puis libère la vitesse après son franchissement. Plus loin, la SOW peut augmenter avec la marée puis diminuer de nouveau si un autre DSQ l’exige. La marge DSQ de 2 % demeure locale et ne s’applique que lorsque le DSQ fixe réellement la vitesse utilisée.</li>
+          <li>Le minimum de 7,0 kn sert uniquement à décider si le DSQ permet le transit avant application de la marge de 2 %; il ne constitue pas un minimum de SOW après cette marge.</li>
           <li>Si les données nécessaires sont indisponibles, le calcul s'arrête avec une erreur visible.</li>
           </ul>
         </div>
@@ -1266,6 +1269,7 @@ function fmtLocal(ms,tz){const p=_dtParts(new Date(ms),tz,{year:'numeric',month:
 function fmtDuration(ms){const total=Math.round(ms/60000),h=Math.floor(total/60),m=total%60;return h?`${h} h ${String(m).padStart(2,'0')} min`:`${m} min`;}
 function fmtUtcIso(ms){return new Date(ms).toISOString().replace('.000Z','Z');}
 function tzOffsetMinutes(instantMs,timeZone){const p=_dtParts(new Date(instantMs),timeZone,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});return Math.round((Date.UTC(+p.get('year'),+p.get('month')-1,+p.get('day'),+p.get('hour'),+p.get('minute'),+p.get('second'))-instantMs)/60000);}
+function easternZoneFr(ms){const off=tzOffsetMinutes(ms,LOCAL_TZ);if(off===-240)return 'HAE';if(off===-300)return 'HNE';const p=_dtParts(new Date(ms),LOCAL_TZ,{timeZoneName:'short'}),z=p.get('timeZoneName')||'';if(z==='EDT')return 'HAE';if(z==='EST')return 'HNE';return z||'HE';}
 function localWallToMs(dateStr,timeStr,timeZone){const m=`${dateStr}T${timeStr}`.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);if(!m)throw new Error('Date/heure invalide.');const wall=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],0);let off=tzOffsetMinutes(wall,timeZone);let inst=wall-off*60000;const off2=tzOffsetMinutes(inst,timeZone);if(off2!==off)inst=wall-off2*60000;return inst;}
 function seriesToSorted(series){const pairs=[];for(const row of series){const t=Date.parse(row.eventDate),v=Number(row.value);if(Number.isFinite(t)&&Number.isFinite(v))pairs.push([t,v]);}pairs.sort((a,b)=>a[0]-b[0]);return{times:pairs.map(x=>x[0]),vals:pairs.map(x=>x[1])};}
 function findValueNearEvent(sorted,target,tolMin=6,interp=true){const {times,vals}=sorted;if(!times.length)return{value:null,usedMs:null,interp:false};const i=bisectLeft(times,target);if(interp&&i>0&&i<times.length&&times[i-1]<=target&&target<=times[i]){const t0=times[i-1],t1=times[i];if(target-t0<=tolMin*60000&&t1-target<=tolMin*60000){const a=(target-t0)/(t1-t0);return{value:vals[i-1]+a*(vals[i]-vals[i-1]),usedMs:target,interp:true};}}let best=null;if(i>0)best=[Math.abs(times[i-1]-target),i-1];if(i<times.length&&(!best||Math.abs(times[i]-target)<best[0]))best=[Math.abs(times[i]-target),i];if(best&&best[0]<=tolMin*60000)return{value:vals[best[1]],usedMs:times[best[1]],interp:false};return{value:null,usedMs:null,interp:false};}
@@ -1299,6 +1303,24 @@ function allowedSow(tbl,dsq,maxSow,extraCandidate=null){
   }
   eligible=eligible.filter(s=>s<=maxSow+EPS&&s<=20+EPS&&dsqReqForSpeed(tbl,s)<=dsq+EPS);
   return eligible.length?Math.max(...eligible):0;
+}
+
+// Marge opérationnelle DSQ: -2 % seulement lorsque le DSQ est réellement
+// la contrainte qui fixe la vitesse désirée/planifiée, et seulement jusqu'à
+// 15 kn inclusivement. Si une consigne volontaire, une limite locale ou la
+// vitesse maximale du navire est déjà plus basse que le plafond DSQ, aucune
+// marge DSQ n'est appliquée.
+function dsqOperationalSowCap(tbl,dsq,desiredMaxSow){
+  const rawDsqCap=allowedSow(tbl,dsq,20.0);
+  if(!(rawDsqCap>0))return 0;
+  const desired=Number(desiredMaxSow);
+  const dsqIsLimiting=Number.isFinite(desired)&&rawDsqCap<=desired+EPS;
+  return dsqIsLimiting&&rawDsqCap<=15.0+EPS?rawDsqCap*0.98:rawDsqCap;
+}
+function allowedSowWithDsqMargin(tbl,dsq,maxSow){
+  const dsqCap=dsqOperationalSowCap(tbl,dsq,maxSow);
+  if(!(dsqCap>0))return 0;
+  return Math.min(maxSow,dsqCap);
 }
 
 
@@ -1952,6 +1974,7 @@ function namedPoints(direction){const pts=OHPS_ROUTE_POINTS.filter(p=>p.name||p.
 function pathBetween(a,b){const step=b.index>a.index?1:-1,arr=[];for(let i=a.index;;i+=step){arr.push(OHPS_ROUTE_POINTS[i]);if(i===b.index)break;}return arr;}
 function buildSegments(direction){const n=namedPoints(direction),out=[];for(let i=0;i<n.length-1;i++){const a=n[i],b=n[i+1],path=pathBetween(a,b);out.push({key:`${a.index}-${b.index}`,start:a,end:b,path,distanceNm:Math.abs(Number(b.distanceFromStartNm)-Number(a.distanceFromStartNm))});}return{named:n,segments:out};}
 function configForIndex(x){if(x<9)return{stationKey:'Neuville',cap:16,depth:15.0};let best=CONFIG_ANCHORS[0],d=Infinity;for(const c of CONFIG_ANCHORS){const dd=Math.abs(c.idx-x);if(dd<d){d=dd;best=c}}return best;}
+function reportPointReferenceDepthM(pointIndex,direction){const idx=Number(pointIndex);if(idx===23)return direction==='QPOR'?10.7:11.1;return Number(configForIndex(idx).depth);}
 function geoDistanceNm(a,b){return ohpsDistanceKm(a.latitude,a.longitude,b.latitude,b.longitude)/1.852;}
 async function fetchStationSeries(stationId,fromIso,toIso){const url=`https://api-iwls.dfo-mpo.gc.ca/api/v1/stations/${stationId}/data?time-series-code=wlf-spine&from=${encodeURIComponent(fromIso)}&to=${encodeURIComponent(toIso)}`;const r=await fetch(url);if(!r.ok)throw new Error(`IWLS HTTP ${r.status}`);const d=await r.json();if(!Array.isArray(d))throw new Error('Réponse IWLS inattendue.');return d;}
 async function loadInputs(depMs,setProgress){const fromIso=fmtUtcIso(depMs-6*3600000),toIso=fmtUtcIso(depMs+60*3600000);const stationKeys=[...new Set(CONFIG_ANCHORS.map(c=>c.stationKey))];setProgress('Téléchargement des niveaux IWLS…',5);const seriesByStation={};await Promise.all(stationKeys.map(async k=>{const raw=await fetchStationSeries(STATIONS[k][0],fromIso,toIso);seriesByStation[k]=seriesToSorted(raw);}));setProgress('Préparation du modèle OHPS…',15);await shopPrepare(depMs,setProgress);return{seriesByStation,fromIso,toIso};}
@@ -1973,10 +1996,11 @@ async function sampleCurrentForEta(point,targetMs,direction,inputData=null){
 }
 
 async function calcTrip(params,inputData,trip,setProgress){
-  const {direction,vesselType,draftM,beamM,maxSowKn,depMs,tzName,preQ73SowCapKn=null}=params;
+  const {direction,vesselType,draftM,beamM,maxSowKn,depMs,tzName,preQ73SowCapKn=null,continuousPaceCaps=null,traceMaxSowKn=null}=params;
   const beam=roundWidthEvenM(beamM),tbl=selectTable(vesselType);
   if(!tbl[beam]) throw new Error(`Largeur ${beam} m non prise en charge. Choix: ${Object.keys(tbl).sort().join(', ')}`);
-  const dsqTable=tbl[beam],rows=[],logs=[];
+  const dsqTable=tbl[beam],rows=[],logs=[],speedTrace=[];
+  const traceMax=Number.isFinite(Number(traceMaxSowKn))?Number(traceMaxSowKn):maxSowKn;
   let eta=depMs,totalDist=0,doneSegments=0,q73Plan=null;
   const startRow={name:displayName(trip.named[0]),etaMs:eta,status:'DÉPART',level:null,dsqMin:null,currentKn:null,pointCurrentKn:null,pointCurrentType:null,pointLevel:null,pointDsq:null,pointSowPerm:null,pointSog:null,sowPermise:null,sowUsed:null,sog:null,detail:null};
   rows.push(startRow);
@@ -1984,6 +2008,7 @@ async function calcTrip(params,inputData,trip,setProgress){
   logs.push(`Départ: ${fmtLocal(depMs,tzName)} | SOW max utilisateur: ${maxSowKn.toFixed(1)} kn`);
   logs.push(direction==='QPOR'?'Règle courant Québec → Pointe-des-Ormes: MONTANT = ajouté | DESCENDANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.':'Règle courant Pointe-des-Ormes → Québec: DESCENDANT = ajouté | MONTANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.');
   logs.push(direction==='QPOR'?"SOW locale (Québec → Pointe-des-Ormes): maximum 9,0 kn sur le premier 1,0 NM depuis Station Québec; puis 11,0 kn jusqu’à 2,0 NM; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.":"SOW locale (Pointe-des-Ormes → Québec): maximum 9,0 kn sur le premier 1,0 NM depuis Station Pointe-des-Ormes; puis 11,0 kn jusqu’à Wayagamak; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.");
+  logs.push('Marge DSQ opérationnelle: la faisabilité est vérifiée sur le plafond brut de la table SQ avec un seuil de 7,0 kn. La réduction de 2 % est appliquée seulement lorsque le DSQ fixe réellement la vitesse utilisée et que ce plafond DSQ est <= 15,0 kn; aucune marge n’est appliquée si une consigne volontaire, une limite locale ou la vitesse maximale du navire est déjà plus basse.');
   if(beamM>=30-EPS) logs.push('Navire de largeur réelle >= 30 m: maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes, dans les deux directions; toute limite locale plus basse demeure prioritaire.');
   else logs.push('Navire de largeur réelle < 30 m: vitesse maximale saisie jusqu’à 20,0 kn. Jusqu’à 15,0 kn, table SQ initiale inchangée; au-dessus de 15,0 kn, dégagement requis = exigence à 15,0 kn + 0,60 m par nœud supplémentaire, avec interpolation linéaire.');
   logs.push('Majoration du courant DESCENDANT OHPS: +14 % par défaut; +20 % entre Station Québec et CIP St-Nicolas inclusivement (incluant Pont de Québec et Bouée Q19); +30 % entre Phare Richelieu et Barre Boulard; +13 % supplémentaires sur le courant DESCENDANT calculé entre CIP Grondines et Cap à la roche inclusivement. Le courant MONTANT n’est pas modifié par cette correction. Exception: au point Q73 en direction Québec → Trois-Rivières, le courant OHPS est remplacé par la table Portneuf − Deschaillons.');
@@ -2008,18 +2033,33 @@ async function calcTrip(params,inputData,trip,setProgress){
         return{rows,logs:logs.join('\n'),ok:false,error:`Niveau IWLS indisponible (${cfg.stationKey})`,depMs,etaMs:eta,distanceNm:totalDist};
       }
       const beforeQ73Sector=direction==='QPOR' && q.index<=38;
-      const planningMaxSowKn=(beforeQ73Sector&&Number.isFinite(preQ73SowCapKn))?Math.max(7,Math.min(maxSowKn,preQ73SowCapKn)):maxSowKn;
+      let planningMaxSowKn=(beforeQ73Sector&&Number.isFinite(preQ73SowCapKn))?Math.max(7,Math.min(maxSowKn,preQ73SowCapKn)):maxSowKn;
+      if(continuousPaceCaps&&Object.prototype.hasOwnProperty.call(continuousPaceCaps,String(p.index))){
+        const profileCap=Number(continuousPaceCaps[String(p.index)]);
+        if(Number.isFinite(profileCap))planningMaxSowKn=Math.min(planningMaxSowKn,profileCap);
+      }
       const speedPieces=localSpeedPieces(p,q,planningMaxSowKn,beamM,direction);
       const inDeschambeaultToMidpointDepthZone=Math.min(p.index,q.index)===9 && Math.max(p.index,q.index)===10;
       const referenceDepthM=inDeschambeaultToMidpointDepthZone?10.8:cfg.depth;
       const level=Number(lv.value),dsq=level+referenceDepthM-draftM;
+      const rawDsqCap=allowedSow(dsqTable,dsq,20.0);
+      // Capacité brute naturelle à cet endroit, avant la marge de 2 % et avant
+      // tout profil volontaire. Elle sert uniquement à construire le profil
+      // continu du recalcul alternatif; elle n'altère pas le calcul initial.
+      const naturalPieces=localSpeedPieces(p,q,traceMax,beamM,direction);
+      const naturalRawCap=Math.min(...naturalPieces.map(x=>Math.min(x.maxSowKn,rawDsqCap)));
       for(const piece of speedPieces){
-        piece.sowPerm=allowedSow(dsqTable,dsq,piece.maxSowKn);
+        piece.sowPerm=allowedSowWithDsqMargin(dsqTable,dsq,piece.maxSowKn);
         piece.sow=Math.min(piece.sowPerm,piece.maxSowKn);
       }
       const sowPerm=Math.min(...speedPieces.map(x=>x.sowPerm));
       const sow=(speedPieces.reduce((a,x)=>a+x.sow*x.distanceNm,0))/(speedPieces.reduce((a,x)=>a+x.distanceNm,0)||1);
-      if(speedPieces.some(x=>!(x.sow>0))){
+      const plannedRawCap=Math.min(...speedPieces.map(x=>Math.min(x.maxSowKn,rawDsqCap)));
+      speedTrace.push({pIndex:Number(p.index),qIndex:Number(q.index),etaMs:eta,dsq,rawDsqCap,naturalRawCap,plannedRawCap,sowUsed:sow,referenceDepthM});
+      // Faisabilité DSQ: le seuil de 7 kn est vérifié AVANT la marge opérationnelle de 2 %.
+      // Ainsi, un DSQ qui permet exactement 7,0 kn reste acceptable et le calcul
+      // peut ensuite utiliser 6,86 kn (7,0 x 0,98).
+      if(speedPieces.some(x=>allowedSow(dsqTable,dsq,x.maxSowKn)<7-EPS)){
         const dsqMin7=dsqReqForSpeed(dsqTable,7);
         rows.push({name:displayName(seg.end),etaMs:eta,status:'ABANDON',level,dsqMin:dsq,error:'DSQ insuffisant'});
         return{rows,logs:logs.join('\n'),ok:false,error:`DSQ insuffisant près de ${displayName(p)}`,failureKind:'DSQ',failurePointName:displayName(p),failurePointIndex:p.index,failureEtaMs:eta,failureDsq:dsq,failureRequiredDsq:dsqMin7,failureStation:cfg.stationKey,depMs,etaMs:eta,distanceNm:totalDist};
@@ -2038,7 +2078,7 @@ async function calcTrip(params,inputData,trip,setProgress){
       }
       if(startRow.pointCurrentKn==null && totalDist<=EPS && p.index===trip.named[0].index){
         const pPointMaxSow=localMaxSowKnForDistance(Number(p.distanceFromStartNm),planningMaxSowKn,beamM,direction);
-        const pPointSowPerm=allowedSow(dsqTable,dsq,pPointMaxSow);
+        const pPointSowPerm=allowedSowWithDsqMargin(dsqTable,dsq,pPointMaxSow);
         // Colonne de rapport: maximum dicté par le DSQ / la table SQ seulement.
         // On ne lui applique ni la vitesse maximale saisie ni les limites locales de transit.
         const pPointDsqSowMax=allowedSow(dsqTable,dsq,15.0);
@@ -2149,7 +2189,7 @@ async function calcTrip(params,inputData,trip,setProgress){
       const qBeforeQ73=direction==='QPOR' && q.index<=38;
       const qPlanningMaxSowKn=(qBeforeQ73&&Number.isFinite(preQ73SowCapKn))?Math.max(7,Math.min(maxSowKn,preQ73SowCapKn)):maxSowKn;
       const qPointMaxSow=localMaxSowKnForDistance(Number(q.distanceFromStartNm),qPlanningMaxSowKn,beamM,direction);
-      const qPointSowPerm=qDsq==null?null:allowedSow(dsqTable,qDsq,qPointMaxSow);
+      const qPointSowPerm=qDsq==null?null:allowedSowWithDsqMargin(dsqTable,qDsq,qPointMaxSow);
       const qPointDsqSowMax=qDsq==null?null:allowedSow(dsqTable,qDsq,15.0);
       lastPointLevel=qLevel;
       lastPointDsq=qDsq;
@@ -2175,7 +2215,7 @@ async function calcTrip(params,inputData,trip,setProgress){
     doneSegments++;
     setProgress?.(`Calcul OHPS point par point… ${doneSegments}/${trip.segments.length} secteurs`,20+Math.round(doneSegments/trip.segments.length*75));
   }
-  return{rows,logs:logs.join('\n'),ok:true,depMs,etaMs:eta,distanceNm:totalDist,q73Plan,preQ73SowCapKn:Number.isFinite(preQ73SowCapKn)?preQ73SowCapKn:null};
+  return{rows,logs:logs.join('\n'),ok:true,depMs,etaMs:eta,distanceNm:totalDist,q73Plan,preQ73SowCapKn:Number.isFinite(preQ73SowCapKn)?preQ73SowCapKn:null,speedTrace};
 }
 
 
@@ -2273,7 +2313,7 @@ function appendQ73SogPlanResult(search,initialRes,tzName,maxSowKn){
     const paceAdjusted=Number.isFinite(search.paceCapKn)&&search.paceCapKn<maxSowKn-EPS;
     const speedText=paceAdjusted?`Départ ${search.sameDeparture?'conservé':'retenu'} avec un plafond de synchronisation de <b>${search.paceCapKn.toFixed(1)} kn</b> avant Q73 seulement; à Q73 et après, retour à la SOW maximale permise par le DSQ, la vitesse saisie et les restrictions locales.`:`SOW maximale permise par le DSQ, la vitesse maximale saisie (${maxSowKn.toFixed(1)} kn) et les restrictions locales.`;
     summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-blue-50 border-blue-200 p-3"><div class="font-semibold">Plan de passage Q73</div><div class="mt-1">Départ ${escapeHtml(origin)} : <b>${escapeHtml(fmtLocal(search.depMs,tzName))}</b></div><div class="mt-1">${speedText}</div><div class="mt-1">Passage Q73 : <b>${q.entryEtaMs?escapeHtml(fmtLocal(q.entryEtaMs,tzName)):'—'}</b> — Portneuf : <b>${Number.isFinite(q.portneufLevel)?q.portneufLevel.toFixed(2):'—'} m</b> — Deschaillons : <b>${Number.isFinite(q.deschaillonsLevel)?q.deschaillonsLevel.toFixed(2):'—'} m</b> — différence : <b>${Number.isFinite(q.levelDifferenceM)?`${q.levelDifferenceM>=0?'+':''}${q.levelDifferenceM.toFixed(2)}`:'—'} m</b>.</div><div class="mt-1">Courant baissant Q73 : <b>${Number.isFinite(q.currentKn)?q.currentKn.toFixed(2):'—'} kn</b> — SOW : <b>${Number.isFinite(q.sowUsed)?q.sowUsed.toFixed(1):'—'} kn</b> — SOG : <b>${Number.isFinite(q.sogKn)?q.sogKn.toFixed(2):'—'} kn</b> — minimum requis : <b>${Number.isFinite(q.minSogKn)?q.minSogKn.toFixed(1):'—'} kn</b>.</div><div class="mt-1">ETA destination : <b>${escapeHtml(fmtLocal(search.result.etaMs,tzName))}</b>${search.waitMs?` — attente avant départ : <b>${escapeHtml(fmtDuration(search.waitMs))}</b>`:''}.</div><div class="mt-1">Le tableau est recalculé avec ce départ et les vitesses maximales permises à chaque étape.</div></div>`);
-    const extra=`\n\n[PLAN PASSAGE Q73]\nDépart ${origin}: ${fmtLocal(search.depMs,tzName)}\nRègle de vitesse: SOW maximale permise à chaque position par le DSQ, la vitesse maximale saisie et les restrictions locales; plancher 7 kn; aucun plafond artificiel.\nPassage Q73: ${q.entryEtaMs?fmtLocal(q.entryEtaMs,tzName):'—'} | Portneuf ${Number.isFinite(q.portneufLevel)?q.portneufLevel.toFixed(2):'—'} m | Deschaillons ${Number.isFinite(q.deschaillonsLevel)?q.deschaillonsLevel.toFixed(2):'—'} m | différence ${Number.isFinite(q.levelDifferenceM)?q.levelDifferenceM.toFixed(2):'—'} m | courant baissant ${Number.isFinite(q.currentKn)?q.currentKn.toFixed(2):'—'} kn | SOW ${Number.isFinite(q.sowUsed)?q.sowUsed.toFixed(1):'—'} kn | SOG ${Number.isFinite(q.sogKn)?q.sogKn.toFixed(2):'—'} kn | minimum ${Number.isFinite(q.minSogKn)?q.minSogKn.toFixed(1):'—'} kn\nETA destination: ${fmtLocal(search.result.etaMs,tzName)}`;
+    const extra=`\n\n[PLAN PASSAGE Q73]\nDépart ${origin}: ${fmtLocal(search.depMs,tzName)}\nRègle de vitesse: faisabilité DSQ vérifiée sur un plafond brut d’au moins 7,0 kn; marge opérationnelle de 2 % appliquée ensuite à la SOW issue du DSQ; vitesse maximale saisie et restrictions locales également appliquées.\nPassage Q73: ${q.entryEtaMs?fmtLocal(q.entryEtaMs,tzName):'—'} | Portneuf ${Number.isFinite(q.portneufLevel)?q.portneufLevel.toFixed(2):'—'} m | Deschaillons ${Number.isFinite(q.deschaillonsLevel)?q.deschaillonsLevel.toFixed(2):'—'} m | différence ${Number.isFinite(q.levelDifferenceM)?q.levelDifferenceM.toFixed(2):'—'} m | courant baissant ${Number.isFinite(q.currentKn)?q.currentKn.toFixed(2):'—'} kn | SOW ${Number.isFinite(q.sowUsed)?q.sowUsed.toFixed(1):'—'} kn | SOG ${Number.isFinite(q.sogKn)?q.sogKn.toFixed(2):'—'} kn | minimum ${Number.isFinite(q.minSogKn)?q.minSogKn.toFixed(1):'—'} kn\nETA destination: ${fmtLocal(search.result.etaMs,tzName)}`;
     el('log').textContent=(el('log').textContent||'')+extra;
     lastText=el('log').textContent;
   }else if(search.notFound){
@@ -2329,13 +2369,297 @@ async function findNextContinuousDeparture(baseParams,inputData,trip,setProgress
   return{ok:true,depMs:best.depMs,result:best.result,waitMs:best.depMs-startMs,attempts};
 }
 
+
+const CONTINUOUS_PLAN_FLOOR_KN=7.0;
+const CONTINUOUS_PROFILE_ALPHA_STEPS=[1.0,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1,0.0];
+const CONTINUOUS_PROFILE_STABILIZE_PASSES=6;
+
+function continuousProfileStats(caps,trace){
+  const vals=[];
+  for(const t of trace||[]){
+    const v=Number(caps?.[String(t.pIndex)]);
+    if(Number.isFinite(v))vals.push(v);
+  }
+  return vals.length?{start:vals[0],end:vals.at(-1),min:Math.min(...vals),max:Math.max(...vals)}:{start:null,end:null,min:null,max:null};
+}
+function isExpectedTransitFailure(result){
+  return result?.failureKind==='DSQ'||result?.failureKind==='Q73_SOG'||String(result?.error||'').startsWith('DSQ insuffisant');
+}
+function initialSyncControlPointIndex(initialRes,trip){
+  if(initialRes?.failureKind==='Q73_SOG')return 38;
+  const idx=Number(initialRes?.failurePointIndex);
+  if(Number.isInteger(idx))return idx;
+  return Number(trip?.named?.[Math.min(1,(trip?.named?.length||1)-1)]?.index);
+}
+function initialSyncControlPointName(initialRes,trip){
+  const idx=initialSyncControlPointIndex(initialRes,trip);
+  const p=OHPS_ROUTE_POINTS.find(x=>Number(x.index)===idx);
+  return p?displayName(p):(initialRes?.failurePointName||'la restriction initiale');
+}
+function traceControlPosition(trace,controlPointIndex){
+  if(!Array.isArray(trace)||!trace.length)return-1;
+  const idx=Number(controlPointIndex);
+  let pos=trace.findIndex(t=>Number(t?.pIndex)===idx);
+  if(pos>=0)return pos;
+  const qPos=trace.findIndex(t=>Number(t?.qIndex)===idx);
+  return qPos>=0?Math.min(trace.length-1,qPos+1):-1;
+}
+function initialSyncProfileCapsFromTrace(trace,maxSowKn,controlPointIndex){
+  const caps={};
+  const controlPos=traceControlPosition(trace,controlPointIndex);
+  if(controlPos<0)return caps;
+  let suffix=Infinity;
+  for(let i=controlPos;i>=0;i--){
+    const t=trace[i];
+    const natural=Number(t?.naturalRawCap);
+    if(!Number.isFinite(natural))continue;
+    const cap=Math.max(CONTINUOUS_PLAN_FLOOR_KN,Math.min(maxSowKn,natural));
+    suffix=Math.min(suffix,cap);
+    // Le point de contrôle lui-même sert à resserrer les vitesses en amont,
+    // mais sa vitesse sortante est libérée : après la restriction initiale,
+    // le calcul revient aux limites normales et une baisse ultérieure est permise.
+    if(i<controlPos)caps[String(t.pIndex)]=suffix;
+  }
+  return caps;
+}
+function blendContinuousProfile(caps,alpha){
+  const out={};
+  const a=Math.max(0,Math.min(1,Number(alpha)||0));
+  for(const [k,v0] of Object.entries(caps||{})){
+    const v=Number(v0);
+    if(!Number.isFinite(v))continue;
+    out[k]=CONTINUOUS_PLAN_FLOOR_KN+a*(v-CONTINUOUS_PLAN_FLOOR_KN);
+  }
+  return out;
+}
+function initialSyncPlannedRawIsNonDecreasing(trace,controlPointIndex){
+  const controlPos=traceControlPosition(trace,controlPointIndex);
+  if(controlPos<0)return true;
+  let previous=null;
+  for(let i=0;i<=controlPos&&i<(trace||[]).length;i++){
+    const v=Number(trace[i]?.plannedRawCap);
+    if(!Number.isFinite(v))continue;
+    if(previous!=null&&v<previous-0.05)return false;
+    previous=v;
+  }
+  return true;
+}
+function tighterContinuousCaps(currentCaps,newCaps){
+  const out={...currentCaps};
+  for(const [k,v0] of Object.entries(newCaps||{})){
+    const v=Number(v0);
+    if(!Number.isFinite(v))continue;
+    const old=Number(out[k]);
+    out[k]=Number.isFinite(old)?Math.min(old,v):v;
+  }
+  return out;
+}
+function continuousCapsNearlyEqual(a,b){
+  const keys=new Set([...Object.keys(a||{}),...Object.keys(b||{})]);
+  for(const k of keys){
+    const x=Number(a?.[k]),y=Number(b?.[k]);
+    if(Number.isFinite(x)!==Number.isFinite(y))return false;
+    if(Number.isFinite(x)&&Math.abs(x-y)>0.02)return false;
+  }
+  return true;
+}
+function displayProfileCapsFromTrace(trace){
+  const out={};
+  for(const t of trace||[]){
+    const idx=Number(t?.pIndex),v=Number(t?.plannedRawCap);
+    if(Number.isInteger(idx)&&Number.isFinite(v))out[String(idx)]=v;
+  }
+  return out;
+}
+
+async function continuousFloorTrial(baseParams,inputData,trip,depMs){
+  const result=await calcTrip({
+    ...baseParams,
+    depMs,
+    maxSowKn:CONTINUOUS_PLAN_FLOOR_KN,
+    preQ73SowCapKn:null,
+    continuousPaceCaps:null,
+    traceMaxSowKn:baseParams.maxSowKn
+  },inputData,trip,null);
+  if(result.ok)return{ok:true,result};
+  if(isExpectedTransitFailure(result))return{ok:false,result};
+  return{ok:false,dataError:true,error:result.error||'Erreur de données pendant la recherche.',result};
+}
+
+async function buildInitialDsqSyncPlanAtDeparture(baseParams,inputData,trip,depMs,initialRes,floorResult=null){
+  const controlPointIndex=initialSyncControlPointIndex(initialRes,trip);
+  const controlPointName=initialSyncControlPointName(initialRes,trip);
+  let floor=floorResult;
+  if(!floor){
+    const trial=await continuousFloorTrial(baseParams,inputData,trip,depMs);
+    if(trial.dataError)return{ok:false,dataError:true,error:trial.error};
+    if(!trial.ok)return{ok:false,expectedFailure:true,result:trial.result};
+    floor=trial.result;
+  }
+
+  const rawProfile=initialSyncProfileCapsFromTrace(floor.speedTrace,baseParams.maxSowKn,controlPointIndex);
+  let attempts=0;
+
+  for(const alpha of CONTINUOUS_PROFILE_ALPHA_STEPS){
+    let caps=blendContinuousProfile(rawProfile,alpha);
+    for(let pass=0;pass<CONTINUOUS_PROFILE_STABILIZE_PASSES;pass++){
+      const candidate=await calcTrip({
+        ...baseParams,
+        depMs,
+        preQ73SowCapKn:null,
+        continuousPaceCaps:caps,
+        traceMaxSowKn:baseParams.maxSowKn
+      },inputData,trip,null);
+      attempts++;
+      if(!candidate.ok){
+        if(!isExpectedTransitFailure(candidate))return{ok:false,dataError:true,error:candidate.error||'Erreur de données pendant la synchronisation initiale.',attempts};
+        break;
+      }
+
+      const refreshedRaw=initialSyncProfileCapsFromTrace(candidate.speedTrace,baseParams.maxSowKn,controlPointIndex);
+      const refreshedCaps=blendContinuousProfile(refreshedRaw,alpha);
+      const tightened=tighterContinuousCaps(caps,refreshedCaps);
+      const prefixSmooth=initialSyncPlannedRawIsNonDecreasing(candidate.speedTrace,controlPointIndex);
+      const stable=continuousCapsNearlyEqual(caps,tightened);
+
+      if(prefixSmooth&&stable){
+        const displayCaps=displayProfileCapsFromTrace(candidate.speedTrace);
+        const result={
+          ...candidate,
+          continuousProfile:true,
+          initialSyncProfile:true,
+          initialSyncControlPointIndex:controlPointIndex,
+          initialSyncControlPointName:controlPointName,
+          continuousProfileCaps:displayCaps,
+          initialSyncCaps:{...caps}
+        };
+        const stats=continuousProfileStats(caps,candidate.speedTrace);
+        return{ok:true,result,attempts,profileAlpha:alpha,profileStartKn:stats.start,profileEndKn:stats.end,controlPointIndex,controlPointName};
+      }
+      caps=tightened;
+    }
+  }
+
+  // Repli : 7 kn seulement jusqu'à la restriction initiale, puis retour aux
+  // vitesses normales. Si une autre restriction plus loin impose ensuite une
+  // baisse, elle est acceptée; si elle rend le transit impossible (<7 kn brut),
+  // ce départ est rejeté et la recherche continue plus tard.
+  const floorCaps=blendContinuousProfile(rawProfile,0);
+  const fallback=await calcTrip({
+    ...baseParams,
+    depMs,
+    preQ73SowCapKn:null,
+    continuousPaceCaps:floorCaps,
+    traceMaxSowKn:baseParams.maxSowKn
+  },inputData,trip,null);
+  attempts++;
+  if(!fallback.ok){
+    if(!isExpectedTransitFailure(fallback))return{ok:false,dataError:true,error:fallback.error||'Erreur de données pendant la synchronisation initiale.',attempts};
+    return{ok:false,expectedFailure:true,result:fallback,attempts};
+  }
+  const displayCaps=displayProfileCapsFromTrace(fallback.speedTrace);
+  const result={...fallback,continuousProfile:true,initialSyncProfile:true,initialSyncControlPointIndex:controlPointIndex,initialSyncControlPointName:controlPointName,continuousProfileCaps:displayCaps,initialSyncCaps:{...floorCaps}};
+  const stats=continuousProfileStats(floorCaps,fallback.speedTrace);
+  return{ok:true,result,attempts,profileAlpha:0,profileStartKn:stats.start,profileEndKn:stats.end,controlPointIndex,controlPointName};
+}
+
+async function findContinuousProgressivePlan(baseParams,inputData,trip,setProgress,initialRes){
+  // Q73 garde sa logique dédiée : vitesse de synchronisation avant Q73,
+  // puis retour aux vitesses normales après Q73. Une diminution ultérieure
+  // imposée par le DSQ est donc permise.
+  if(initialRes?.failureKind==='Q73_SOG'){
+    const qSearch=await findQ73SogPlan(baseParams,inputData,trip,setProgress);
+    if(qSearch?.ok&&qSearch.result){
+      qSearch.result={...qSearch.result,continuousProfileCaps:displayProfileCapsFromTrace(qSearch.result.speedTrace)};
+    }
+    return qSearch;
+  }
+
+  const startMs=baseParams.depMs;
+  const endMs=startMs+NEXT_PASSAGE_SEARCH_HOURS*3600000;
+  const coarseStepMs=NEXT_PASSAGE_STEP_MIN*60000;
+  let attempts=0;
+  let firstFloor=null;
+
+  // 1) Premier départ où le transit complet est au moins faisable à 7 kn brut.
+  setProgress?.('Recherche du premier départ continu à 7 kn SOW…',20);
+  let trial=await continuousFloorTrial(baseParams,inputData,trip,startMs);
+  attempts++;
+  if(trial.dataError)return{ok:false,dataError:true,error:trial.error,attempts};
+  if(trial.ok)firstFloor={depMs:startMs,result:trial.result};
+
+  if(!firstFloor){
+    for(let candidateMs=startMs+coarseStepMs;candidateMs<=endMs;candidateMs+=coarseStepMs){
+      attempts++;
+      if(setProgress&&(attempts===2||attempts%6===0)){
+        const pct=25+Math.min(40,Math.round((candidateMs-startMs)/(endMs-startMs)*40));
+        setProgress(`Recherche du premier départ continu à 7 kn… ${fmtLocal(candidateMs,baseParams.tzName)}`,pct);
+      }
+      trial=await continuousFloorTrial(baseParams,inputData,trip,candidateMs);
+      if(trial.dataError)return{ok:false,dataError:true,error:trial.error,attempts};
+      if(trial.ok){firstFloor={depMs:candidateMs,result:trial.result};break;}
+    }
+  }
+  if(!firstFloor)return{ok:false,notFound:true,searchHours:NEXT_PASSAGE_SEARCH_HOURS,attempts};
+
+  // Raffinement à la minute du premier départ faisable au plancher.
+  if(firstFloor.depMs>startMs){
+    const refineStart=Math.max(startMs,firstFloor.depMs-(NEXT_PASSAGE_STEP_MIN-1)*60000);
+    for(let candidateMs=refineStart;candidateMs<firstFloor.depMs;candidateMs+=60000){
+      const fine=await continuousFloorTrial(baseParams,inputData,trip,candidateMs);
+      attempts++;
+      if(fine.dataError)return{ok:false,dataError:true,error:fine.error,attempts};
+      if(fine.ok){firstFloor={depMs:candidateMs,result:fine.result};break;}
+    }
+  }
+
+  // 2) Synchroniser seulement jusqu'au point qui a causé l'échec initial.
+  // Après ce point, les vitesses redeviennent naturelles et peuvent augmenter
+  // ou diminuer selon le DSQ rencontré plus loin.
+  setProgress?.('Synchronisation de la vitesse jusqu’à la restriction initiale…',70);
+  let plan=await buildInitialDsqSyncPlanAtDeparture(baseParams,inputData,trip,firstFloor.depMs,initialRes,firstFloor.result);
+  attempts+=plan.attempts||0;
+  if(plan.dataError)return{ok:false,dataError:true,error:plan.error,attempts};
+  if(plan.ok){
+    return{...plan,depMs:firstFloor.depMs,waitMs:firstFloor.depMs-startMs,sameDeparture:firstFloor.depMs===startMs,attempts,continuousProfile:true,initialSyncProfile:true};
+  }
+
+  // Une accélération après la restriction initiale peut modifier les heures
+  // d'arrivée plus loin. Si cela rend un autre point non faisable, on ne garde
+  // pas artificiellement 7 kn jusqu'à destination : on cherche le prochain
+  // départ qui permet ce profil naturel complet.
+  let coarseSuccess=null,coarsePrev=firstFloor.depMs;
+  for(let candidateMs=firstFloor.depMs+coarseStepMs;candidateMs<=endMs;candidateMs+=coarseStepMs){
+    if(setProgress){
+      const pct=72+Math.min(20,Math.round((candidateMs-firstFloor.depMs)/(endMs-firstFloor.depMs||1)*20));
+      setProgress(`Validation du profil après la restriction initiale… ${fmtLocal(candidateMs,baseParams.tzName)}`,pct);
+    }
+    const candidate=await buildInitialDsqSyncPlanAtDeparture(baseParams,inputData,trip,candidateMs,initialRes,null);
+    attempts+=candidate.attempts||1;
+    if(candidate.dataError)return{ok:false,dataError:true,error:candidate.error,attempts};
+    if(candidate.ok){coarseSuccess={depMs:candidateMs,plan:candidate};break;}
+    coarsePrev=candidateMs;
+  }
+  if(!coarseSuccess)return{ok:false,notFound:true,searchHours:NEXT_PASSAGE_SEARCH_HOURS,attempts};
+
+  let best=coarseSuccess;
+  const refineStart=Math.max(firstFloor.depMs+60000,coarseSuccess.depMs-(NEXT_PASSAGE_STEP_MIN-1)*60000);
+  for(let candidateMs=refineStart;candidateMs<coarseSuccess.depMs;candidateMs+=60000){
+    const fine=await buildInitialDsqSyncPlanAtDeparture(baseParams,inputData,trip,candidateMs,initialRes,null);
+    attempts+=fine.attempts||1;
+    if(fine.dataError)return{ok:false,dataError:true,error:fine.error,attempts};
+    if(fine.ok){best={depMs:candidateMs,plan:fine};break;}
+  }
+  return{...best.plan,depMs:best.depMs,waitMs:best.depMs-startMs,sameDeparture:best.depMs===startMs,attempts,continuousProfile:true,initialSyncProfile:true};
+}
+
 function appendNextPassageResult(search,initialRes,tzName){
   const summary=el('summary');
   if(search.ok){
     const origin=initialRes.rows?.[0]?.name||'origine';
     const destination=search.result.rows?.at(-1)?.name||'destination';
-    summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-blue-50 border-blue-200 p-3"><div class="font-semibold">Prochain transit continu possible</div><div class="mt-1">Départ ${escapeHtml(origin)} : <b>${escapeHtml(fmtLocal(search.depMs,tzName))}</b></div><div class="mt-1">ETA ${escapeHtml(destination)} : <b>${escapeHtml(fmtLocal(search.result.etaMs,tzName))}</b></div><div class="mt-1">Attente avant départ : <b>${escapeHtml(fmtDuration(search.waitMs))}</b> — transit calculé sans interruption avec SOW ≥ 7 kn.</div></div>`);
-    const extra=`\n\n[RECHERCHE PROCHAIN PASSAGE]\nÉchec initial: ${initialRes.failurePointName||'point inconnu'} à ${fmtLocal(initialRes.failureEtaMs||initialRes.etaMs,tzName)}${Number.isFinite(initialRes.failureDsq)?` | DSQ ${initialRes.failureDsq.toFixed(2)} m | requis à 7 kn ${Number(initialRes.failureRequiredDsq).toFixed(2)} m`:''}\nProchain départ continu: ${fmtLocal(search.depMs,tzName)}\nETA destination: ${fmtLocal(search.result.etaMs,tzName)}\nAttente: ${fmtDuration(search.waitMs)}\nCritère: aucun arrêt DSQ, SOW minimale 7 kn.`;
+    summary.insertAdjacentHTML('beforeend',`<div class="mt-3 rounded-2xl border bg-blue-50 border-blue-200 p-3"><div class="font-semibold">Prochain transit continu possible</div><div class="mt-1">Départ ${escapeHtml(origin)} : <b>${escapeHtml(fmtLocal(search.depMs,tzName))}</b></div><div class="mt-1">ETA ${escapeHtml(destination)} : <b>${escapeHtml(fmtLocal(search.result.etaMs,tzName))}</b></div><div class="mt-1">Attente avant départ : <b>${escapeHtml(fmtDuration(search.waitMs))}</b> — transit calculé sans interruption avec un DSQ brut permettant au moins 7,0 kn.</div></div>`);
+    const extra=`\n\n[RECHERCHE PROCHAIN PASSAGE]\nÉchec initial: ${initialRes.failurePointName||'point inconnu'} à ${fmtLocal(initialRes.failureEtaMs||initialRes.etaMs,tzName)}${Number.isFinite(initialRes.failureDsq)?` | DSQ ${initialRes.failureDsq.toFixed(2)} m | requis à 7 kn ${Number(initialRes.failureRequiredDsq).toFixed(2)} m`:''}\nProchain départ continu: ${fmtLocal(search.depMs,tzName)}\nETA destination: ${fmtLocal(search.result.etaMs,tzName)}\nAttente: ${fmtDuration(search.waitMs)}\nCritère: aucun arrêt DSQ; plafond brut de la table SQ d’au moins 7,0 kn avant application de la marge opérationnelle de 2 %.`;
     el('log').textContent=(el('log').textContent||'')+extra;
     lastText=el('log').textContent;
   }else if(search.notFound){
@@ -2367,8 +2691,18 @@ function renderReportRowsInto(tbodyId,res){
     tr.className=r.status==='ERREUR'||r.status==='ABANDON'?'bg-red-50':'';
     tr.classList.add('result-row');
     const pointLevel=r.pointLevel??r.level;
-    const pointDsq=r.pointDsq??r.dsqMin;
+    const enginePointDsq=r.pointDsq??r.dsqMin;
+    const reportPoint=OHPS_ROUTE_POINTS.find(p=>displayName(p)===r.name);
+    const reportPointIndex=reportPoint?Number(reportPoint.index):null;
+    const reportDirection=el('direction')?.value||'QPOR';
+    const pointRefDepth=Number.isFinite(reportPointIndex)?reportPointReferenceDepthM(reportPointIndex,reportDirection):null;
+    const reportDraft=Number(el('draftM')?.value);
+    const pointDsq=(pointLevel!=null&&Number.isFinite(pointRefDepth)&&Number.isFinite(reportDraft))
+      ? Number(pointLevel)+pointRefDepth-reportDraft
+      : enginePointDsq;
     const pointSowPerm=r.pointSowPerm;
+    // Important: SOW max remains the engine value based on the normal waypoint depths.
+    // The special 10.7/11.1 m at Sainte-Croix is display-only.
     const pointDsqSowMax=r.pointDsqSowMax;
     const pointCurrent=r.pointCurrentKn;
     const pointCurrentType=r.pointCurrentType;
@@ -2376,11 +2710,13 @@ function renderReportRowsInto(tbodyId,res){
     const currentArrow=pointCurrentType==='MONTANT'?'↑':pointCurrentType==='DESCENDANT'?'↓':'';
     const currentLabel=pointCurrentType==='MONTANT'?'courant montant':pointCurrentType==='DESCENDANT'?'courant baissant':'courant nul';
     const currentClass=pointCurrentType==='MONTANT'?'current-up':pointCurrentType==='DESCENDANT'?'current-down':'current-slack';
-    const etaParts=_dtParts(new Date(r.etaMs),LOCAL_TZ,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false,timeZoneName:'short'});
-    const etaZone=etaParts.get('timeZoneName')||'';
+    const etaParts=_dtParts(new Date(r.etaMs),LOCAL_TZ,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
+    const etaZone=easternZoneFr(r.etaMs);
+    const etaDate=`${etaParts.get('year')}-${etaParts.get('month')}-${etaParts.get('day')}`;
     let etaHour=etaParts.get('hour'); if(etaHour==='24')etaHour='00';
-    const etaCompact=`${etaParts.get('year')}-${etaParts.get('month')}-${etaParts.get('day')} ${etaHour}:${etaParts.get('minute')}`;
-    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA${etaZone?` (${escapeHtml(etaZone)})`:''}" class="p-2 whitespace-nowrap">${escapeHtml(etaCompact)}</td><td data-label="Niveau (m)" class="p-2">${pointLevel==null?'—':pointLevel.toFixed(2)}</td><td data-label="DSQ (m)" class="p-2">${pointDsq==null?'—':pointDsq.toFixed(2)}</td><td data-label="SOW max au point (kn)" class="p-2">${pointDsqSowMax==null?'—':pointDsqSowMax.toFixed(1)}</td><td data-label="Courant" class="p-2 whitespace-nowrap">${currentText==='—'?'—':`<span class="report-current-value ${currentClass}" title="${escapeHtml(currentLabel)}">${currentText} kn <span class="report-current-arrow" aria-hidden="true">${currentArrow}</span></span>`}</td>`;
+    const etaTime=`${etaHour}:${etaParts.get('minute')}`;
+    const dsqLabel=`DSQ (m)${pointRefDepth==null?'':` · Prof: ${pointRefDepth.toFixed(1)} m`}`;
+    tr.innerHTML=`<td data-label="Point de rapport" class="p-2 font-medium">${escapeHtml(REPORT_POINT_LABELS.get(r.name)||r.name)}</td><td data-label="ETA" class="p-2 whitespace-nowrap"><span class="report-eta-meta">${escapeHtml(etaZone)} · ${escapeHtml(etaDate)}</span><span class="report-eta-time report-number">${escapeHtml(etaTime)}</span></td><td data-label="Niveau (m)" class="p-2"><span class="report-number">${pointLevel==null?'—':pointLevel.toFixed(2)}</span></td><td data-label="${escapeHtml(dsqLabel)}" class="p-2"><span class="report-number">${pointDsq==null?'—':pointDsq.toFixed(2)}</span>${pointRefDepth==null?'':`<span class="report-depth-pc">Prof: ${pointRefDepth.toFixed(1)} m</span>`}</td><td data-label="SOW max au point (kn)" class="p-2"><span class="report-number">${pointDsqSowMax==null?'—':pointDsqSowMax.toFixed(1)}</span></td><td data-label="Courant" class="p-2 whitespace-nowrap">${currentText==='—'?'—':`<span class="report-current-value report-number ${currentClass}" title="${escapeHtml(currentLabel)}">${currentText} kn <span class="report-current-arrow" aria-hidden="true">${currentArrow}</span></span>`}</td>`;
     tbody.appendChild(tr);
   }
 }
@@ -2425,7 +2761,7 @@ function failureExplanation(res){
     const point=res.failurePointName||'un point de la route';
     const dsq=Number.isFinite(res.failureDsq)?`${res.failureDsq.toFixed(2)} m`:'insuffisant';
     const req=Number.isFinite(res.failureRequiredDsq)?`${res.failureRequiredDsq.toFixed(2)} m`:'le minimum requis';
-    return `Bris du plan initial près de <b>${escapeHtml(point)}</b> vers <b>${escapeHtml(when)}</b> : DSQ disponible <b>${dsq}</b>, alors que <b>${req}</b> est requis pour maintenir le plancher de 7 kn.`;
+    return `Bris du plan initial près de <b>${escapeHtml(point)}</b> vers <b>${escapeHtml(when)}</b> : DSQ disponible <b>${dsq}</b>, alors que <b>${req}</b> est requis pour que la table SQ permette au moins 7,0 kn.`;
   }
   return `Le transit initial est interrompu : ${escapeHtml(res.error||'raison non précisée')}.`;
 }
@@ -2475,9 +2811,21 @@ function renderRecalcResult(search,initialRes){
     const maxInput=Number.isFinite(pendingRecalcContext?.baseParams?.maxSowKn)?pendingRecalcContext.baseParams.maxSowKn:null;
     const hasPace=Number.isFinite(search.paceCapKn)&&Number.isFinite(maxInput)&&search.paceCapKn<maxInput-EPS;
     const departureText=search.sameDeparture?'Heure de départ demandée conservée':`Départ retardé de ${escapeHtml(fmtDuration(search.waitMs||0))}`;
-    const paceHtml=hasPace?`<div class="mt-1">Synchronisation Q73 : plafond volontaire de <b>${search.paceCapKn.toFixed(1)} kn</b> avant Q73 seulement. À Q73 et après, retour à la SOW maximale permise par le DSQ, la vitesse maximale saisie et les limites locales.</div>`:`<div class="mt-1">Les vitesses sont recalculées à chaque position avec la SOW maximale permise par le DSQ, la vitesse maximale saisie et les limites locales.</div>`;
+    let paceHtml,extraRule;
+    if(search.initialSyncProfile){
+      const startTxt=Number.isFinite(search.profileStartKn)?` La cible brute initiale est d’environ <b>${search.profileStartKn.toFixed(1)} kn</b>.`:'';
+      const controlTxt=search.controlPointName?` jusqu’à <b>${escapeHtml(search.controlPointName)}</b>`:'';
+      paceHtml=`<div class="mt-1">Synchronisation initiale : la SOW est ajustée ${controlTxt} pour franchir la première restriction sans interruption.${startTxt} Après ce point, retour aux vitesses maximales permises normalement; elles peuvent ensuite augmenter ou diminuer selon le DSQ rencontré plus loin.</div>`;
+      extraRule=`Synchronisation seulement jusqu’à ${search.controlPointName||'la restriction initiale'}; après ce point, la vitesse peut augmenter ou diminuer selon le DSQ. Marge DSQ de 2 % seulement lorsque le DSQ fixe réellement la vitesse.`;
+    }else if(search.continuousProfile){
+      paceHtml=`<div class="mt-1">Transit recalculé avec les vitesses maximales permises par le DSQ, la vitesse maximale saisie et les limites locales.</div>`;
+      extraRule=`Transit recalculé avec les limites normales.`;
+    }else{
+      paceHtml=hasPace?`<div class="mt-1">Synchronisation Q73 : plafond volontaire de <b>${search.paceCapKn.toFixed(1)} kn</b> avant Q73 seulement. À Q73 et après, retour à la SOW maximale permise par le DSQ, la vitesse maximale saisie et les limites locales.</div>`:`<div class="mt-1">Les vitesses sont recalculées à chaque position avec la SOW maximale permise par le DSQ, la vitesse maximale saisie et les limites locales.</div>`;
+      extraRule=`Synchronisation avant Q73: ${hasPace?`plafond ${search.paceCapKn.toFixed(1)} kn avant Q73 seulement; vitesse maximale permise à Q73 et après`:'aucun ralentissement volontaire requis'}`;
+    }
     summary.innerHTML=`<div class="rounded-2xl border bg-emerald-50 border-emerald-200 p-3"><div class="font-semibold">Nouveau plan réalisable</div><div class="mt-1">${departureText} : <b>${escapeHtml(fmtLocal(search.depMs,LOCAL_TZ))}</b>.</div><div class="mt-1">ETA ${escapeHtml(destination)} : <b>${escapeHtml(fmtLocal(res.etaMs,LOCAL_TZ))}</b>.</div>${paceHtml}</div>${q73ControlHtml(res)}`;
-    const extra=`\n\n[NOUVEAU PLAN DE PASSAGE]\nDépart: ${fmtLocal(search.depMs,LOCAL_TZ)}\nAttente: ${fmtDuration(search.waitMs||0)}\nSynchronisation avant Q73: ${hasPace?`plafond ${search.paceCapKn.toFixed(1)} kn avant Q73 seulement; vitesse maximale permise à Q73 et après`:'aucun ralentissement volontaire requis'}\nETA destination: ${fmtLocal(res.etaMs,LOCAL_TZ)}`;
+    const extra=`\n\n[NOUVEAU PLAN DE PASSAGE]\nDépart: ${fmtLocal(search.depMs,LOCAL_TZ)}\nAttente: ${fmtDuration(search.waitMs||0)}\nRègle: ${extraRule}\nETA destination: ${fmtLocal(res.etaMs,LOCAL_TZ)}`;
     el('log').textContent=(initialRes.logs||'')+extra+'\n\n'+(res.logs||'');
     lastText=el('log').textContent;
   }else if(search.notFound){
@@ -2538,13 +2886,8 @@ el('recalcBtn').addEventListener('click',async()=>{
   btn.disabled=true;
   el('recalcSection').classList.add('hidden');
   try{
-    setProgress('Recherche du plan le plus tôt possible : même départ d’abord, avec synchronisation avant Q73…',10);
-    let search;
-    if(ctx.baseParams.direction==='QPOR'&&(ctx.res.failureKind==='DSQ'||ctx.res.failureKind==='Q73_SOG')){
-      search=await findQ73SogPlan(ctx.baseParams,ctx.inputs,ctx.trip,setProgress);
-    }else{
-      search=await findNextContinuousDeparture(ctx.baseParams,ctx.inputs,ctx.trip,setProgress);
-    }
+    setProgress('Recherche du premier départ permettant un transit continu…',10);
+    const search=await findContinuousProgressivePlan(ctx.baseParams,ctx.inputs,ctx.trip,setProgress,ctx.res);
     renderRecalcResult(search,ctx.res);
     setProgress('Recalcul terminé.',100);
     setStatus(search.ok?'Nouveau plan trouvé — voir le second tableau.':search.notFound?'Aucun nouveau plan trouvé dans la fenêtre de recherche.':'Recalcul interrompu.',search.ok?'ok':'err');
@@ -2752,7 +3095,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     if (result.failureKind === 'DSQ' || String(result.error || '').startsWith('DSQ insuffisant')) {
       add(reason, 'DSQ disponible '); add(reason, metres(result.failureDsq) || 'insuffisant', true);
       add(reason, ', alors que '); add(reason, metres(result.failureRequiredDsq) || 'le minimum requis', true);
-      add(reason, ' est requis pour maintenir le plancher de 7 kn.');
+      add(reason, ' est requis pour que la table SQ permette au moins 7,0 kn.');
     } else if (result.failureKind === 'Q73_SOG') {
       add(reason, 'SOG calcul\u00e9e '); add(reason, knots(result.failureSogKn) || '\u2014', true);
       add(reason, ', inf\u00e9rieure au minimum requis de '); add(reason, knots(result.failureMinSogKn) || '\u2014', true);
@@ -2988,13 +3331,24 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     color: #eef6ff;
   }
   .route-update-speed { width: 5.3rem; min-width: 4.8rem; }
+  .report-eta-meta { display:block; font-size:.72rem; line-height:1rem; color:#64748b; font-weight:600; }
+  .report-eta-time { display:block; }
+  .report-depth-pc {
+    display:block;
+    margin-top:.12rem;
+    font-size:.68rem;
+    line-height:.82rem;
+    color:#7899b8;
+    font-weight:600;
+    white-space:nowrap;
+  }
   .route-update-date,
   .route-update-note {
     display: block;
     margin-top: .22rem;
     font-size: .68rem;
     line-height: .9rem;
-    color: #8eabc5;
+    color: #7899b8;
     white-space: normal;
   }
   .route-update-btn {
@@ -3019,7 +3373,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
   .report-current-value.current-up { color: #2563eb; }
   .report-current-value.current-down { color: #dc2626; }
   .report-current-value.current-slack { color: #64748b; }
-  body.app-night .report-current-value.current-up { color: #7dd3fc; }
+  body.app-night .report-current-value.current-up { color: #4fb8e8; }
   body.app-night .report-current-value.current-down { color: #fb7185; }
   body.app-night .report-current-value.current-slack { color: #94a3b8; }
   .report-current-arrow {
@@ -3033,6 +3387,8 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     vertical-align: -.1em;
   }
   @media (max-width: 767px) {
+    /* Sur mobile, la profondeur est déjà incluse dans le libellé DSQ de la carte. */
+    .report-depth-pc { display:none; }
     /* Ergonomie iPhone : la case ETA/heure est volontairement ~5 mm plus étroite. */
     .route-update-time { width: calc(100% - 19px); min-width: 0; max-width: calc(100% - 19px); }
     .route-update-speed { width: 5.3rem; min-width: 0; max-width: calc(100% - .5rem); }
@@ -3103,10 +3459,10 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     return (state.trip?.segments||[]).reduce((a,s)=>a+(Number(s.distanceNm)||0),0);
   }
   function localParts(ms){
-    const p=_dtParts(new Date(ms),LOCAL_TZ,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZoneName:'short'});
+    const p=_dtParts(new Date(ms),LOCAL_TZ,{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
     let h=p.get('hour');
     if(h==='24')h='00';
-    return{date:`${p.get('year')}-${p.get('month')}-${p.get('day')}`,time:`${h}:${p.get('minute')}`,zone:p.get('timeZoneName')||''};
+    return{date:`${p.get('year')}-${p.get('month')}-${p.get('day')}`,time:`${h}:${p.get('minute')}`,zone:easternZoneFr(ms)};
   }
   function resolveEditedTime(timeStr,referenceMs){
     if(!/^\d{2}:\d{2}$/.test(String(timeStr||'')))throw new Error('Heure de passage invalide.');
@@ -3125,10 +3481,19 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
   function effectiveCapsForRenderedRows(rows){
     const caps=new Map();
     let cap=state.rootMaxSowKn;
+    let manualActive=false;
+    const autoProfile=state.currentResult?.continuousProfileCaps||null;
     for(const row of rows){
       const idx=POINT_INDEX_BY_NAME.get(row.name);
       if(idx==null)continue;
-      if(state.speedChanges.has(idx))cap=state.speedChanges.get(idx);
+      if(!manualActive&&autoProfile&&Object.prototype.hasOwnProperty.call(autoProfile,String(idx))){
+        const autoCap=Number(autoProfile[String(idx)]);
+        if(Number.isFinite(autoCap))cap=autoCap;
+      }
+      if(state.speedChanges.has(idx)){
+        cap=state.speedChanges.get(idx);
+        manualActive=true;
+      }
       caps.set(idx,cap);
     }
     return caps;
@@ -3137,7 +3502,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     const tbody=get(tbodyId),table=tbody?.closest('table'),tr=table?.querySelector('thead tr');
     if(!tr||tr.dataset.routeUpdateHeader==='yes')return;
     const ths=Array.from(tr.children);
-    if(ths[1])ths[1].textContent=`ETA${etaZone?` (${etaZone})`:''} / heure de passage`;
+    if(ths[1])ths[1].textContent='ETA / heure de passage';
     if(ths[4]){ths[4].textContent='SOW max au point (kn)';ths[4].classList.add('whitespace-nowrap');}
     if(ths[5]){ths[5].textContent='Courant';ths[5].classList.add('whitespace-nowrap');}
     if(ths[6])ths[6].remove();
@@ -3180,16 +3545,16 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
       const lp=localParts(data.etaMs);
       const isStart=pointIndex===startIdx;
       const editable=pointIndex!==endIdx;
-      etaCell.dataset.label=`ETA${lp.zone?` (${lp.zone})`:''}`;
+      etaCell.dataset.label='ETA';
 
       if(!isStart){
         etaCell.innerHTML='';
+        const date=document.createElement('span');date.className='route-update-date';date.textContent=`${lp.zone} · ${lp.date}`;etaCell.append(date);
         const time=document.createElement('input');
         time.type='time';time.step='60';time.value=lp.time;time.dataset.routeUpdateBaseline=time.value;time.className='route-update-time';
         time.setAttribute('aria-label','Heure de passage à '+(REPORT_POINT_LABELS.get(data.name)||data.name));
         time.disabled=!editable;
         etaCell.append(time);
-        const date=document.createElement('span');date.className='route-update-date';date.textContent=lp.date;etaCell.append(date);
       }
 
       const speedCell=document.createElement('td');
@@ -3292,10 +3657,11 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     get('log').textContent=result.logs||'';
     lastText=result.logs||'';
     try{shopAppendDiagnostic();}catch(_){/* le moteur principal reste responsable du diagnostic */}
+    try{window.__persistTransitPlan?.();}catch(_){/* la sauvegarde locale ne doit jamais bloquer le calcul */}
   }
 
   async function applyUpdate(tr){
-    if(state.busy||!state.currentResult||!state.baseParams||!state.inputs||!state.trip)return;
+    if(state.busy||!state.currentResult||!state.baseParams||!state.trip)return;
     const pointIndex=pointIndexFromRow(tr);
     if(pointIndex==null)return;
     const data=rowDataForIndex(pointIndex);
@@ -3314,6 +3680,15 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     setBusy(true);
     setProgress('Actualisation du voyage à partir de '+(REPORT_POINT_LABELS.get(data.name)||data.name)+'…',25);
     try{
+      // Après restauration d'un résultat sauvegardé, les objets réseau ne sont
+      // volontairement pas stockés. On les recharge seulement si le pilote
+      // demande une nouvelle mise à jour du trajet.
+      if(!state.inputs){
+        setProgress('Rafraîchissement des données pour la mise à jour…',10);
+        state.inputs=await loadInputs(state.journeyDepMs||state.baseParams.depMs,setProgress);
+      }else if(!SHOP_STATE.source){
+        await shopPrepare(state.journeyDepMs||state.baseParams.depMs,setProgress);
+      }
       const subTrip=subTripFrom(pointIndex);
       const subParams={...state.baseParams,depMs:checkpointMs,maxSowKn:capKn,preQ73SowCapKn:null};
       let subRes,paceCapKn=null;
@@ -3390,6 +3765,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     state.rootMaxSowKn=cap?.baseParams?.maxSowKn??null;
     state.activeTableId='reportTbody';state.activeFullTableId='tbody';state.activeSummaryId='summary';
     if(res.ok&&state.baseParams&&state.inputs&&state.trip)enhanceActive();
+    try{window.__persistTransitPlan?.();}catch(_){/* sans effet sur le calcul */}
   };
 
   const originalRenderRecalcResult=renderRecalcResult;
@@ -3406,6 +3782,29 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     state.rootMaxSowKn=ctx.baseParams.maxSowKn;
     state.activeTableId='recalcReportTbody';state.activeFullTableId='recalcTbody';state.activeSummaryId='recalcSummary';
     enhanceActive();
+    try{window.__persistTransitPlan?.();}catch(_){/* sans effet sur le calcul */}
+  };
+
+  // Expose seulement l'état nécessaire à la sauvegarde/restauration locale.
+  // Les données réseau SHOP/IWLS ne sont jamais sérialisées.
+  window.__transitRouteState=state;
+  window.__restoreTransitRouteState=function(saved){
+    if(!saved?.result||!saved?.baseParams)return false;
+    state.capture=null;
+    state.currentResult=saved.result;
+    state.baseParams={...saved.baseParams};
+    state.inputs=null;
+    state.trip=buildSegments(state.baseParams.direction);
+    state.journeyDepMs=Number.isFinite(saved.journeyDepMs)?saved.journeyDepMs:saved.result.depMs;
+    state.rootMaxSowKn=Number.isFinite(saved.rootMaxSowKn)?saved.rootMaxSowKn:state.baseParams.maxSowKn;
+    state.speedChanges=new Map(Array.isArray(saved.speedChanges)?saved.speedChanges:[]);
+    state.manualMeta=new Map(Array.isArray(saved.manualMeta)?saved.manualMeta:[]);
+    state.activeTableId='reportTbody';
+    state.activeFullTableId='tbody';
+    state.activeSummaryId='summary';
+    originalRenderInitialResult(state.currentResult);
+    if(state.currentResult?.rows?.length)enhanceActive();
+    return true;
   };
 
   installDelegation('reportTbody');
@@ -3420,6 +3819,11 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     li.textContent='Mise à jour en route : au point de départ, seul le plafond SOW peut être modifié; l’heure demeure celle saisie dans les paramètres. Aux points de rapport intermédiaires, l’heure de passage et le plafond SOW peuvent être modifiés. Après toute modification, l’avis « Recalcul requis » et le bouton « Actualiser la suite » apparaissent.';
     list.append(li);
   }
+  if(list&&!get('reportDepthDirective')){
+    const li=document.createElement('li');li.id='reportDepthDirective';
+    li.textContent='Tableau des points de rapport : le DSQ ponctuel de CIP Sainte-Croix est affiché avec une profondeur de référence de 10,7 m en Québec → POR et de 11,1 m en POR → Québec. Cette profondeur est strictement informative dans le tableau : la faisabilité, les vitesses et la recherche du prochain passage utilisent toujours les profondeurs normales des waypoints.';
+    list.append(li);
+  }
 })();
 </script>
 <!-- ROUTE-UPDATE-STAGE2-END -->
@@ -3430,7 +3834,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
 (function(){
   'use strict';
   const KEY='transit-qc-tr-vessel-v1';
-  const IDS=['vesselType','draftM','beamM','maxSowKn'];
+  const IDS=['direction','vesselType','draftM','beamM','maxSowKn','depTime'];
 
   function readStored(){
     try{
@@ -3461,6 +3865,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
     }
   }
 
+  // depDate n'est volontairement pas mémorisée : l'initialisation conserve la date du jour.
   restore();
   for(const id of IDS){
     const node=document.getElementById(id);
@@ -3472,5 +3877,74 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
 </script>
 <!-- VESSEL-MEMORY-END -->
 
+
+
+<!-- RESULT-MEMORY-60MIN-BEGIN -->
+<script id="result-memory-60min">
+(function(){
+  'use strict';
+  const KEY='transit-qc-tr-last-plan-v6';
+  const TTL_MS=60*60*1000;
+
+  function safeGet(){try{return localStorage.getItem(KEY)}catch(_){return null}}
+  function safeSet(v){try{localStorage.setItem(KEY,v);return true}catch(_){return false}}
+  function safeRemove(){try{localStorage.removeItem(KEY)}catch(_){}}
+  function clockText(ms){
+    try{return new Intl.DateTimeFormat('fr-CA',{timeZone:LOCAL_TZ,hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(ms));}
+    catch(_){return new Date(ms).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}
+  }
+  function indicator(){
+    let n=document.getElementById('savedResultIndicator');
+    if(n)return n;
+    n=document.createElement('div');
+    n.id='savedResultIndicator';
+    n.className='mt-2 text-xs text-slate-500';
+    const anchor=document.getElementById('diagnosticDetails');
+    if(anchor?.parentNode)anchor.parentNode.insertBefore(n,anchor);
+    return n;
+  }
+  function showStamp(savedAt,restored){
+    const n=indicator();
+    if(!n)return;
+    n.textContent=`Calcul effectué à ${clockText(savedAt)}${restored?' — résultat restauré':''}.`;
+  }
+
+  window.__persistTransitPlan=function(){
+    const s=window.__transitRouteState;
+    if(!s?.currentResult?.rows?.length||!s?.baseParams)return;
+    const savedAt=Date.now();
+    const payload={
+      version:1,
+      savedAt,
+      result:s.currentResult,
+      baseParams:s.baseParams,
+      journeyDepMs:s.journeyDepMs,
+      rootMaxSowKn:s.rootMaxSowKn,
+      speedChanges:Array.from(s.speedChanges?.entries?.()||[]),
+      manualMeta:Array.from(s.manualMeta?.entries?.()||[])
+    };
+    if(safeSet(JSON.stringify(payload)))showStamp(savedAt,false);
+  };
+
+  function restore(){
+    const raw=safeGet();
+    if(!raw)return;
+    let saved;
+    try{saved=JSON.parse(raw);}catch(_){safeRemove();return;}
+    const age=Date.now()-Number(saved?.savedAt);
+    if(!Number.isFinite(age)||age<0||age>TTL_MS){safeRemove();return;}
+    try{
+      if(window.__restoreTransitRouteState?.(saved))showStamp(saved.savedAt,true);
+    }catch(e){console.warn('Restauration du dernier calcul impossible:',e);}
+  }
+
+  // Laisse d'abord la mémoire des champs (direction, navire, heure) se restaurer.
+  setTimeout(restore,0);
+})();
+</script>
+<!-- RESULT-MEMORY-60MIN-END -->
+
+
+<!-- CONTINUOUS-PROFILE-DSQ-FIX-2026-10-21 -->
 </body>
 </html>
