@@ -1939,7 +1939,7 @@ async function shopPointAtHour(source,point,time){
 function shopPointLabel(p){return displayName(p)||`Point interm\u00e9diaire ${p.index+1}/86 (${p.distanceFromStartNm.toFixed(1)} NM depuis Qu\u00e9bec)`;}
 async function shopPrepare(depMs,setProgress){
   SHOP_STATE.source=null;SHOP_STATE.hours.clear();SHOP_STATE.pending.clear();SHOP_STATE.diagnostic=[];SHOP_STATE.metadataKey.clear();SHOP_STATE.fetchedAt=Date.now();
-  shopNote(`Version SHOP 2026-10-14 U2 (validation des unites) | requ\u00eates lanc\u00e9es ${fmtUtcIso(SHOP_STATE.fetchedAt)}\nSeul SHOP/OHPS est autoris\u00e9. Valeur manquante jamais remplac\u00e9e par z\u00e9ro.`);
+  shopNote(`Version SHOP 2026-10-23 U4 (GeoServer + validation robuste) | requ\u00eates lanc\u00e9es ${fmtUtcIso(SHOP_STATE.fetchedAt)}\nSeul SHOP/OHPS est autoris\u00e9. Valeur manquante jamais remplac\u00e9e par z\u00e9ro.`);
   const start=OHPS_ROUTE_POINTS[el('direction').value==='PORQ'?85:0],errors=[];
   for(const make of [shopGeoSource,shopErddapSource]){
     try{
@@ -3254,11 +3254,114 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
       new Set(matches.map(x=>x.index)).size>=CFG.requiredLocations &&
       new Set(matches.map(x=>x.time)).size>=CFG.requiredHours;
   }
+  const HISTORICAL_SCHEMA = Object.freeze({
+    speedUnit:'m s-1',
+    directionUnit:'degree',
+    url:'ohps_mosaic schema historically cross-checked with ecccShopNautilo',
+    checkedAt:Date.now()
+  });
+
+  function angleDiffDeg(a,b){
+    return Math.abs(((a-b+540)%360)-180);
+  }
+
+  async function selfCheckGeoTiff(source,point,time){
+    const url=shopCoverageUrl(source,[point],time,CFG.radiusKm);
+    const buf=await shopFetch(url,'Courants SHOP GeoTIFF - controle interne',true);
+    const tiff=await shopReadTiff(buf);
+    const bands=originalTiffBands(tiff,source);
+    const names=namedBands(bands);
+    if(!names)throw fail('controle interne impossible : les 4 bandes u/v/magnitude/direction ne sont plus presentes exactement.');
+    const indexByName={};
+    bands.forEach((b,i)=>{indexByName[shopNorm(b.name)]=i;});
+    const required=['u','v','magnitude','direction'];
+    if(required.some(k=>!Number.isInteger(indexByName[k])))throw fail('controle interne impossible : ordre/noms de bandes inattendus.');
+
+    let best=null;
+    for(let y=0;y<tiff.height;y++)for(let x=0;x<tiff.width;x++){
+      const i=y*tiff.width+x;
+      const u=shopValue(tiff.arrays[indexByName.u][i],bands[indexByName.u],tiff.nodata);
+      const v=shopValue(tiff.arrays[indexByName.v][i],bands[indexByName.v],tiff.nodata);
+      const mag=shopValue(tiff.arrays[indexByName.magnitude][i],bands[indexByName.magnitude],tiff.nodata);
+      const dir=shopValue(tiff.arrays[indexByName.direction][i],bands[indexByName.direction],tiff.nodata);
+      if(![u,v,mag,dir].every(Number.isFinite))continue;
+      const [lon,lat]=tiff.xy(x,y);
+      if(!(lat>=-90&&lat<=90&&lon>=-180&&lon<=180))continue;
+      const distanceToGridKm=ohpsDistanceKm(point.latitude,point.longitude,lat,lon);
+      if(distanceToGridKm>CFG.radiusKm)continue;
+      if(!best||distanceToGridKm<best.distanceToGridKm)best={u,v,mag,dir,lat,lon,distanceToGridKm};
+    }
+    if(!best)return{ok:false,index:point.index,point:shopPointLabel(point),time:fmtUtcIso(time),reason:'aucune cellule complete u/v/magnitude/direction dans le rayon'};
+
+    const calcMag=Math.hypot(best.u,best.v);
+    const calcDir=(Math.atan2(best.u,best.v)*180/Math.PI+360)%360;
+    const magTol=Math.max(0.03,calcMag*0.06);
+    const dirTol=4;
+    const result={
+      ok:false,index:point.index,point:shopPointLabel(point),time:fmtUtcIso(time),
+      cell:[best.lat,best.lon],distanceToGridKm:best.distanceToGridKm,
+      uRaw:best.u,vRaw:best.v,magnitudeRaw:best.mag,directionRaw:best.dir,
+      magnitudeFromUv:calcMag,directionFromUv:calcDir,
+      magnitudeDifference:Math.abs(best.mag-calcMag),
+      directionDifferenceDeg:angleDiffDeg(best.dir,calcDir),
+      magnitudeTolerance:magTol,directionToleranceDeg:dirTol
+    };
+    if(best.distanceToGridKm>CFG.maxCellOffsetKm)return{...result,reason:'cellule trop eloignee du point de controle'};
+    if(calcMag<0||calcMag>6||best.mag<0||best.mag>6)return{...result,contradiction:true,reason:'amplitude de courant hors plage de controle 0-6 m/s'};
+    if(best.dir<0||best.dir>360)return{...result,contradiction:true,reason:'direction hors plage 0-360 degres'};
+    if(Math.abs(best.mag-calcMag)>magTol||angleDiffDeg(best.dir,calcDir)>dirTol)
+      return{...result,contradiction:true,reason:'u/v ne concordent pas avec magnitude/direction dans le GeoTIFF'};
+    return{...result,ok:true,reason:'coherence interne u/v <-> magnitude/direction conforme'};
+  }
+
+  async function establishHistorical(source,targetTime,referenceError){
+    shopNote('[U4 ERDDAP INDISPONIBLE] '+String(referenceError?.message||referenceError||'indisponible')+
+      '\nLe controle bascule sur le schema historique deja recoupe, avec verification interne obligatoire du GeoTIFF courant. Aucun ancien courant n est reutilise.');
+    const times=source.times
+      .filter(t=>Math.abs(t-targetTime)<=CFG.maxAgeHours*3600000)
+      .sort((a,b)=>Math.abs(a-targetTime)-Math.abs(b-targetTime))
+      .slice(0,2)
+      .sort((a,b)=>a-b);
+    if(times.length<2)throw fail('controle interne : moins de deux heures SHOP disponibles autour de l heure visee.');
+    const matches=[],attempts=[];
+    for(const time of times){
+      for(const index of CFG.pointIndices){
+        const point=OHPS_ROUTE_POINTS.find(p=>p.index===index);
+        if(!point)throw fail('point de controle interne absent de la route.');
+        let check;
+        try{check=await selfCheckGeoTiff(source,point,time);}
+        catch(e){check={ok:false,index,point:shopPointLabel(point),time:fmtUtcIso(time),reason:String(e?.message||e)};}
+        attempts.push(check);shopNote('[U4 CONTROLE INTERNE] '+JSON.stringify(check));
+        if(check.contradiction)throw fail('controle interne contradictoire; le schema historique n est pas applique. Voir [U4 CONTROLE INTERNE].');
+        if(check.ok)matches.push(check);
+        if(sufficient(matches)){
+          const reference=Object.freeze({...HISTORICAL_SCHEMA,checkedAt:Date.now()});
+          const entry={reference,verified:true,comparisons:matches.slice(),mode:'historical-internal-crosscheck'};
+          bySource.set(source,entry);
+          shopNote('[U4 SCHEMA HISTORIQUE RETENU] '+JSON.stringify({
+            source:reference.url,speedUnit:reference.speedUnit,directionUnit:reference.directionUnit,
+            matches:matches.length,locations:new Set(matches.map(x=>x.index)).size,
+            hours:[...new Set(matches.map(x=>x.time))]
+          })+
+          '\nLe schema historique sert uniquement a interpreter les unites/convention. Les courants du transit proviennent exclusivement du GeoServer WCS actuel.');
+          return entry;
+        }
+      }
+    }
+    throw fail(`controle interne insuffisant : ${matches.length} controles conformes sur ${attempts.length}; 3, sur 2 lieux et 2 heures, sont requis.`);
+  }
+
   async function establish(source,targetTime){
     if(!isExpectedMosaic(source))throw fail('cette proc\u00e9dure est limit\u00e9e \u00e0 ohps_mosaic de l\u2019OGSL.');
     shopNote('[U3 CONTROLE CROISE] GeoTIFF sans unite exploitable. Essai du schema magnitude/direction documente par ERDDAP. Les donnees de comparaison ne seront PAS utilisees pour le transit.');
     shopNote('[U3 CRITERES DE COMPARAISON] '+JSON.stringify(CFG));
-    const {source:ref,reference}=await referenceSource();
+    let refBundle;
+    try{
+      refBundle=await referenceSource();
+    }catch(referenceError){
+      return establishHistorical(source,targetTime,referenceError);
+    }
+    const {source:ref,reference}=refBundle;
     const available=new Set(ref.times);
     const times=source.times.filter(t=>available.has(t)&&t<=targetTime&&targetTime-t<=CFG.maxAgeHours*3600000).sort((a,b)=>b-a).slice(0,2);
     if(times.length<CFG.requiredHours)throw fail('pas assez d\u2019heures communes pour recouper les deux distributions.');
@@ -3315,6 +3418,7 @@ el('downloadBtn').addEventListener('click',()=>{if(!lastText)return;const b=new 
 })();
 
 </script>
+<!-- SHOP-ROBUST-U4-2026-10-23: ERDDAP preferred; historical schema only after live GeoTIFF internal consistency check -->
 <!-- SHOP-UNIT-BRIDGE-U3-END -->
 
 
