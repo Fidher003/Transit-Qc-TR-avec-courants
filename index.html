@@ -424,6 +424,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
           <li>À Q73 en direction Québec → Trois-Rivières, critère de passage basé sur la SOG avec ce courant spécial : si le tirant d’eau est supérieur à 9,0 m ou si la largeur réelle est ≥ 30 m → SOG minimale 3,5 kn; sinon, largeur réelle &lt; 24 m → 2,5 kn; largeur réelle de 24 m à moins de 30 m → 3,0 kn.</li>
           <li>Heures : toutes les heures sont affichées en heure locale du Saint-Laurent (America/Montreal); aucun choix de fuseau n'est demandé.</li>
           <li>DSQ : la faisabilité reste évaluée sur le plafond brut de la table SQ avec un minimum de 7,0 kn. La marge de 2 % s’applique seulement lorsque le DSQ est réellement la contrainte qui fixe la vitesse utilisée et que ce plafond DSQ est de 15,0 kn ou moins. Si une vitesse volontaire, une limite locale ou la vitesse maximale du navire est plus basse que le plafond DSQ, aucune marge DSQ n’est retranchée. La colonne « SOW max au point » continue d’afficher le plafond brut de la table SQ.</li>
+          <li>Marge opérationnelle Grondines–WP55 : de CIP Grondines jusqu’au waypoint 55 inclusivement, dans les deux directions, la vitesse effectivement permise est réduite de 2 %. Si la marge DSQ de 2 % s’applique déjà au même endroit, les deux marges ne se cumulent pas : un seul facteur de 0,98 est appliqué.</li>
           <li>Profondeur de référence spéciale : 10,8 m de Pointe Deschambeault jusqu'au point intermédiaire non nommé (11,5 NM), puis 10,7 m de ce point jusqu'à Bouée Q19, dans les deux directions.</li>
           <li>Plancher SOW général : 7,0 kn partout. À Q73 en direction Québec → Trois-Rivières, le critère additionnel est une SOG minimale, et non un plancher SOW spécial.</li>
           <li>Limites locales de SOW selon la direction : Québec → Pointe-des-Ormes, maximum 9,0 kn sur le premier 1,0 NM depuis Station Québec, puis 11,0 kn jusqu’à 2,0 NM, puis retour à la vitesse maximale normale; Pointe-des-Ormes → Québec, maximum 9,0 kn sur le premier 1,0 NM depuis Station Pointe-des-Ormes, puis 11,0 kn jusqu’à Wayagamak, puis retour à la vitesse maximale normale. Toute limite DSQ, navire ou autre limite locale plus basse demeure prioritaire.</li>
@@ -431,7 +432,7 @@ Icon blob SHA: 7a43ea90e2f88d57fd32d2c6a53723b088fe98bb
           <li>Navires de largeur réelle ≥ 30 m, dans les deux directions : maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes. Toute limite locale plus basse demeure prioritaire.</li>
           <li>Table SQ porte-conteneurs complète utilisée de 7 à 15 kn pour toutes les largeurs 24 à 44 m; au-dessus de 15 kn, l'exigence augmente de 0,60 m par nœud supplémentaire, avec interpolation.</li>
           <li>Le seuil de faisabilité DSQ demeure 7,0 kn sur la valeur brute de la table SQ. Après validation de ce seuil, la marge opérationnelle de 2 % peut donc produire une SOW utilisée inférieure à 7,0 kn (6,86 kn lorsque le plafond brut est exactement 7,0 kn).</li>
-          <li>Tableau principal : seuls les points de rapport Station Québec, CIP Saint-Nicolas, CIP Sainte-Croix, CIP Grondines, CIP Batiscan et Pointe-des-Ormes sont affichés. La colonne « SOW max au point » indique uniquement le maximum permis par le DSQ et la table SQ, jusqu’à 15 kn, sans appliquer la vitesse maximale saisie ni les limites locales de transit. La SOG au point demeure calculée avec la vitesse réellement permise par l’ensemble des règles applicables. Le tableau complet repliable demeure inchangé.</li>
+          <li>Tableau principal : seuls les points de rapport Station Québec, CIP Saint-Nicolas, CIP Sainte-Croix, CIP Grondines, Bouée C20-21, CIP Batiscan et Pointe-des-Ormes sont affichés. La colonne « SOW max au point » indique uniquement le maximum permis par le DSQ et la table SQ, jusqu’à 15 kn, sans appliquer la vitesse maximale saisie ni les limites locales de transit. La SOG au point demeure calculée avec la vitesse réellement permise par l’ensemble des règles applicables. Le tableau complet repliable demeure inchangé.</li>
           <li>Le bouton Calculer affiche toujours d'abord le plan initial demandé. Si le transit est interrompu, le tableau initial demeure visible avec la raison du bris.</li>
           <li>Le bouton « Recalculer le prochain passage » traite la cause du bris initial. Pour un échec DSQ, il cherche d’abord le premier départ où le transit complet demeure faisable avec le plancher brut de 7,0 kn, puis synchronise la vitesse seulement jusqu’à la restriction qui a causé le bris. Pour un échec Q73, il conserve la logique dédiée de synchronisation avant Q73. La recherche se fait sur 30 h, par pas de 5 min puis avec raffinement à 1 min.</li>
           <li>Après avoir trouvé ce départ, le logiciel synchronise la SOW seulement jusqu’au point qui a causé l’échec initial : il évite d’arriver trop tôt à cette première restriction, puis libère la vitesse après son franchissement. Plus loin, la SOW peut augmenter avec la marée puis diminuer de nouveau si un autre DSQ l’exige. La marge DSQ de 2 % demeure locale et ne s’applique que lorsque le DSQ fixe réellement la vitesse utilisée.</li>
@@ -1305,22 +1306,27 @@ function allowedSow(tbl,dsq,maxSow,extraCandidate=null){
   return eligible.length?Math.max(...eligible):0;
 }
 
-// Marge opérationnelle DSQ: -2 % seulement lorsque le DSQ est réellement
-// la contrainte qui fixe la vitesse désirée/planifiée, et seulement jusqu'à
-// 15 kn inclusivement. Si une consigne volontaire, une limite locale ou la
-// vitesse maximale du navire est déjà plus basse que le plafond DSQ, aucune
-// marge DSQ n'est appliquée.
-function dsqOperationalSowCap(tbl,dsq,desiredMaxSow){
+// Marge opérationnelle de 2 % : elle peut être déclenchée soit par le DSQ,
+// soit par la zone CIP Grondines -> waypoint 55, mais elle ne se cumule jamais.
+// La faisabilité DSQ reste évaluée sur la capacité brute avant cette marge.
+function operationalSowCap(tbl,dsq,desiredMaxSow,routeMargin2Pct=false){
   const rawDsqCap=allowedSow(tbl,dsq,20.0);
   if(!(rawDsqCap>0))return 0;
   const desired=Number(desiredMaxSow);
-  const dsqIsLimiting=Number.isFinite(desired)&&rawDsqCap<=desired+EPS;
-  return dsqIsLimiting&&rawDsqCap<=15.0+EPS?rawDsqCap*0.98:rawDsqCap;
+  if(!Number.isFinite(desired)||!(desired>0))return 0;
+  const baseCap=Math.min(desired,rawDsqCap);
+  const dsqIsLimiting=rawDsqCap<=desired+EPS;
+  const dsqMargin2Pct=dsqIsLimiting&&rawDsqCap<=15.0+EPS;
+  return (dsqMargin2Pct||routeMargin2Pct)?baseCap*0.98:baseCap;
+}
+function dsqOperationalSowCap(tbl,dsq,desiredMaxSow){
+  return operationalSowCap(tbl,dsq,desiredMaxSow,false);
 }
 function allowedSowWithDsqMargin(tbl,dsq,maxSow){
-  const dsqCap=dsqOperationalSowCap(tbl,dsq,maxSow);
-  if(!(dsqCap>0))return 0;
-  return Math.min(maxSow,dsqCap);
+  return operationalSowCap(tbl,dsq,maxSow,false);
+}
+function allowedSowWithOperationalMargin(tbl,dsq,maxSow,routeMargin2Pct=false){
+  return operationalSowCap(tbl,dsq,maxSow,routeMargin2Pct);
 }
 
 
@@ -1449,6 +1455,13 @@ function ohpsCurrentEffectKn(c,direction,point){
   }
   return null;
 }
+const GRONDINES_MARGIN_START_NM=Number(OHPS_ROUTE_POINTS.find(p=>Number(p.index)===42)?.distanceFromStartNm); // CIP Grondines: 41.4 NM
+const GRONDINES_MARGIN_END_NM=Number(OHPS_ROUTE_POINTS.find(p=>Number(p.index)===55)?.distanceFromStartNm);   // waypoint 55: 48.7 NM
+function grondinesWp55Margin2PctApplies(distanceFromQuebecNm){
+  const d=Number(distanceFromQuebecNm);
+  return Number.isFinite(d)&&Number.isFinite(GRONDINES_MARGIN_START_NM)&&Number.isFinite(GRONDINES_MARGIN_END_NM)
+    && d>=GRONDINES_MARGIN_START_NM-EPS && d<=GRONDINES_MARGIN_END_NM+EPS;
+}
 function localMaxSowKnForDistance(distanceFromQuebecNm,userMaxSowKn,beamM,direction){
   let localMax=userMaxSowKn;
   // Québec -> Pointe-des-Ormes (voyage montant): 9 kn sur le premier NM,
@@ -1472,20 +1485,24 @@ function localMaxSowKnForDistance(distanceFromQuebecNm,userMaxSowKn,beamM,direct
 function localSpeedPieces(p,q,userMaxSowKn,beamM,direction){
   const a=Number(p.distanceFromStartNm),b=Number(q.distanceFromStartNm);
   const total=Math.abs(b-a);
-  if(!(total>0)) return [{distanceNm:0,maxSowKn:localMaxSowKnForDistance((a+b)/2,userMaxSowKn,beamM,direction)}];
+  if(!(total>0)){
+    const mid=(a+b)/2;
+    return [{distanceNm:0,maxSowKn:localMaxSowKnForDistance(mid,userMaxSowKn,beamM,direction),routeMargin2Pct:grondinesWp55Margin2PctApplies(mid)}];
+  }
   const lo=Math.min(a,b),hi=Math.max(a,b);
   const cuts=[lo,hi];
   // 1/2 NM: limites au départ de Québec en QPOR.
-  // 41.4 NM: changement de plafond des navires >=30 m.
+  // Grondines -> WP55: zone de marge opérationnelle unique de 2 % dans les deux directions.
+  // 41.4 NM: changement de plafond des navires >=30 m et début de cette zone.
   // 66.6 NM: Wayagamak; 69.9 NM: fin du premier NM depuis Pointe-des-Ormes en PORQ.
-  for(const boundary of [1.0,2.0,41.4,66.6,69.9]){
-    if(boundary>lo+EPS && boundary<hi-EPS) cuts.push(boundary);
+  for(const boundary of [1.0,2.0,GRONDINES_MARGIN_START_NM,GRONDINES_MARGIN_END_NM,66.6,69.9]){
+    if(Number.isFinite(boundary)&&boundary>lo+EPS && boundary<hi-EPS) cuts.push(boundary);
   }
   cuts.sort((x,y)=>x-y);
   const pieces=[];
   for(let i=0;i<cuts.length-1;i++){
     const x0=cuts[i],x1=cuts[i+1],mid=(x0+x1)/2;
-    pieces.push({distanceNm:x1-x0,maxSowKn:localMaxSowKnForDistance(mid,userMaxSowKn,beamM,direction)});
+    pieces.push({distanceNm:x1-x0,maxSowKn:localMaxSowKnForDistance(mid,userMaxSowKn,beamM,direction),routeMargin2Pct:grondinesWp55Margin2PctApplies(mid)});
   }
   if(b<a) pieces.reverse();
   return pieces;
@@ -2009,6 +2026,7 @@ async function calcTrip(params,inputData,trip,setProgress){
   logs.push(direction==='QPOR'?'Règle courant Québec → Pointe-des-Ormes: MONTANT = ajouté | DESCENDANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.':'Règle courant Pointe-des-Ormes → Québec: DESCENDANT = ajouté | MONTANT = soustrait | SLACK < 0,10 kn = 0 | moyenne P-Q.');
   logs.push(direction==='QPOR'?"SOW locale (Québec → Pointe-des-Ormes): maximum 9,0 kn sur le premier 1,0 NM depuis Station Québec; puis 11,0 kn jusqu’à 2,0 NM; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.":"SOW locale (Pointe-des-Ormes → Québec): maximum 9,0 kn sur le premier 1,0 NM depuis Station Pointe-des-Ormes; puis 11,0 kn jusqu’à Wayagamak; ensuite retour à la vitesse maximale normale, sous réserve du DSQ et des autres plafonds applicables.");
   logs.push('Marge DSQ opérationnelle: la faisabilité est vérifiée sur le plafond brut de la table SQ avec un seuil de 7,0 kn. La réduction de 2 % est appliquée seulement lorsque le DSQ fixe réellement la vitesse utilisée et que ce plafond DSQ est <= 15,0 kn; aucune marge n’est appliquée si une consigne volontaire, une limite locale ou la vitesse maximale du navire est déjà plus basse.');
+  logs.push('Marge opérationnelle Grondines-WP55: de CIP Grondines (41,4 NM) au waypoint 55 (48,7 NM) inclusivement, dans les deux directions, réduction de 2 % sur la vitesse effectivement limitante. Si la marge DSQ de 2 % s’applique aussi, un seul facteur 0,98 est appliqué; les marges ne se cumulent jamais.');
   if(beamM>=30-EPS) logs.push('Navire de largeur réelle >= 30 m: maximum 15,0 kn entre Québec et CIP Grondines; maximum 14,0 kn entre CIP Grondines et Station Pointe-des-Ormes, dans les deux directions; toute limite locale plus basse demeure prioritaire.');
   else logs.push('Navire de largeur réelle < 30 m: vitesse maximale saisie jusqu’à 20,0 kn. Jusqu’à 15,0 kn, table SQ initiale inchangée; au-dessus de 15,0 kn, dégagement requis = exigence à 15,0 kn + 0,60 m par nœud supplémentaire, avec interpolation linéaire.');
   logs.push('Majoration du courant DESCENDANT OHPS: +14 % par défaut; +20 % entre Station Québec et CIP St-Nicolas inclusivement (incluant Pont de Québec et Bouée Q19); +30 % entre Phare Richelieu et Barre Boulard; +13 % supplémentaires sur le courant DESCENDANT calculé entre CIP Grondines et Cap à la roche inclusivement. Le courant MONTANT n’est pas modifié par cette correction. Exception: au point Q73 en direction Québec → Trois-Rivières, le courant OHPS est remplacé par la table Portneuf − Deschaillons.');
@@ -2049,7 +2067,7 @@ async function calcTrip(params,inputData,trip,setProgress){
       const naturalPieces=localSpeedPieces(p,q,traceMax,beamM,direction);
       const naturalRawCap=Math.min(...naturalPieces.map(x=>Math.min(x.maxSowKn,rawDsqCap)));
       for(const piece of speedPieces){
-        piece.sowPerm=allowedSowWithDsqMargin(dsqTable,dsq,piece.maxSowKn);
+        piece.sowPerm=allowedSowWithOperationalMargin(dsqTable,dsq,piece.maxSowKn,piece.routeMargin2Pct);
         piece.sow=Math.min(piece.sowPerm,piece.maxSowKn);
       }
       const sowPerm=Math.min(...speedPieces.map(x=>x.sowPerm));
@@ -2078,7 +2096,7 @@ async function calcTrip(params,inputData,trip,setProgress){
       }
       if(startRow.pointCurrentKn==null && totalDist<=EPS && p.index===trip.named[0].index){
         const pPointMaxSow=localMaxSowKnForDistance(Number(p.distanceFromStartNm),planningMaxSowKn,beamM,direction);
-        const pPointSowPerm=allowedSowWithDsqMargin(dsqTable,dsq,pPointMaxSow);
+        const pPointSowPerm=allowedSowWithOperationalMargin(dsqTable,dsq,pPointMaxSow,grondinesWp55Margin2PctApplies(Number(p.distanceFromStartNm)));
         // Colonne de rapport: maximum dicté par le DSQ / la table SQ seulement.
         // On ne lui applique ni la vitesse maximale saisie ni les limites locales de transit.
         const pPointDsqSowMax=allowedSow(dsqTable,dsq,15.0);
@@ -2189,7 +2207,7 @@ async function calcTrip(params,inputData,trip,setProgress){
       const qBeforeQ73=direction==='QPOR' && q.index<=38;
       const qPlanningMaxSowKn=(qBeforeQ73&&Number.isFinite(preQ73SowCapKn))?Math.max(7,Math.min(maxSowKn,preQ73SowCapKn)):maxSowKn;
       const qPointMaxSow=localMaxSowKnForDistance(Number(q.distanceFromStartNm),qPlanningMaxSowKn,beamM,direction);
-      const qPointSowPerm=qDsq==null?null:allowedSowWithDsqMargin(dsqTable,qDsq,qPointMaxSow);
+      const qPointSowPerm=qDsq==null?null:allowedSowWithOperationalMargin(dsqTable,qDsq,qPointMaxSow,grondinesWp55Margin2PctApplies(Number(q.distanceFromStartNm)));
       const qPointDsqSowMax=qDsq==null?null:allowedSow(dsqTable,qDsq,15.0);
       lastPointLevel=qLevel;
       lastPointDsq=qDsq;
@@ -2679,6 +2697,7 @@ const REPORT_POINT_LABELS=new Map([
   ['CIP St-Nicolas','CIP Saint-Nicolas'],
   ['CIP Ste Croix','CIP Sainte-Croix'],
   ['CIP Grondines','CIP Grondines'],
+  ['C20 / C21','Bouée C20-21'],
   ['CIP Batiscan','CIP Batiscan'],
   ['Station Pointe-des-Ormes','Pointe-des-Ormes']
 ]);
