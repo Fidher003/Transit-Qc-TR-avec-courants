@@ -369,7 +369,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
 <div class="max-w-7xl mx-auto p-4 md:p-6">
   <header class="mb-4">
     <h1 class="text-2xl md:text-3xl font-semibold">Transit Québec Trois-Rivières</h1>
-    <div class="lt-muted mt-1">Version légère : les calculs sont faits sur le serveur (moteur <span id="ltEngineVersion">—</span>).</div>
+    <div class="lt-muted mt-1">Version légère : les calculs sont faits sur le serveur (version <span id="ltEngineVersion">—</span>).</div>
   </header>
 
   
@@ -407,10 +407,10 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
           <span class="block text-slate-700 mb-1">Vitesse sur l'eau maximum (kn)</span>
           <input id="maxSowKn" type="number" min="7" max="20" step="0.1" value="12.0" class="w-full border rounded-xl px-3 py-2" />
         </label>
-        <label id="transitDsqMarginWrap" class="text-sm hidden">
-          <span class="block text-slate-700 mb-1">Marge DSQ (m) — routes Montréal</span>
+        <label id="transitDsqMarginWrap" class="text-sm">
+          <span class="block text-slate-700 mb-1">Marge DSQ (m)</span>
           <input id="transitDsqMarginM" type="number" min="0" max="0.50" step="0.01" value="0.05" class="w-full border rounded-xl px-3 py-2" />
-          <span class="block text-xs text-slate-500 mt-1">Ajoutée à l’exigence DSQ (comme en Optimisation). Heure de départ et d’arrivée Montréal : au CIP Section 110.</span>
+          <span class="block text-xs text-slate-500 mt-1">Ajoutée à l’exigence DSQ de chaque point, comme en Optimisation ; non retranchée du tirant. Routes Montréal : heures au CIP Section 110.</span>
         </label>
         <div class="departure-datetime grid grid-cols-2 gap-2">
           <label class="text-sm"><span class="block text-slate-700 mb-1">Date départ</span><input id="depDate" type="date" class="w-full border rounded-xl px-3 py-2" /></label>
@@ -453,8 +453,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
   const persist=()=>save({url:$('ltApiUrl').value.trim(),key:$('ltApiKey').value.trim(),form:Object.fromEntries(FORM_IDS.map(id=>[id,$(id)?.value]))});
   ['ltApiUrl','ltApiKey',...FORM_IDS].forEach(id=>{$(id)?.addEventListener('change',persist);$(id)?.addEventListener('input',persist);});
   // v1.38 : marge DSQ affichée seulement pour les routes Montréal ↔ Pointe-des-Ormes
-  const syncMargin=()=>{const d=$('direction')?.value;$('transitDsqMarginWrap')?.classList.toggle('hidden',!(d==='MTLPOR'||d==='PORMTL'));};
-  $('direction')?.addEventListener('change',syncMargin);syncMargin();
+  // v1.46 : champ « Marge DSQ » affiché pour toutes les routes (0,05 m par défaut, comme l'Optimisation).
   // v1.40 : choix de l'option du recalcul à afficher (les tableaux arrivent préparés du serveur, cachés).
   document.addEventListener('click',ev=>{
     const b=ev.target.closest?.('[data-recalc-view]');if(!b)return;
@@ -496,7 +495,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
   $('ltPostOn')?.addEventListener('change',postUi);
   const postBanner=f=>f?`<div id="ltPostBanner" class="mb-3 rounded-xl border p-3 text-sm" style="outline:2px solid #f59e0b;outline-offset:-2px"><b>Analyse a posteriori</b> — demande du ${fmtStamp(Date.parse(f.requestedAt))} : courants de la prévision <b>${f.run}</b>${f.collectedAt?`, en service depuis le ${fmtStamp(Date.parse(f.collectedAt))}`:''} (heure de Québec).</div>`:'';
   let lastParams=null,busy=false,ops=[];   // ops : recalcul et mises à jour en route, dans l'ordre, rejoués par le serveur
-  function params(){return{direction:$('direction').value,vesselType:$('vesselType').value,draftM:Number($('draftM').value),beamM:Number($('beamM').value),maxSowKn:Number($('maxSowKn').value),depDate:$('depDate').value,depTime:$('depTime').value,...(postOn()?{forecastAt:`${$('ltPostDate').value}T${$('ltPostTime').value}`}:{}),...(($('direction').value==='MTLPOR'||$('direction').value==='PORMTL')&&$('transitDsqMarginM')?{dsqSafetyMarginM:Number($('transitDsqMarginM').value)}:{})};}
+  function params(){return{direction:$('direction').value,vesselType:$('vesselType').value,draftM:Number($('draftM').value),beamM:Number($('beamM').value),maxSowKn:Number($('maxSowKn').value),depDate:$('depDate').value,depTime:$('depTime').value,...(postOn()?{forecastAt:`${$('ltPostDate').value}T${$('ltPostTime').value}`}:{}),...($('transitDsqMarginM')?{dsqSafetyMarginM:Number(String($('transitDsqMarginM').value).replace(',','.'))}:{})};}
   // v1.44 : dernier plan enregistré sur l'appareil (saisie, mises à jour en route, résultat) — rouvert tel quel,
   // puis « Rafraîchir les données » refait le même plan avec les niveaux et courants actuels.
   const PLAN_KEY=KEY+'-plan',PLAN_TTL_MS=24*3600*1000;
@@ -574,7 +573,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
   $('ltResult').addEventListener('change',onRouteEdit);   // v1.43 : sélecteurs d'heure des téléphones
   $('ltCopyLog').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('ltCopyLog').dataset.log||'');setStatus('Journal copié.','ok');}catch(_){setStatus('Impossible de copier.','err');}});
   // vérification de la connexion au chargement
-  api({action:'health'},30000).then(r=>{$('ltConn').textContent=`Serveur joignable — moteur v${r.version}.`;}).catch(e=>{$('ltConn').textContent='Serveur : '+e.message;$('ltSettings').open=true;});
+  api({action:'health'},30000).then(r=>{$('ltConn').textContent=`Serveur joignable — version v${r.version}.`;}).catch(e=>{$('ltConn').textContent='Serveur : '+e.message;$('ltSettings').open=true;});
 })();
 </script>
 <div id="ltToast" class="lt-hidden" role="status" aria-live="polite"></div>
