@@ -373,6 +373,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
   </header>
 
   
+
   <details id="ltSettings" class="mb-4 bg-white rounded-2xl shadow-sm border p-3">
     <summary class="cursor-pointer text-sm font-semibold text-slate-700">Connexion au serveur</summary>
     <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -415,12 +416,22 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
           <label class="text-sm"><span class="block text-slate-700 mb-1">Date départ</span><input id="depDate" type="date" class="w-full border rounded-xl px-3 py-2" /></label>
           <label class="text-sm"><span class="block text-slate-700 mb-1">Heure départ</span><input id="depTime" type="time" step="60" class="w-full border rounded-xl px-3 py-2" /></label>
         </div>
+        <details id="ltPostBox" class="rounded-xl border p-3 text-sm">
+          <summary class="cursor-pointer font-semibold text-slate-700">Analyse a posteriori</summary>
+          <label class="flex items-start gap-2 mt-2"><input id="ltPostOn" type="checkbox" class="mt-1" /><span>Utiliser la prévision de courants qui était en service au moment de la demande</span></label>
+          <div id="ltPostFields" class="grid grid-cols-2 gap-2 mt-2 lt-hidden">
+            <label class="text-sm"><span class="block text-slate-700 mb-1">Date de la demande</span><input id="ltPostDate" type="date" class="w-full border rounded-xl px-3 py-2" /></label>
+            <label class="text-sm"><span class="block text-slate-700 mb-1">Heure de la demande</span><input id="ltPostTime" type="time" step="60" class="w-full border rounded-xl px-3 py-2" /></label>
+          </div>
+          <div class="lt-muted mt-2">Courants : la prévision SHOP archivée qui était en service à ce moment, gardée du départ à l’arrivée. Niveaux d’eau : IWLS pour la période du transit, tels que disponibles au moment du calcul. Heure de Québec.</div>
+        </details>
         <button id="runBtn" class="w-full bg-slate-900 text-white rounded-2xl py-3 font-semibold hover:bg-slate-800">Calculer</button>
         <div id="status" class="text-sm text-slate-700"></div>
         <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden"><div id="progressBar" class="bg-slate-700 h-2" style="width:0%"></div></div>
       </div>
     </section>
     <section class="bg-white rounded-2xl shadow-sm border p-4 lg:col-span-2">
+      <div id="ltSavedStamp" class="mb-3 lt-hidden rounded-xl border p-3 text-sm"></div>
       <div id="ltResult"><div class="text-sm text-slate-500">Entrez les données du transit puis cliquez « Calculer ».</div></div>
       <div class="mt-3 flex flex-wrap gap-2"><button id="ltCopyLog" type="button" class="border rounded-xl px-3 py-2 text-sm lt-hidden">Copier le journal</button></div>
       <div id="ltSource" class="lt-muted mt-2"></div>
@@ -436,12 +447,25 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
   const save=o=>{try{localStorage.setItem(KEY,JSON.stringify(o));}catch(_){}};
   const st=load();
   $('ltApiUrl').value=st.url||DEFAULT_URL;$('ltApiKey').value=st.key||'';
-  for(const id of ['direction','vesselType','draftM','beamM','maxSowKn'])if(st.form?.[id]!=null&&$(id))$(id).value=st.form[id];
-  const persist=()=>save({url:$('ltApiUrl').value.trim(),key:$('ltApiKey').value.trim(),form:Object.fromEntries(['direction','vesselType','draftM','beamM','maxSowKn'].map(id=>[id,$(id)?.value]))});
-  ['ltApiUrl','ltApiKey','direction','vesselType','draftM','beamM','maxSowKn'].forEach(id=>$(id)?.addEventListener('change',persist));
+  // v1.44 : les saisies restent enregistrées sur l'appareil (navire, vitesse, heure, marge) d'une ouverture à l'autre.
+  const FORM_IDS=['direction','vesselType','draftM','beamM','maxSowKn','depTime','transitDsqMarginM'];
+  for(const id of FORM_IDS)if(st.form?.[id]!=null&&$(id))$(id).value=st.form[id];
+  const persist=()=>save({url:$('ltApiUrl').value.trim(),key:$('ltApiKey').value.trim(),form:Object.fromEntries(FORM_IDS.map(id=>[id,$(id)?.value]))});
+  ['ltApiUrl','ltApiKey',...FORM_IDS].forEach(id=>{$(id)?.addEventListener('change',persist);$(id)?.addEventListener('input',persist);});
   // v1.38 : marge DSQ affichée seulement pour les routes Montréal ↔ Pointe-des-Ormes
   const syncMargin=()=>{const d=$('direction')?.value;$('transitDsqMarginWrap')?.classList.toggle('hidden',!(d==='MTLPOR'||d==='PORMTL'));};
   $('direction')?.addEventListener('change',syncMargin);syncMargin();
+  // v1.40 : choix de l'option du recalcul à afficher (les tableaux arrivent préparés du serveur, cachés).
+  document.addEventListener('click',ev=>{
+    const b=ev.target.closest?.('[data-recalc-view]');if(!b)return;
+    const key=b.dataset.recalcView,box=b.closest('#recalcViewChooser');if(!box)return;
+    box.querySelectorAll('[data-recalc-view]').forEach(x=>{const on=x===b;x.setAttribute('aria-pressed',on?'true':'false');x.classList.toggle('bg-slate-900',on);x.classList.toggle('text-white',on);});
+    for(const base of ['recalcReportTbody','recalcTbody']){
+      const main=document.getElementById(base);if(!main)continue;main.classList.toggle('hidden',key!=='proposed');
+      for(const k of ['normal','q50'])document.getElementById(base+'__'+k)?.classList.toggle('hidden',k!==key);
+    }
+    const cap=document.getElementById('recalcViewCaption');if(cap){const html=cap.getAttribute('data-caption-'+key);if(html){const t=document.createElement('textarea');t.innerHTML=html;cap.innerHTML=t.value;}}
+  });
   // date et heure de Québec par défaut
   try{const f=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date()),g=t=>f.find(p=>p.type===t)?.value;
     if(!$('depDate').value)$('depDate').value=`${g('year')}-${g('month')}-${g('day')}`;if(!$('depTime').value)$('depTime').value=`${g('hour')==='24'?'00':g('hour')}:${g('minute')}`;}catch(_){}
@@ -457,41 +481,85 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
     if(j.version)$('ltEngineVersion').textContent='v'+j.version;
     return j.result;
   }
-  function setStatus(msg,kind){const n=$('status');if(!n)return;n.innerHTML=msg;n.className='text-sm '+(kind==='err'?'text-red-700':kind==='ok'?'text-emerald-700':'text-slate-700');}
+  let toastTimer=null;
+  function setStatus(msg,kind){const n=$('status');if(n){n.innerHTML=msg;n.className='text-sm '+(kind==='err'?'text-red-700':kind==='ok'?'text-emerald-700':'text-slate-700');}
+    // v1.43 : sur téléphone, le même message s'affiche aussi en bas de l'écran (bandeau), visible depuis le tableau.
+    const t=$('ltToast');if(!t||!window.matchMedia('(max-width: 900px)').matches)return;
+    t.innerHTML=msg;t.dataset.kind=kind||'info';t.classList.remove('lt-hidden');clearTimeout(toastTimer);
+    if(!/lt-spin/.test(String(msg)))toastTimer=setTimeout(()=>t.classList.add('lt-hidden'),kind==='err'?12000:5000);}
   function setBar(p){const b=$('progressBar');if(b)b.style.width=p+'%';}
+  // v1.45 : analyse a posteriori (prévision de courants en service à l'heure de la demande ; non mémorisée hors du plan enregistré).
+  const postOn=()=>!!$('ltPostOn')?.checked;
+  function postUi(){const on=postOn();$('ltPostFields')?.classList.toggle('lt-hidden',!on);{const bx=$('ltPostBox');if(bx){bx.style.outline=on?'2px solid #f59e0b':'';bx.style.outlineOffset=on?'-2px':'';}}
+    if(on){if(!$('ltPostDate').value)$('ltPostDate').value=$('depDate').value;if(!$('ltPostTime').value)$('ltPostTime').value=$('depTime').value;$('ltPostBox').open=true;}
+    const b=$('runBtn');if(b&&!busy)b.textContent=on?'Calculer — analyse a posteriori':'Calculer';}
+  $('ltPostOn')?.addEventListener('change',postUi);
+  const postBanner=f=>f?`<div id="ltPostBanner" class="mb-3 rounded-xl border p-3 text-sm" style="outline:2px solid #f59e0b;outline-offset:-2px"><b>Analyse a posteriori</b> — demande du ${fmtStamp(Date.parse(f.requestedAt))} : courants de la prévision <b>${f.run}</b>${f.collectedAt?`, en service depuis le ${fmtStamp(Date.parse(f.collectedAt))}`:''} (heure de Québec).</div>`:'';
   let lastParams=null,busy=false,ops=[];   // ops : recalcul et mises à jour en route, dans l'ordre, rejoués par le serveur
-  function params(){return{direction:$('direction').value,vesselType:$('vesselType').value,draftM:Number($('draftM').value),beamM:Number($('beamM').value),maxSowKn:Number($('maxSowKn').value),depDate:$('depDate').value,depTime:$('depTime').value,...(($('direction').value==='MTLPOR'||$('direction').value==='PORMTL')&&$('transitDsqMarginM')?{dsqSafetyMarginM:Number($('transitDsqMarginM').value)}:{})};}
+  function params(){return{direction:$('direction').value,vesselType:$('vesselType').value,draftM:Number($('draftM').value),beamM:Number($('beamM').value),maxSowKn:Number($('maxSowKn').value),depDate:$('depDate').value,depTime:$('depTime').value,...(postOn()?{forecastAt:`${$('ltPostDate').value}T${$('ltPostTime').value}`}:{}),...(($('direction').value==='MTLPOR'||$('direction').value==='PORMTL')&&$('transitDsqMarginM')?{dsqSafetyMarginM:Number($('transitDsqMarginM').value)}:{})};}
+  // v1.44 : dernier plan enregistré sur l'appareil (saisie, mises à jour en route, résultat) — rouvert tel quel,
+  // puis « Rafraîchir les données » refait le même plan avec les niveaux et courants actuels.
+  const PLAN_KEY=KEY+'-plan',PLAN_TTL_MS=24*3600*1000;
+  const fmtStamp=ms=>{try{return new Intl.DateTimeFormat('fr-CA',{timeZone:'America/Toronto',dateStyle:'medium',timeStyle:'short'}).format(new Date(ms));}catch(_){return new Date(ms).toLocaleString();}};
+  function savePlan(r){try{localStorage.setItem(PLAN_KEY,JSON.stringify({savedAt:Date.now(),params:lastParams,ops,html:r.html||'',source:$('ltSource').textContent,log:r.log||'',status:r.status||''}));}catch(_){/* stockage indisponible : aucun effet sur le calcul */}}
+  function showStamp(savedAt,restored){const n=$('ltSavedStamp');if(!n)return;
+    n.innerHTML=`<div>${restored?'Plan enregistré':'Calcul effectué'} le <b>${fmtStamp(savedAt)}</b>${restored?' — résultat rouvert tel qu’enregistré (niveaux et courants de ce moment-là).':'.'}</div>`+
+      `<button id="ltRefreshBtn" type="button" class="mt-2 rounded-xl px-4 py-2 text-sm font-semibold bg-slate-900 text-white">Rafraîchir les données</button>`+
+      `<div class="lt-muted mt-1">${lastParams?.forecastAt?'Refait le même plan (mêmes saisies, mises à jour en route et prévision archivée).':'Refait le même plan (mêmes saisies et mises à jour en route) avec les niveaux et courants les plus récents.'}</div>`;
+    n.classList.remove('lt-hidden');}
+  function restorePlan(){let pl=null;try{pl=JSON.parse(localStorage.getItem(PLAN_KEY)||'null');}catch(_){}
+    if(!pl||!pl.params||!pl.html)return;
+    const age=Date.now()-Number(pl.savedAt);if(!(age>=0&&age<=PLAN_TTL_MS)){try{localStorage.removeItem(PLAN_KEY);}catch(_){}return;}
+    const p=pl.params;
+    if($('ltPostOn')){const fa=/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})$/.exec(String(p.forecastAt||''));$('ltPostOn').checked=!!fa;if(fa){$('ltPostDate').value=fa[1];$('ltPostTime').value=fa[2];}postUi();}
+    for(const [id,v] of Object.entries({direction:p.direction,vesselType:p.vesselType,draftM:p.draftM,beamM:p.beamM,maxSowKn:p.maxSowKn,depDate:p.depDate,depTime:p.depTime,transitDsqMarginM:p.dsqSafetyMarginM}))if(v!=null&&$(id))$(id).value=String(v);
+    $('direction')?.dispatchEvent(new Event('change'));
+    lastParams=p;ops=Array.isArray(pl.ops)?pl.ops:[];
+    $('ltResult').innerHTML=pl.html;$('ltSource').textContent=pl.source||'';
+    $('ltCopyLog').classList.toggle('lt-hidden',!pl.log);$('ltCopyLog').dataset.log=pl.log||'';
+    showStamp(pl.savedAt,true);}
   async function run(op){
     if(busy)return;busy=true;const btn=$('runBtn');btn.disabled=true;
-    if(!op){ops=[];lastParams=params();}else ops.push(op);
+    const refresh=op&&op.type==='refresh';if(refresh)op=null;
+    if(!op&&!refresh){ops=[];lastParams=params();}else if(op)ops.push(op);
     const p=lastParams||params();lastParams=p;
-    const label=!op?'Calcul':op.type==='recalc'?'Recalcul':'Actualisation';
+    const label=refresh?'Rafraîchissement':!op?'Calcul':op.type==='recalc'?'Recalcul':'Actualisation';
     const t0=Date.now(),tick=setInterval(()=>setStatus(`<span class="lt-spin"></span>${label} sur le serveur… ${Math.round((Date.now()-t0)/1000)} s`),500);
     setBar(15);
     try{
       const r=await api({action:'transit',ops,params:p});
       if(r.opError){ops.pop();}
+      r.html=postBanner(r.forecast)+(r.html||'');
       $('ltResult').innerHTML=r.html||'<div class="text-sm">Aucun résultat.</div>';
       $('ltSource').textContent=(r.currents||'')+` · calcul ${Math.round((Date.now()-t0)/1000)} s`;
       $('ltCopyLog').classList.toggle('lt-hidden',!r.log);$('ltCopyLog').dataset.log=r.log||'';
       // le résultat serveur contient le bouton « Recalculer » : il relance le calcul avec recalcul
       const rb=$('ltResult').querySelector('#recalcBtn');if(rb){rb.disabled=false;}
-      if(r.opError)setStatus(r.opError,'err');
+      // v1.43 : après un recalcul, amener le nouveau plan à l'écran (sur téléphone, il est loin sous le plan initial).
+      if(op&&op.type==='recalc'&&!r.opError){const sec=$('ltResult').querySelector('#recalcSection');if(sec&&!sec.classList.contains('hidden'))try{sec.scrollIntoView({behavior:'smooth',block:'start'});}catch(_){}}
+      if(r.opError){setStatus(r.opError,'err');
+        if(op&&op.type==='update'){const row=$(op.table)?.querySelector(`tr.result-row[data-point-index="${op.pointIndex}"]`),cell=row?.querySelector('button[data-route-update="apply"]')?.parentElement;
+          if(cell){const d=document.createElement('div');d.className='text-xs text-red-700 mt-1';d.textContent=r.opError;cell.append(d);}}}
       else setStatus(r.status||'Calcul terminé.',/interrompu|impossible|erreur|aucun/i.test(r.status||'')?'err':'ok');setBar(100);
+      savePlan(r);showStamp(Date.now(),false);
     }catch(e){if(op)ops.pop();setStatus(String(e.message||e),'err');setBar(0);}
-    finally{clearInterval(tick);busy=false;btn.disabled=false;}
+    finally{clearInterval(tick);busy=false;btn.disabled=false;postUi();}
   }
   $('runBtn').addEventListener('click',()=>run(null));
+  $('ltSavedStamp')?.addEventListener('click',ev=>{if(ev.target.closest('#ltRefreshBtn')){ev.preventDefault();run({type:'refresh'});}});
+  restorePlan();
   // Bouton « Recalculer » et « Actualiser la suite » (mise à jour en route) dans le résultat renvoyé par le serveur.
   $('ltResult').addEventListener('click',ev=>{
-    if(ev.target.closest('#recalcBtn')){ev.preventDefault();run({type:'recalc'});return;}
+    if(ev.target.closest('#recalcBtn')){ev.preventDefault();if(busy)return;const rb=ev.target.closest('#recalcBtn');rb.disabled=true;rb.innerHTML='<span class="lt-spin"></span>Recalcul…';run({type:'recalc'});return;}
     const b=ev.target.closest('button[data-route-update="apply"]');if(!b)return;ev.preventDefault();
+    if(busy)return;
     const tr=b.closest('tr.result-row'),tb=b.closest('tbody');if(!tr||!tb)return;
     const ti=tr.querySelector('.route-update-time'),sp=tr.querySelector('.route-update-speed');
-    run({type:'update',table:tb.id,pointIndex:tr.dataset.pointIndex,time:ti?ti.value:null,speed:sp?Number(sp.value):null});
+    b.disabled=true;b.innerHTML='<span class="lt-spin"></span>Actualisation…';   // v1.43 : réaction immédiate au toucher
+    run({type:'update',table:tb.id,pointIndex:tr.dataset.pointIndex,time:ti?String(ti.value||'').slice(0,5):null,speed:sp?Number(sp.value):null});
   });
   // Affiche le bouton « Actualiser la suite » dès qu'une heure ou une vitesse est modifiée (même règle que la page complète).
-  $('ltResult').addEventListener('input',ev=>{
+  const onRouteEdit=ev=>{
     if(!ev.target.matches('.route-update-time,.route-update-speed'))return;
     const tr=ev.target.closest('tr.result-row');if(!tr)return;
     const t=tr.querySelector('.route-update-time'),s=tr.querySelector('.route-update-speed');
@@ -501,11 +569,15 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
     const dirty=td||sd;
     tr.querySelector('[data-route-update-pending="yes"]')?.classList.toggle('hidden',!dirty);
     const btn=tr.querySelector('button[data-route-update="apply"]');if(btn){btn.classList.toggle('hidden',!dirty);btn.classList.toggle('route-update-dirty',dirty);btn.disabled=false;}
-  });
+  };
+  $('ltResult').addEventListener('input',onRouteEdit);
+  $('ltResult').addEventListener('change',onRouteEdit);   // v1.43 : sélecteurs d'heure des téléphones
   $('ltCopyLog').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('ltCopyLog').dataset.log||'');setStatus('Journal copié.','ok');}catch(_){setStatus('Impossible de copier.','err');}});
   // vérification de la connexion au chargement
   api({action:'health'},30000).then(r=>{$('ltConn').textContent=`Serveur joignable — moteur v${r.version}.`;}).catch(e=>{$('ltConn').textContent='Serveur : '+e.message;$('ltSettings').open=true;});
 })();
 </script>
+<div id="ltToast" class="lt-hidden" role="status" aria-live="polite"></div>
+<style>#ltToast{position:fixed;left:12px;right:12px;bottom:12px;z-index:70;padding:10px 14px;border-radius:12px;background:#0f2a44;color:#e2e8f0;font:600 14px system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.35)}#ltToast[data-kind="err"]{background:#7f1d1d;color:#fff}#ltToast[data-kind="ok"]{background:#14532d;color:#fff}#ltToast.lt-hidden{display:none}</style>
 </body>
 </html>
