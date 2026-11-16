@@ -531,6 +531,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
       r.html=postBanner(r.forecast)+(r.html||'');
       $('ltResult').innerHTML=r.html||'<div class="text-sm">Aucun résultat.</div>';
       $('ltSource').textContent=(r.currents||'')+` · calcul ${Math.round((Date.now()-t0)/1000)} s`;
+      {const sec=/SECOURS/.test(r.currents||'');$('ltSource').style.color=sec?'#f59e0b':'';$('ltSource').style.fontWeight=sec?'700':'';}   // v1.48 : source de secours bien visible
       $('ltCopyLog').classList.toggle('lt-hidden',!r.log);$('ltCopyLog').dataset.log=r.log||'';
       // le résultat serveur contient le bouton « Recalculer » : il relance le calcul avec recalcul
       const rb=$('ltResult').querySelector('#recalcBtn');if(rb){rb.disabled=false;}
