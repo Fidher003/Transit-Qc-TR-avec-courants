@@ -407,10 +407,15 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
           <span class="block text-slate-700 mb-1">Vitesse sur l'eau maximum (kn)</span>
           <input id="maxSowKn" type="number" min="7" max="20" step="0.1" value="12.0" class="w-full border rounded-xl px-3 py-2" />
         </label>
+        <label id="transitTimeMarginWrap" class="text-sm">
+          <span class="block text-slate-700 mb-1">Marge de temps (min)</span>
+          <input id="transitTimeMarginMin" type="number" min="0" max="120" step="1" value="20" class="w-full border rounded-xl px-3 py-2" />
+          <span class="block text-xs text-slate-500 mt-1">Le niveau doit suffire (table à 7 kn) ce nombre de minutes avant et après chaque passage, de Québec à Port-Saint-François. En amont (Lac Saint-Pierre à Montréal) : 4 h centrées sur le passage. Sortie de la Québec 50 : marge de 10 cm, sans marge de temps.</span>
+        </label>
         <label id="transitDsqMarginWrap" class="text-sm">
           <span class="block text-slate-700 mb-1">Marge DSQ (m)</span>
-          <input id="transitDsqMarginM" type="number" min="0" max="0.50" step="0.01" value="0.05" class="w-full border rounded-xl px-3 py-2" />
-          <span class="block text-xs text-slate-500 mt-1">Ajoutée à l’exigence DSQ de chaque point, comme en Optimisation ; non retranchée du tirant. Routes Montréal : heures au CIP Section 110.</span>
+          <input id="transitDsqMarginM" type="number" min="0" max="0.50" step="0.01" value="0" class="w-full border rounded-xl px-3 py-2" />
+          <span class="block text-xs text-slate-500 mt-1">Ajoutée à l’exigence DSQ de chaque point, comme en Optimisation ; non retranchée du tirant. 0 par défaut (la marge de temps la remplace). Routes Montréal : heures au CIP Section 110.</span>
         </label>
         <div class="departure-datetime grid grid-cols-2 gap-2">
           <label class="text-sm"><span class="block text-slate-700 mb-1">Date départ</span><input id="depDate" type="date" class="w-full border rounded-xl px-3 py-2" /></label>
@@ -448,9 +453,11 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
   const st=load();
   $('ltApiUrl').value=st.url||DEFAULT_URL;$('ltApiKey').value=st.key||'';
   // v1.44 : les saisies restent enregistrées sur l'appareil (navire, vitesse, heure, marge) d'une ouverture à l'autre.
-  const FORM_IDS=['direction','vesselType','draftM','beamM','maxSowKn','depTime','transitDsqMarginM'];
-  for(const id of FORM_IDS)if(st.form?.[id]!=null&&$(id))$(id).value=st.form[id];
-  const persist=()=>save({url:$('ltApiUrl').value.trim(),key:$('ltApiKey').value.trim(),form:Object.fromEntries(FORM_IDS.map(id=>[id,$(id)?.value]))});
+  const FORM_IDS=['direction','vesselType','draftM','beamM','maxSowKn','depTime','transitDsqMarginM','transitTimeMarginMin'];   // v1.49 : marge de temps aussi
+  // v1.49 : la marge DSQ passe à 0 par défaut (la marge de temps la remplace) ; l'ancien défaut 0,05 m enregistré avant la v1.49 n'est pas repris.
+  const oldDefault=!st.memV&&Math.abs(Number(String(st.form?.transitDsqMarginM).replace(',','.'))-0.05)<1e-9;
+  for(const id of FORM_IDS)if(st.form?.[id]!=null&&$(id)&&!(id==='transitDsqMarginM'&&oldDefault))$(id).value=st.form[id];
+  const persist=()=>save({memV:'1.49',url:$('ltApiUrl').value.trim(),key:$('ltApiKey').value.trim(),form:Object.fromEntries(FORM_IDS.map(id=>[id,$(id)?.value]))});
   ['ltApiUrl','ltApiKey',...FORM_IDS].forEach(id=>{$(id)?.addEventListener('change',persist);$(id)?.addEventListener('input',persist);});
   // v1.38 : marge DSQ affichée seulement pour les routes Montréal ↔ Pointe-des-Ormes
   // v1.46 : champ « Marge DSQ » affiché pour toutes les routes (0,05 m par défaut, comme l'Optimisation).
@@ -495,7 +502,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
   $('ltPostOn')?.addEventListener('change',postUi);
   const postBanner=f=>f?`<div id="ltPostBanner" class="mb-3 rounded-xl border p-3 text-sm" style="outline:2px solid #f59e0b;outline-offset:-2px"><b>Analyse a posteriori</b> — demande du ${fmtStamp(Date.parse(f.requestedAt))} : courants de la prévision <b>${f.run}</b>${f.collectedAt?`, en service depuis le ${fmtStamp(Date.parse(f.collectedAt))}`:''} (heure de Québec).</div>`:'';
   let lastParams=null,busy=false,ops=[];   // ops : recalcul et mises à jour en route, dans l'ordre, rejoués par le serveur
-  function params(){return{direction:$('direction').value,vesselType:$('vesselType').value,draftM:Number($('draftM').value),beamM:Number($('beamM').value),maxSowKn:Number($('maxSowKn').value),depDate:$('depDate').value,depTime:$('depTime').value,...(postOn()?{forecastAt:`${$('ltPostDate').value}T${$('ltPostTime').value}`}:{}),...($('transitDsqMarginM')?{dsqSafetyMarginM:Number(String($('transitDsqMarginM').value).replace(',','.'))}:{})};}
+  function params(){return{direction:$('direction').value,vesselType:$('vesselType').value,draftM:Number($('draftM').value),beamM:Number($('beamM').value),maxSowKn:Number($('maxSowKn').value),depDate:$('depDate').value,depTime:$('depTime').value,...(postOn()?{forecastAt:`${$('ltPostDate').value}T${$('ltPostTime').value}`}:{}),...($('transitDsqMarginM')?{dsqSafetyMarginM:Number(String($('transitDsqMarginM').value).replace(',','.'))}:{}),...($('transitTimeMarginMin')?{timeMarginMin:Number(String($('transitTimeMarginMin').value).replace(',','.'))}:{})};}
   // v1.44 : dernier plan enregistré sur l'appareil (saisie, mises à jour en route, résultat) — rouvert tel quel,
   // puis « Rafraîchir les données » refait le même plan avec les niveaux et courants actuels.
   const PLAN_KEY=KEY+'-plan',PLAN_TTL_MS=24*3600*1000;
@@ -511,7 +518,7 @@ button,[role=button]{cursor:pointer}:disabled{cursor:default}img,svg,video,canva
     const age=Date.now()-Number(pl.savedAt);if(!(age>=0&&age<=PLAN_TTL_MS)){try{localStorage.removeItem(PLAN_KEY);}catch(_){}return;}
     const p=pl.params;
     if($('ltPostOn')){const fa=/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})$/.exec(String(p.forecastAt||''));$('ltPostOn').checked=!!fa;if(fa){$('ltPostDate').value=fa[1];$('ltPostTime').value=fa[2];}postUi();}
-    for(const [id,v] of Object.entries({direction:p.direction,vesselType:p.vesselType,draftM:p.draftM,beamM:p.beamM,maxSowKn:p.maxSowKn,depDate:p.depDate,depTime:p.depTime,transitDsqMarginM:p.dsqSafetyMarginM}))if(v!=null&&$(id))$(id).value=String(v);
+    for(const [id,v] of Object.entries({direction:p.direction,vesselType:p.vesselType,draftM:p.draftM,beamM:p.beamM,maxSowKn:p.maxSowKn,depDate:p.depDate,depTime:p.depTime,transitDsqMarginM:p.dsqSafetyMarginM,transitTimeMarginMin:p.timeMarginMin}))if(v!=null&&$(id))$(id).value=String(v);
     $('direction')?.dispatchEvent(new Event('change'));
     lastParams=p;ops=Array.isArray(pl.ops)?pl.ops:[];
     $('ltResult').innerHTML=pl.html;$('ltSource').textContent=pl.source||'';
